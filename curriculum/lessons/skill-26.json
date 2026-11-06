@@ -1,0 +1,15 @@
+{
+  "skill": 26,
+  "summary": "LEFT JOIN keeps every row from the left table, even when nothing matches on the right.",
+  "points": [
+    "The table after FROM is the left table, and the table after LEFT JOIN is the right.",
+    "When nothing matches, the right table's columns are NULL.",
+    "To count matches, use COUNT(right_column), not COUNT(*), so unmatched rows count as 0.",
+    "Choose the left table by asking which rows must all appear."
+  ],
+  "example": {
+    "dataset": "shop",
+    "sql": "SELECT c.name, COUNT(o.id) AS orders\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id\nGROUP BY c.id, c.name;",
+    "explanation": "Noor stays in the result with 0 orders, which an inner join would have lost."
+  }
+}

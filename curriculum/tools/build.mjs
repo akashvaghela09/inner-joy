@@ -32,6 +32,9 @@ const datasets = new Map(
 const altFor = new Map(authoredDatasets.map((dataset) => [dataset.id, dataset.alt]));
 altFor.set("bookshop", "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);");
 
+altFor.set("cafe", "DELETE FROM orders; DELETE FROM customers; INSERT INTO customers VALUES (5, 'Lena'), (6, 'Omar'), (8, 'Zuri'); INSERT INTO orders VALUES (9, 6, 'Mocha', 5.0), (10, 9, 'Toast', 2.5), (11, 6, 'Bun', 1.5);");
+altFor.set("trail-club", "DELETE FROM trails; INSERT INTO trails VALUES (7, 'Birch Walk', 'West', 3.1, 40), (8, 'High Moor', 'East', 12.6, 610), (9, 'Crag Top', 'North', 6.0, 900);");
+
 function regexp(pattern, value) {
   return value !== null && new RegExp(pattern).test(String(value)) ? 1 : 0;
 }

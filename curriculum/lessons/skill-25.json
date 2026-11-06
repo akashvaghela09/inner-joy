@@ -1,0 +1,15 @@
+{
+  "skill": 25,
+  "summary": "INNER JOIN combines rows from two tables wherever a condition matches.",
+  "points": [
+    "FROM a JOIN b ON a.key = b.other_key is the usual form. JOIN means INNER JOIN.",
+    "Rows with no match on either side are left out.",
+    "Short aliases keep queries readable: FROM orders o JOIN customers c.",
+    "Prefix column names with the table when both tables have a column of that name."
+  ],
+  "example": {
+    "dataset": "shop",
+    "sql": "SELECT o.id, c.name, o.order_date\nFROM orders o\nJOIN customers c ON c.id = o.customer_id;",
+    "explanation": "Each order finds its customer through customer_id. Noor has no orders, so she doesn't appear."
+  }
+}

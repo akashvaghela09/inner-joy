@@ -1,0 +1,15 @@
+{
+  "skill": 27,
+  "summary": "With a LEFT JOIN, where you put a condition changes the result.",
+  "points": [
+    "A condition in ON decides which right rows match, and left rows all stay.",
+    "A condition in WHERE runs after the join and removes rows, including unmatched ones.",
+    "WHERE right.column = value removes NULL rows, turning a left join into an inner join.",
+    "To filter the right table and keep every left row, put the condition in ON."
+  ],
+  "example": {
+    "dataset": "shop",
+    "sql": "SELECT c.name, o.id AS shipped_order\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id AND o.status = 'shipped';",
+    "explanation": "Every customer stays. Customers without a shipped order show NULL, including those with only other statuses."
+  }
+}

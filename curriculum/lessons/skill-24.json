@@ -1,0 +1,15 @@
+{
+  "skill": 24,
+  "summary": "Before joining tables, know how they relate and what one row means. This is called the grain, and it prevents most join mistakes.",
+  "points": [
+    "One-to-many means one row here links to many rows there: one customer has many orders.",
+    "The foreign key lives on the many side: orders stores customer_id.",
+    "The grain is what one row represents: one row of order_items is one product in one order.",
+    "To check a relationship, group by the key and count rows per value."
+  ],
+  "example": {
+    "dataset": "shop",
+    "sql": "SELECT customer_id, COUNT(*) AS orders\nFROM orders\nGROUP BY customer_id;",
+    "explanation": "Some customers have several orders, which shows that customers to orders is one-to-many."
+  }
+}

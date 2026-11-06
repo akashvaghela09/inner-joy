@@ -1,0 +1,15 @@
+{
+  "skill": 28,
+  "summary": "An anti-join finds rows with no match, such as customers who have never ordered.",
+  "points": [
+    "LEFT JOIN the other table, then keep rows where its key IS NULL.",
+    "Test the right table's key, because a key can't be NULL in a real match.",
+    "Check the direction: which table's rows do you want?",
+    "The same pattern finds broken links, such as orders pointing to deleted customers."
+  ],
+  "example": {
+    "dataset": "shop",
+    "sql": "SELECT c.name\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id\nWHERE o.id IS NULL;",
+    "explanation": "Only customers with no matching order have a NULL order id."
+  }
+}

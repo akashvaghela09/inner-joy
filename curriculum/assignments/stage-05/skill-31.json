@@ -1,0 +1,1085 @@
+[
+  {
+    "id": "s31-01",
+    "skill": 31,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Every pairing",
+    "prompt": "Show every student's name with every course title. Replace the ___.",
+    "dataset": "school",
+    "starterSql": "SELECT s.name, c.title\nFROM students s\n___ JOIN courses c;",
+    "hints": [
+      "CROSS JOIN needs no condition."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "title"
+          ],
+          "rows": [
+            [
+              "Anya",
+              "Algebra"
+            ],
+            [
+              "Anya",
+              "Geometry"
+            ],
+            [
+              "Anya",
+              "Biology"
+            ],
+            [
+              "Anya",
+              "Poetry"
+            ],
+            [
+              "Bilal",
+              "Algebra"
+            ],
+            [
+              "Bilal",
+              "Geometry"
+            ],
+            [
+              "Bilal",
+              "Biology"
+            ],
+            [
+              "Bilal",
+              "Poetry"
+            ],
+            [
+              "Cara",
+              "Algebra"
+            ],
+            [
+              "Cara",
+              "Geometry"
+            ],
+            [
+              "Cara",
+              "Biology"
+            ],
+            [
+              "Cara",
+              "Poetry"
+            ],
+            [
+              "Dmitri",
+              "Algebra"
+            ],
+            [
+              "Dmitri",
+              "Geometry"
+            ],
+            [
+              "Dmitri",
+              "Biology"
+            ],
+            [
+              "Dmitri",
+              "Poetry"
+            ],
+            [
+              "Esi",
+              "Algebra"
+            ],
+            [
+              "Esi",
+              "Geometry"
+            ],
+            [
+              "Esi",
+              "Biology"
+            ],
+            [
+              "Esi",
+              "Poetry"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "name",
+            "title"
+          ],
+          "rows": [
+            [
+              "Femi",
+              "Chemistry"
+            ],
+            [
+              "Femi",
+              "Drama"
+            ],
+            [
+              "Gia",
+              "Chemistry"
+            ],
+            [
+              "Gia",
+              "Drama"
+            ],
+            [
+              "Hao",
+              "Chemistry"
+            ],
+            [
+              "Hao",
+              "Drama"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT s.name, c.title FROM students s CROSS JOIN courses c;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT s.name, c.title FROM students s JOIN courses c ON c.id = s.id;",
+        "why": "Pairs by matching ids only"
+      },
+      {
+        "sql": "SELECT s.name FROM students s;",
+        "why": "Leaves out courses"
+      }
+    ]
+  },
+  {
+    "id": "s31-02",
+    "skill": 31,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      18
+    ],
+    "title": "Grid size",
+    "prompt": "Show how many rows a cross join of customers and products gives, as grid_rows.",
+    "dataset": "shop",
+    "hints": [
+      "It's the two counts multiplied."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "grid_rows"
+          ],
+          "rows": [
+            [
+              30
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "grid_rows"
+          ],
+          "rows": [
+            [
+              9
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT COUNT(*) AS grid_rows FROM customers CROSS JOIN products;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT COUNT(*) AS grid_rows FROM customers;",
+        "why": "Counts customers only"
+      },
+      {
+        "sql": "SELECT COUNT(*) AS grid_rows FROM customers c JOIN orders o ON o.customer_id = c.id;",
+        "why": "A different join"
+      }
+    ]
+  },
+  {
+    "id": "s31-03",
+    "skill": 31,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [],
+    "title": "Every customer and status",
+    "prompt": "Show every customer's name with every different order status, as status.",
+    "dataset": "shop",
+    "hints": [
+      "Cross join with a DISTINCT subquery."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "status"
+          ],
+          "rows": [
+            [
+              "Priya",
+              "shipped"
+            ],
+            [
+              "Priya",
+              "cancelled"
+            ],
+            [
+              "Priya",
+              "pending"
+            ],
+            [
+              "Marco",
+              "shipped"
+            ],
+            [
+              "Marco",
+              "cancelled"
+            ],
+            [
+              "Marco",
+              "pending"
+            ],
+            [
+              "Hana",
+              "shipped"
+            ],
+            [
+              "Hana",
+              "cancelled"
+            ],
+            [
+              "Hana",
+              "pending"
+            ],
+            [
+              "Luis",
+              "shipped"
+            ],
+            [
+              "Luis",
+              "cancelled"
+            ],
+            [
+              "Luis",
+              "pending"
+            ],
+            [
+              "Noor",
+              "shipped"
+            ],
+            [
+              "Noor",
+              "cancelled"
+            ],
+            [
+              "Noor",
+              "pending"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO orders VALUES (14, 7, '2024-04-01', 'returned');",
+        "expected": {
+          "columns": [
+            "name",
+            "status"
+          ],
+          "rows": [
+            [
+              "Ravi",
+              "shipped"
+            ],
+            [
+              "Ravi",
+              "pending"
+            ],
+            [
+              "Ravi",
+              "cancelled"
+            ],
+            [
+              "Ravi",
+              "returned"
+            ],
+            [
+              "Sara",
+              "shipped"
+            ],
+            [
+              "Sara",
+              "pending"
+            ],
+            [
+              "Sara",
+              "cancelled"
+            ],
+            [
+              "Sara",
+              "returned"
+            ],
+            [
+              "Tom",
+              "shipped"
+            ],
+            [
+              "Tom",
+              "pending"
+            ],
+            [
+              "Tom",
+              "cancelled"
+            ],
+            [
+              "Tom",
+              "returned"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name, s.status FROM customers c CROSS JOIN (SELECT DISTINCT status FROM orders) s;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name, o.status FROM customers c JOIN orders o ON o.customer_id = c.id;",
+        "why": "Shows only real orders"
+      },
+      {
+        "sql": "SELECT c.name, s.status FROM customers c CROSS JOIN orders s;",
+        "why": "Repeats statuses"
+      }
+    ]
+  },
+  {
+    "id": "s31-04",
+    "skill": 31,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      26,
+      18
+    ],
+    "title": "Attempts per pair",
+    "prompt": "For every student and course, show the student's name, the course title, and how many times they enrolled, as attempts. Pairs with none show 0.",
+    "dataset": "school",
+    "hints": [
+      "Cross join, then LEFT JOIN enrolments."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "title",
+            "attempts"
+          ],
+          "rows": [
+            [
+              "Anya",
+              "Algebra",
+              1
+            ],
+            [
+              "Anya",
+              "Geometry",
+              0
+            ],
+            [
+              "Anya",
+              "Biology",
+              1
+            ],
+            [
+              "Anya",
+              "Poetry",
+              0
+            ],
+            [
+              "Bilal",
+              "Algebra",
+              2
+            ],
+            [
+              "Bilal",
+              "Geometry",
+              0
+            ],
+            [
+              "Bilal",
+              "Biology",
+              0
+            ],
+            [
+              "Bilal",
+              "Poetry",
+              0
+            ],
+            [
+              "Cara",
+              "Algebra",
+              0
+            ],
+            [
+              "Cara",
+              "Geometry",
+              1
+            ],
+            [
+              "Cara",
+              "Biology",
+              1
+            ],
+            [
+              "Cara",
+              "Poetry",
+              0
+            ],
+            [
+              "Dmitri",
+              "Algebra",
+              1
+            ],
+            [
+              "Dmitri",
+              "Geometry",
+              1
+            ],
+            [
+              "Dmitri",
+              "Biology",
+              1
+            ],
+            [
+              "Dmitri",
+              "Poetry",
+              0
+            ],
+            [
+              "Esi",
+              "Algebra",
+              0
+            ],
+            [
+              "Esi",
+              "Geometry",
+              0
+            ],
+            [
+              "Esi",
+              "Biology",
+              0
+            ],
+            [
+              "Esi",
+              "Poetry",
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "name",
+            "title",
+            "attempts"
+          ],
+          "rows": [
+            [
+              "Femi",
+              "Chemistry",
+              2
+            ],
+            [
+              "Femi",
+              "Drama",
+              0
+            ],
+            [
+              "Gia",
+              "Chemistry",
+              1
+            ],
+            [
+              "Gia",
+              "Drama",
+              1
+            ],
+            [
+              "Hao",
+              "Chemistry",
+              0
+            ],
+            [
+              "Hao",
+              "Drama",
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT s.name, c.title, COUNT(e.id) AS attempts FROM students s CROSS JOIN courses c LEFT JOIN enrolments e ON e.student_id = s.id AND e.course_id = c.id GROUP BY s.id, s.name, c.id, c.title;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT s.name, c.title, COUNT(*) AS attempts FROM students s CROSS JOIN courses c LEFT JOIN enrolments e ON e.student_id = s.id AND e.course_id = c.id GROUP BY s.id, s.name, c.id, c.title;",
+        "why": "COUNT(*) shows 1 for none"
+      },
+      {
+        "sql": "SELECT s.name, c.title, COUNT(e.id) AS attempts FROM students s JOIN enrolments e ON e.student_id = s.id JOIN courses c ON c.id = e.course_id GROUP BY s.id, s.name, c.id, c.title;",
+        "why": "Drops pairs with none"
+      }
+    ]
+  },
+  {
+    "id": "s31-05",
+    "skill": 31,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      28
+    ],
+    "title": "Empty combinations",
+    "prompt": "Show each customer's name and product name pair where that customer has never bought that product, for customer 1 only.",
+    "dataset": "shop",
+    "hints": [
+      "Cross join, LEFT JOIN purchases, and keep NULLs."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "product"
+          ],
+          "rows": [
+            [
+              "Priya",
+              "Mug"
+            ],
+            [
+              "Priya",
+              "Lamp"
+            ],
+            [
+              "Priya",
+              "Rug"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "UPDATE orders SET customer_id = 1 WHERE id = 2;",
+        "expected": {
+          "columns": [
+            "name",
+            "product"
+          ],
+          "rows": [
+            [
+              "Priya",
+              "Lamp"
+            ],
+            [
+              "Priya",
+              "Rug"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name, p.name AS product FROM customers c CROSS JOIN products p LEFT JOIN (SELECT o.customer_id, i.product_id FROM orders o JOIN order_items i ON i.order_id = o.id) b ON b.customer_id = c.id AND b.product_id = p.id WHERE c.id = 1 AND b.product_id IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name, p.name AS product FROM customers c CROSS JOIN products p WHERE c.id = 1;",
+        "why": "Includes products they bought"
+      },
+      {
+        "sql": "SELECT c.name, p.name AS product FROM customers c JOIN orders o ON o.customer_id = c.id JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id WHERE c.id = 1;",
+        "why": "Finds what they did buy"
+      }
+    ]
+  },
+  {
+    "id": "s31-06",
+    "skill": 31,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the accidental cross join",
+    "prompt": "This should show each employee's name and department name as department, but it pairs everyone with everything. Fix it.",
+    "dataset": "staff",
+    "starterSql": "SELECT e.name, d.name AS department\nFROM employees e\nCROSS JOIN departments d;",
+    "hints": [
+      "It needs an ON condition."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "department"
+          ],
+          "rows": [
+            [
+              "Asha",
+              "Engineering"
+            ],
+            [
+              "Ben",
+              "Engineering"
+            ],
+            [
+              "Chloe",
+              "Engineering"
+            ],
+            [
+              "Dev",
+              "Sales"
+            ],
+            [
+              "Elena",
+              "Sales"
+            ],
+            [
+              "Farid",
+              "Sales"
+            ],
+            [
+              "Grace",
+              "Support"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "department"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              "Design"
+            ],
+            [
+              "Jon",
+              "Design"
+            ],
+            [
+              "Kim",
+              "Finance"
+            ],
+            [
+              "Mia",
+              "Finance"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT e.name, d.name AS department FROM employees e JOIN departments d ON d.id = e.department_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT e.name, d.name AS department FROM employees e CROSS JOIN departments d;",
+        "why": "Still pairs everyone"
+      },
+      {
+        "sql": "SELECT e.name, d.name AS department FROM employees e JOIN departments d ON d.id = e.id;",
+        "why": "Joins on the wrong column"
+      }
+    ]
+  },
+  {
+    "id": "s31-07",
+    "skill": 31,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      17,
+      20
+    ],
+    "title": "Sales in every category per month",
+    "prompt": "For every month in orders and every product category, show month, category, and total units sold as units, with 0 for none.",
+    "dataset": "shop",
+    "hints": [
+      "Build the grid from two DISTINCT lists."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "month",
+            "category",
+            "units"
+          ],
+          "rows": [
+            [
+              "2024-01",
+              "Home",
+              0
+            ],
+            [
+              "2024-01",
+              "Kitchen",
+              1
+            ],
+            [
+              "2024-01",
+              "Stationery",
+              5
+            ],
+            [
+              "2024-02",
+              "Home",
+              2
+            ],
+            [
+              "2024-02",
+              "Kitchen",
+              1
+            ],
+            [
+              "2024-02",
+              "Stationery",
+              1
+            ],
+            [
+              "2024-03",
+              "Home",
+              0
+            ],
+            [
+              "2024-03",
+              "Kitchen",
+              3
+            ],
+            [
+              "2024-03",
+              "Stationery",
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "month",
+            "category",
+            "units"
+          ],
+          "rows": [
+            [
+              "2024-02",
+              "Home",
+              1
+            ],
+            [
+              "2024-02",
+              "Kitchen",
+              3
+            ],
+            [
+              "2024-02",
+              "Stationery",
+              0
+            ],
+            [
+              "2024-03",
+              "Home",
+              0
+            ],
+            [
+              "2024-03",
+              "Kitchen",
+              1
+            ],
+            [
+              "2024-03",
+              "Stationery",
+              2
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT m.month, k.category, COALESCE(SUM(s.quantity), 0) AS units FROM (SELECT DISTINCT strftime('%Y-%m', order_date) AS month FROM orders) m CROSS JOIN (SELECT DISTINCT category FROM products) k LEFT JOIN (SELECT strftime('%Y-%m', o.order_date) AS month, p.category, i.quantity FROM orders o JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id) s ON s.month = m.month AND s.category = k.category GROUP BY m.month, k.category;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT strftime('%Y-%m', o.order_date) AS month, p.category, SUM(i.quantity) AS units FROM orders o JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id GROUP BY month, p.category;",
+        "why": "Drops empty combinations"
+      },
+      {
+        "sql": "SELECT m.month, k.category, SUM(s.quantity) AS units FROM (SELECT DISTINCT strftime('%Y-%m', order_date) AS month FROM orders) m CROSS JOIN (SELECT DISTINCT category FROM products) k LEFT JOIN (SELECT strftime('%Y-%m', o.order_date) AS month, p.category, i.quantity FROM orders o JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id) s ON s.month = m.month AND s.category = k.category GROUP BY m.month, k.category;",
+        "why": "Shows NULL instead of 0"
+      }
+    ]
+  },
+  {
+    "id": "s31-08",
+    "skill": 31,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      17,
+      26
+    ],
+    "title": "Report card grid",
+    "prompt": "For every student and subject, show the student's name, the subject, and a label named status: Taken if they've enrolled in any course of it, otherwise Not taken.",
+    "dataset": "school",
+    "hints": [
+      "Cross join students with distinct subjects."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "subject",
+            "status"
+          ],
+          "rows": [
+            [
+              "Anya",
+              "English",
+              "Not taken"
+            ],
+            [
+              "Anya",
+              "Maths",
+              "Taken"
+            ],
+            [
+              "Anya",
+              "Science",
+              "Taken"
+            ],
+            [
+              "Bilal",
+              "English",
+              "Not taken"
+            ],
+            [
+              "Bilal",
+              "Maths",
+              "Taken"
+            ],
+            [
+              "Bilal",
+              "Science",
+              "Not taken"
+            ],
+            [
+              "Cara",
+              "English",
+              "Not taken"
+            ],
+            [
+              "Cara",
+              "Maths",
+              "Taken"
+            ],
+            [
+              "Cara",
+              "Science",
+              "Taken"
+            ],
+            [
+              "Dmitri",
+              "English",
+              "Not taken"
+            ],
+            [
+              "Dmitri",
+              "Maths",
+              "Taken"
+            ],
+            [
+              "Dmitri",
+              "Science",
+              "Taken"
+            ],
+            [
+              "Esi",
+              "English",
+              "Not taken"
+            ],
+            [
+              "Esi",
+              "Maths",
+              "Not taken"
+            ],
+            [
+              "Esi",
+              "Science",
+              "Not taken"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "name",
+            "subject",
+            "status"
+          ],
+          "rows": [
+            [
+              "Femi",
+              "Arts",
+              "Not taken"
+            ],
+            [
+              "Femi",
+              "Science",
+              "Taken"
+            ],
+            [
+              "Gia",
+              "Arts",
+              "Taken"
+            ],
+            [
+              "Gia",
+              "Science",
+              "Taken"
+            ],
+            [
+              "Hao",
+              "Arts",
+              "Not taken"
+            ],
+            [
+              "Hao",
+              "Science",
+              "Not taken"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT s.name, k.subject, CASE WHEN COUNT(e.id) > 0 THEN 'Taken' ELSE 'Not taken' END AS status FROM students s CROSS JOIN (SELECT DISTINCT subject FROM courses) k LEFT JOIN courses c ON c.subject = k.subject LEFT JOIN enrolments e ON e.course_id = c.id AND e.student_id = s.id GROUP BY s.id, s.name, k.subject;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT s.name, c.subject, 'Taken' AS status FROM students s JOIN enrolments e ON e.student_id = s.id JOIN courses c ON c.id = e.course_id GROUP BY s.id, s.name, c.subject;",
+        "why": "Leaves out Not taken"
+      },
+      {
+        "sql": "SELECT s.name, k.subject, CASE WHEN COUNT(*) > 0 THEN 'Taken' ELSE 'Not taken' END AS status FROM students s CROSS JOIN (SELECT DISTINCT subject FROM courses) k LEFT JOIN courses c ON c.subject = k.subject LEFT JOIN enrolments e ON e.course_id = c.id AND e.student_id = s.id GROUP BY s.id, s.name, k.subject;",
+        "why": "COUNT(*) is never 0"
+      }
+    ]
+  }
+]

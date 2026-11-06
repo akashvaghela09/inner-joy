@@ -1,0 +1,675 @@
+[
+  {
+    "id": "s30-01",
+    "skill": 30,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Employee and manager",
+    "prompt": "Show each employee's name as employee and their manager's name as manager. Replace the ___.",
+    "dataset": "staff",
+    "starterSql": "SELECT e.name AS employee, m.name AS manager\nFROM employees e\nJOIN employees m ON ___;",
+    "hints": [
+      "Match the manager's id with the employee's manager_id."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "employee",
+            "manager"
+          ],
+          "rows": [
+            [
+              "Ben",
+              "Asha"
+            ],
+            [
+              "Chloe",
+              "Asha"
+            ],
+            [
+              "Dev",
+              "Asha"
+            ],
+            [
+              "Elena",
+              "Dev"
+            ],
+            [
+              "Farid",
+              "Dev"
+            ],
+            [
+              "Grace",
+              "Asha"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "employee",
+            "manager"
+          ],
+          "rows": [
+            [
+              "Jon",
+              "Ivy"
+            ],
+            [
+              "Kim",
+              "Ivy"
+            ],
+            [
+              "Mia",
+              "Kim"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT e.name AS employee, m.name AS manager FROM employees e JOIN employees m ON m.id = e.manager_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT e.name AS employee, m.name AS manager FROM employees e JOIN employees m ON e.id = m.manager_id;",
+        "why": "Reverses employee and manager"
+      },
+      {
+        "sql": "SELECT e.name AS employee, e.name AS manager FROM employees e;",
+        "why": "Shows the employee twice"
+      }
+    ]
+  },
+  {
+    "id": "s30-02",
+    "skill": 30,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [],
+    "title": "Who invited whom",
+    "prompt": "Show each username as invited, and the username of the user who invited them as invited_by.",
+    "dataset": "app",
+    "hints": [
+      "referrer_id points to another user's id."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "invited",
+            "invited_by"
+          ],
+          "rows": [
+            [
+              "orbit",
+              "nova"
+            ],
+            [
+              "pixel",
+              "nova"
+            ],
+            [
+              "quark",
+              "orbit"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "invited",
+            "invited_by"
+          ],
+          "rows": [
+            [
+              "tulip",
+              "sable"
+            ],
+            [
+              "umber",
+              "sable"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT u.username AS invited, r.username AS invited_by FROM users u JOIN users r ON r.id = u.referrer_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT u.username AS invited, r.username AS invited_by FROM users u JOIN users r ON u.id = r.referrer_id;",
+        "why": "Reverses the link"
+      },
+      {
+        "sql": "SELECT u.username AS invited, u.referrer_id AS invited_by FROM users u;",
+        "why": "Shows an id, not a name"
+      }
+    ]
+  },
+  {
+    "id": "s30-03",
+    "skill": 30,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [],
+    "title": "Keep the top",
+    "prompt": "Show every employee's name as employee and their manager's name as manager. Employees without a matching manager must stay, showing NULL.",
+    "dataset": "staff",
+    "hints": [
+      "Use LEFT JOIN."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "employee",
+            "manager"
+          ],
+          "rows": [
+            [
+              "Asha",
+              null
+            ],
+            [
+              "Ben",
+              "Asha"
+            ],
+            [
+              "Chloe",
+              "Asha"
+            ],
+            [
+              "Dev",
+              "Asha"
+            ],
+            [
+              "Elena",
+              "Dev"
+            ],
+            [
+              "Farid",
+              "Dev"
+            ],
+            [
+              "Grace",
+              "Asha"
+            ],
+            [
+              "Hugo",
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "employee",
+            "manager"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              null
+            ],
+            [
+              "Jon",
+              "Ivy"
+            ],
+            [
+              "Kim",
+              "Ivy"
+            ],
+            [
+              "Leo",
+              null
+            ],
+            [
+              "Mia",
+              "Kim"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT e.name AS employee, m.name AS manager FROM employees e LEFT JOIN employees m ON m.id = e.manager_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT e.name AS employee, m.name AS manager FROM employees e JOIN employees m ON m.id = e.manager_id;",
+        "why": "Drops employees with no manager"
+      },
+      {
+        "sql": "SELECT e.name AS employee, m.name AS manager FROM employees e LEFT JOIN employees m ON e.id = m.manager_id;",
+        "why": "Reverses the link"
+      }
+    ]
+  },
+  {
+    "id": "s30-04",
+    "skill": 30,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      16,
+      6
+    ],
+    "title": "Warmer than yesterday",
+    "prompt": "Show the city and reading_date of readings warmer than the same city's reading on the previous calendar day.",
+    "dataset": "weather",
+    "hints": [
+      "Join on city and on the date minus one day."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "city",
+            "reading_date"
+          ],
+          "rows": [
+            [
+              "Oslo",
+              "2024-03-02"
+            ],
+            [
+              "Lima",
+              "2024-03-02"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "city",
+            "reading_date"
+          ],
+          "rows": [
+            [
+              "Cairo",
+              "2024-07-31"
+            ],
+            [
+              "Cairo",
+              "2024-08-01"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT t.city, t.reading_date FROM readings t JOIN readings y ON y.city = t.city AND y.reading_date = date(t.reading_date, '-1 day') WHERE t.temp_c > y.temp_c;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT t.city, t.reading_date FROM readings t JOIN readings y ON y.city = t.city AND y.id = t.id - 1 WHERE t.temp_c > y.temp_c;",
+        "why": "The previous row isn't always the previous day"
+      },
+      {
+        "sql": "SELECT t.city, t.reading_date FROM readings t JOIN readings y ON y.reading_date = date(t.reading_date, '-1 day') WHERE t.temp_c > y.temp_c;",
+        "why": "Compares across cities"
+      }
+    ]
+  },
+  {
+    "id": "s30-05",
+    "skill": 30,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      7
+    ],
+    "title": "Pairs on the same salary",
+    "prompt": "Find pairs of different employees with the same salary. Show name1 and name2, listing each pair once, with the lower id first.",
+    "dataset": "staff",
+    "hints": [
+      "Using e.id < o.id removes reversed pairs and self-pairs."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name1",
+            "name2"
+          ],
+          "rows": [
+            [
+              "Ben",
+              "Chloe"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name1",
+            "name2"
+          ],
+          "rows": [
+            [
+              "Jon",
+              "Kim"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT e.name AS name1, o.name AS name2 FROM employees e JOIN employees o ON e.salary = o.salary AND e.id < o.id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT e.name AS name1, o.name AS name2 FROM employees e JOIN employees o ON e.salary = o.salary;",
+        "why": "Pairs people with themselves"
+      },
+      {
+        "sql": "SELECT e.name AS name1, o.name AS name2 FROM employees e JOIN employees o ON e.salary = o.salary AND e.id <> o.id;",
+        "why": "Lists each pair twice"
+      }
+    ]
+  },
+  {
+    "id": "s30-06",
+    "skill": 30,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the aliases",
+    "prompt": "This should show each employee and their manager's name as manager, but it fails because the same table has no separate aliases. Fix it.",
+    "dataset": "staff",
+    "starterSql": "SELECT name, name AS manager\nFROM employees\nJOIN employees ON id = manager_id;",
+    "hints": [
+      "Give each copy its own alias."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "manager"
+          ],
+          "rows": [
+            [
+              "Ben",
+              "Asha"
+            ],
+            [
+              "Chloe",
+              "Asha"
+            ],
+            [
+              "Dev",
+              "Asha"
+            ],
+            [
+              "Elena",
+              "Dev"
+            ],
+            [
+              "Farid",
+              "Dev"
+            ],
+            [
+              "Grace",
+              "Asha"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "manager"
+          ],
+          "rows": [
+            [
+              "Jon",
+              "Ivy"
+            ],
+            [
+              "Kim",
+              "Ivy"
+            ],
+            [
+              "Mia",
+              "Kim"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT e.name, m.name AS manager FROM employees e JOIN employees m ON m.id = e.manager_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT e.name, e.name AS manager FROM employees e;",
+        "why": "Shows the employee twice"
+      },
+      {
+        "sql": "SELECT e.name, m.name AS manager FROM employees e JOIN employees m ON m.id = e.id;",
+        "why": "Joins each person to themselves"
+      }
+    ]
+  },
+  {
+    "id": "s30-07",
+    "skill": 30,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      6
+    ],
+    "title": "Earning more than their manager",
+    "prompt": "Show the name of employees who earn more than their manager.",
+    "dataset": "staff",
+    "hints": [
+      "Compare the two copies in WHERE."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": []
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET salary = 95000 WHERE id = 15; UPDATE employees SET salary = 60000 WHERE id = 13;",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Mia"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT e.name FROM employees e JOIN employees m ON m.id = e.manager_id WHERE e.salary > m.salary;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT e.name FROM employees e JOIN employees m ON m.id = e.manager_id WHERE e.salary < m.salary;",
+        "why": "Finds those earning less"
+      },
+      {
+        "sql": "SELECT m.name FROM employees e JOIN employees m ON m.id = e.manager_id WHERE e.salary > m.salary;",
+        "why": "Names the manager"
+      }
+    ]
+  },
+  {
+    "id": "s30-08",
+    "skill": 30,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      20
+    ],
+    "title": "Team sizes",
+    "prompt": "Show each manager's name as manager, how many people report to them as reports, and the average salary of those reports as avg_salary, rounded to a whole number, sorted by manager.",
+    "dataset": "staff",
+    "hints": [
+      "Group by the manager row."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "manager",
+            "reports",
+            "avg_salary"
+          ],
+          "rows": [
+            [
+              "Asha",
+              4,
+              77000
+            ],
+            [
+              "Dev",
+              2,
+              60000
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET salary = 70001 WHERE id = 12;",
+        "expected": {
+          "columns": [
+            "manager",
+            "reports",
+            "avg_salary"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              2,
+              70001
+            ],
+            [
+              "Kim",
+              1,
+              55000
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT m.name AS manager, COUNT(*) AS reports, ROUND(AVG(e.salary)) AS avg_salary FROM employees e JOIN employees m ON m.id = e.manager_id GROUP BY m.id, m.name ORDER BY manager;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT m.name AS manager, COUNT(*) AS reports, AVG(e.salary) AS avg_salary FROM employees e JOIN employees m ON m.id = e.manager_id GROUP BY m.id, m.name ORDER BY manager;",
+        "why": "Doesn't round"
+      },
+      {
+        "sql": "SELECT e.name AS manager, COUNT(*) AS reports, ROUND(AVG(e.salary)) AS avg_salary FROM employees e JOIN employees m ON m.id = e.manager_id GROUP BY e.id, e.name ORDER BY manager;",
+        "why": "Groups by employee"
+      }
+    ]
+  }
+]

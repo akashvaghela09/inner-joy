@@ -1,0 +1,15 @@
+{
+  "skill": 30,
+  "summary": "A self join connects a table to itself, using two different aliases.",
+  "points": [
+    "Use it when rows point to other rows in the same table, such as employees and managers.",
+    "Aliases act like two copies of the table: employees e and employees m.",
+    "It also compares rows with each other, such as each day with the day before.",
+    "Use LEFT JOIN if rows with no match must stay, such as the top manager."
+  ],
+  "example": {
+    "dataset": "staff",
+    "sql": "SELECT e.name AS employee, m.name AS manager\nFROM employees e\nJOIN employees m ON m.id = e.manager_id;",
+    "explanation": "Each employee finds their manager's row. Those with no valid manager drop out of this inner join."
+  }
+}

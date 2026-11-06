@@ -1,0 +1,824 @@
+[
+  {
+    "id": "s32-01",
+    "skill": 32,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Three tables",
+    "prompt": "Show each customer's name, order id as order_id, and the quantity of each item. Replace the ___ with the second join.",
+    "dataset": "shop",
+    "starterSql": "SELECT c.name, o.id AS order_id, i.quantity\nFROM customers c\nJOIN orders o ON o.customer_id = c.id\n___;",
+    "hints": [
+      "Link order_items through its order_id."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "order_id",
+            "quantity"
+          ],
+          "rows": [
+            [
+              "Priya",
+              1,
+              3
+            ],
+            [
+              "Priya",
+              1,
+              2
+            ],
+            [
+              "Marco",
+              2,
+              1
+            ],
+            [
+              "Priya",
+              3,
+              1
+            ],
+            [
+              "Hana",
+              4,
+              2
+            ],
+            [
+              "Hana",
+              4,
+              1
+            ],
+            [
+              "Luis",
+              5,
+              2
+            ],
+            [
+              "Hana",
+              6,
+              1
+            ],
+            [
+              "Hana",
+              6,
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "order_id",
+            "quantity"
+          ],
+          "rows": [
+            [
+              "Ravi",
+              11,
+              1
+            ],
+            [
+              "Ravi",
+              11,
+              3
+            ],
+            [
+              "Sara",
+              12,
+              2
+            ],
+            [
+              "Ravi",
+              13,
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name, o.id AS order_id, i.quantity FROM customers c JOIN orders o ON o.customer_id = c.id JOIN order_items i ON i.order_id = o.id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name, o.id AS order_id, i.quantity FROM customers c JOIN orders o ON o.customer_id = c.id JOIN order_items i;",
+        "why": "The second join has no condition"
+      },
+      {
+        "sql": "SELECT c.name, o.id AS order_id, o.id AS quantity FROM customers c JOIN orders o ON o.customer_id = c.id;",
+        "why": "Leaves out item quantity"
+      }
+    ]
+  },
+  {
+    "id": "s32-02",
+    "skill": 32,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      24
+    ],
+    "title": "Four tables",
+    "prompt": "Show each customer's name and the name of each product they bought, as product.",
+    "dataset": "shop",
+    "hints": [
+      "Walk from customers to products through two tables."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "product"
+          ],
+          "rows": [
+            [
+              "Priya",
+              "Notebook"
+            ],
+            [
+              "Priya",
+              "Pen"
+            ],
+            [
+              "Marco",
+              "Mug"
+            ],
+            [
+              "Priya",
+              "Kettle"
+            ],
+            [
+              "Hana",
+              "Lamp"
+            ],
+            [
+              "Hana",
+              "Notebook"
+            ],
+            [
+              "Luis",
+              "Mug"
+            ],
+            [
+              "Hana",
+              "Kettle"
+            ],
+            [
+              "Hana",
+              "Pen"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "product"
+          ],
+          "rows": [
+            [
+              "Ravi",
+              "Stool"
+            ],
+            [
+              "Ravi",
+              "Cup"
+            ],
+            [
+              "Sara",
+              "Ink"
+            ],
+            [
+              "Ravi",
+              "Cup"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name, p.name AS product FROM customers c JOIN orders o ON o.customer_id = c.id JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name, p.name AS product FROM customers c JOIN products p ON p.id = c.id;",
+        "why": "There's no direct link"
+      },
+      {
+        "sql": "SELECT c.name, i.product_id AS product FROM customers c JOIN orders o ON o.customer_id = c.id JOIN order_items i ON i.order_id = o.id;",
+        "why": "Shows an id, not a name"
+      }
+    ]
+  },
+  {
+    "id": "s32-03",
+    "skill": 32,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [],
+    "title": "Report rows",
+    "prompt": "Show each student's name, the course title, and the grade, for every enrolment.",
+    "dataset": "school",
+    "hints": [
+      "enrolments connects the other two tables."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "title",
+            "grade"
+          ],
+          "rows": [
+            [
+              "Anya",
+              "Algebra",
+              82
+            ],
+            [
+              "Anya",
+              "Biology",
+              91
+            ],
+            [
+              "Bilal",
+              "Algebra",
+              55
+            ],
+            [
+              "Bilal",
+              "Algebra",
+              71
+            ],
+            [
+              "Cara",
+              "Geometry",
+              null
+            ],
+            [
+              "Cara",
+              "Biology",
+              67
+            ],
+            [
+              "Dmitri",
+              "Algebra",
+              91
+            ],
+            [
+              "Dmitri",
+              "Geometry",
+              74
+            ],
+            [
+              "Dmitri",
+              "Biology",
+              88
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "name",
+            "title",
+            "grade"
+          ],
+          "rows": [
+            [
+              "Femi",
+              "Chemistry",
+              60
+            ],
+            [
+              "Femi",
+              "Chemistry",
+              60
+            ],
+            [
+              "Gia",
+              "Chemistry",
+              null
+            ],
+            [
+              "Gia",
+              "Drama",
+              95
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT s.name, c.title, e.grade FROM enrolments e JOIN students s ON s.id = e.student_id JOIN courses c ON c.id = e.course_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT s.name, c.title, e.grade FROM enrolments e JOIN students s ON s.id = e.student_id JOIN courses c ON c.id = e.student_id;",
+        "why": "Uses the wrong column for courses"
+      },
+      {
+        "sql": "SELECT s.name, e.course_id, e.grade FROM enrolments e JOIN students s ON s.id = e.student_id;",
+        "why": "Doesn't show the title"
+      }
+    ]
+  },
+  {
+    "id": "s32-04",
+    "skill": 32,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      11,
+      20
+    ],
+    "title": "Best-selling by customer",
+    "prompt": "Show each customer's name and their total units bought, as units, sorted by units descending, then name.",
+    "dataset": "shop",
+    "hints": [
+      "Join three tables, then group."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "units"
+          ],
+          "rows": [
+            [
+              "Hana",
+              8
+            ],
+            [
+              "Priya",
+              6
+            ],
+            [
+              "Luis",
+              2
+            ],
+            [
+              "Marco",
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "units"
+          ],
+          "rows": [
+            [
+              "Ravi",
+              5
+            ],
+            [
+              "Sara",
+              2
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name, SUM(i.quantity) AS units FROM customers c JOIN orders o ON o.customer_id = c.id JOIN order_items i ON i.order_id = o.id GROUP BY c.id, c.name ORDER BY units DESC, c.name;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name, COUNT(*) AS units FROM customers c JOIN orders o ON o.customer_id = c.id JOIN order_items i ON i.order_id = o.id GROUP BY c.id, c.name ORDER BY units DESC, c.name;",
+        "why": "Counts rows, not units"
+      },
+      {
+        "sql": "SELECT c.name, SUM(i.quantity) AS units FROM customers c JOIN orders o ON o.customer_id = c.id JOIN order_items i ON i.order_id = o.id GROUP BY c.id, c.name ORDER BY units, c.name;",
+        "why": "Sorts lowest first"
+      }
+    ]
+  },
+  {
+    "id": "s32-05",
+    "skill": 32,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      26,
+      27
+    ],
+    "title": "Keep everyone through two joins",
+    "prompt": "Show every customer's name and their total units bought, as units, with 0 for customers who bought nothing.",
+    "dataset": "shop",
+    "hints": [
+      "Both joins must be LEFT JOINs."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "units"
+          ],
+          "rows": [
+            [
+              "Priya",
+              6
+            ],
+            [
+              "Marco",
+              1
+            ],
+            [
+              "Hana",
+              8
+            ],
+            [
+              "Luis",
+              2
+            ],
+            [
+              "Noor",
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "units"
+          ],
+          "rows": [
+            [
+              "Ravi",
+              5
+            ],
+            [
+              "Sara",
+              2
+            ],
+            [
+              "Tom",
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name, COALESCE(SUM(i.quantity), 0) AS units FROM customers c LEFT JOIN orders o ON o.customer_id = c.id LEFT JOIN order_items i ON i.order_id = o.id GROUP BY c.id, c.name;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name, COALESCE(SUM(i.quantity), 0) AS units FROM customers c LEFT JOIN orders o ON o.customer_id = c.id JOIN order_items i ON i.order_id = o.id GROUP BY c.id, c.name;",
+        "why": "The inner join loses unmatched customers"
+      },
+      {
+        "sql": "SELECT c.name, SUM(i.quantity) AS units FROM customers c LEFT JOIN orders o ON o.customer_id = c.id LEFT JOIN order_items i ON i.order_id = o.id GROUP BY c.id, c.name;",
+        "why": "Shows NULL"
+      }
+    ]
+  },
+  {
+    "id": "s32-06",
+    "skill": 32,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the chain",
+    "prompt": "This should show each order's id and product name as product, but one join links to the wrong column, giving wrong rows. Fix it.",
+    "dataset": "shop",
+    "starterSql": "SELECT o.id, p.name AS product\nFROM orders o\nJOIN order_items i ON i.product_id = o.id\nJOIN products p ON p.id = i.product_id;",
+    "hints": [
+      "order_items.order_id links to orders.id."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "product"
+          ],
+          "rows": [
+            [
+              1,
+              "Notebook"
+            ],
+            [
+              1,
+              "Pen"
+            ],
+            [
+              2,
+              "Mug"
+            ],
+            [
+              3,
+              "Kettle"
+            ],
+            [
+              4,
+              "Lamp"
+            ],
+            [
+              4,
+              "Notebook"
+            ],
+            [
+              5,
+              "Mug"
+            ],
+            [
+              6,
+              "Kettle"
+            ],
+            [
+              6,
+              "Pen"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "product"
+          ],
+          "rows": [
+            [
+              11,
+              "Stool"
+            ],
+            [
+              11,
+              "Cup"
+            ],
+            [
+              12,
+              "Ink"
+            ],
+            [
+              13,
+              "Cup"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT o.id, p.name AS product FROM orders o JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT o.id, p.name AS product FROM orders o JOIN order_items i ON i.product_id = o.id JOIN products p ON p.id = i.product_id;",
+        "why": "Keeps the bad link"
+      },
+      {
+        "sql": "SELECT o.id, p.name AS product FROM orders o JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.order_id;",
+        "why": "Moves the bad link"
+      }
+    ]
+  },
+  {
+    "id": "s32-07",
+    "skill": 32,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      21
+    ],
+    "title": "Revenue from good customers",
+    "prompt": "Show the name of customers with total shipped revenue above 50, using price times quantity, and that total as revenue.",
+    "dataset": "shop",
+    "hints": [
+      "Filter status in WHERE, and revenue in HAVING."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true,
+      "decimals": 2
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "revenue"
+          ],
+          "rows": [
+            [
+              "Hana",
+              95
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); UPDATE order_items SET quantity = 2 WHERE order_id = 11 AND product_id = 7;",
+        "expected": {
+          "columns": [
+            "name",
+            "revenue"
+          ],
+          "rows": [
+            [
+              "Ravi",
+              107
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name, SUM(p.price * i.quantity) AS revenue FROM customers c JOIN orders o ON o.customer_id = c.id JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id WHERE o.status = 'shipped' GROUP BY c.id, c.name HAVING SUM(p.price * i.quantity) > 50;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name, SUM(p.price * i.quantity) AS revenue FROM customers c JOIN orders o ON o.customer_id = c.id JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id GROUP BY c.id, c.name HAVING SUM(p.price * i.quantity) > 50;",
+        "why": "Includes other statuses"
+      },
+      {
+        "sql": "SELECT c.name, SUM(p.price * i.quantity) AS revenue FROM customers c JOIN orders o ON o.customer_id = c.id JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id WHERE o.status = 'shipped' GROUP BY c.id, c.name;",
+        "why": "Doesn't filter totals"
+      }
+    ]
+  },
+  {
+    "id": "s32-08",
+    "skill": 32,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      11,
+      20
+    ],
+    "title": "Subject averages per year group",
+    "prompt": "Show each year_group and subject, with the average grade rounded to 1 decimal as average, sorted by year_group then subject. Use only enrolled students.",
+    "dataset": "school",
+    "hints": [
+      "Three tables, two grouping columns."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "year_group",
+            "subject",
+            "average"
+          ],
+          "rows": [
+            [
+              10,
+              "Maths",
+              69.3
+            ],
+            [
+              10,
+              "Science",
+              91
+            ],
+            [
+              11,
+              "Maths",
+              82.5
+            ],
+            [
+              11,
+              "Science",
+              77.5
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "year_group",
+            "subject",
+            "average"
+          ],
+          "rows": [
+            [
+              9,
+              "Arts",
+              95
+            ],
+            [
+              9,
+              "Science",
+              60
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT s.year_group, c.subject, ROUND(AVG(e.grade), 1) AS average FROM enrolments e JOIN students s ON s.id = e.student_id JOIN courses c ON c.id = e.course_id GROUP BY s.year_group, c.subject ORDER BY s.year_group, c.subject;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT s.year_group, c.subject, ROUND(AVG(e.grade), 1) AS average FROM enrolments e JOIN students s ON s.id = e.student_id JOIN courses c ON c.id = e.course_id GROUP BY s.year_group ORDER BY s.year_group, c.subject;",
+        "why": "Merges subjects"
+      },
+      {
+        "sql": "SELECT s.year_group, c.subject, AVG(e.grade) AS average FROM enrolments e JOIN students s ON s.id = e.student_id JOIN courses c ON c.id = e.course_id GROUP BY s.year_group, c.subject ORDER BY s.year_group, c.subject;",
+        "why": "Doesn't round"
+      }
+    ]
+  }
+]

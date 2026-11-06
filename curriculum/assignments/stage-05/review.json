@@ -1,0 +1,1288 @@
+[
+  {
+    "id": "st05-r01",
+    "kind": "review",
+    "stage": 5,
+    "skills": [
+      25,
+      11
+    ],
+    "recalls": [],
+    "title": "Named departments",
+    "prompt": "Show each employee's name and their department's name as department, A to Z by employee.",
+    "dataset": "staff",
+    "hints": [
+      "Unmatched employees don't need to appear."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "department"
+          ],
+          "rows": [
+            [
+              "Asha",
+              "Engineering"
+            ],
+            [
+              "Ben",
+              "Engineering"
+            ],
+            [
+              "Chloe",
+              "Engineering"
+            ],
+            [
+              "Dev",
+              "Sales"
+            ],
+            [
+              "Elena",
+              "Sales"
+            ],
+            [
+              "Farid",
+              "Sales"
+            ],
+            [
+              "Grace",
+              "Support"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET name = 'Abe' WHERE id = 15;",
+        "expected": {
+          "columns": [
+            "name",
+            "department"
+          ],
+          "rows": [
+            [
+              "Abe",
+              "Finance"
+            ],
+            [
+              "Ivy",
+              "Design"
+            ],
+            [
+              "Jon",
+              "Design"
+            ],
+            [
+              "Kim",
+              "Finance"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT e.name, d.name AS department FROM employees e JOIN departments d ON d.id = e.department_id ORDER BY e.name;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT e.name, d.name AS department FROM employees e LEFT JOIN departments d ON d.id = e.department_id ORDER BY e.name;",
+        "why": "Keeps unmatched employees"
+      },
+      {
+        "sql": "SELECT e.name, d.name AS department FROM employees e JOIN departments d ON d.id = e.department_id;",
+        "why": "Doesn't sort"
+      }
+    ]
+  },
+  {
+    "id": "st05-r02",
+    "kind": "review",
+    "stage": 5,
+    "skills": [
+      28
+    ],
+    "recalls": [],
+    "title": "Quiet users",
+    "prompt": "Show the username of users with no sessions.",
+    "dataset": "app",
+    "hints": [
+      "Find what's missing on the other side."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "username"
+          ],
+          "rows": [
+            [
+              "raven"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "username"
+          ],
+          "rows": [
+            [
+              "umber"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT u.username FROM users u LEFT JOIN sessions s ON s.user_id = u.id WHERE s.id IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT u.username FROM users u JOIN sessions s ON s.user_id = u.id;",
+        "why": "Finds active users"
+      },
+      {
+        "sql": "SELECT u.username FROM users u WHERE u.referrer_id IS NULL;",
+        "why": "Finds uninvited users"
+      }
+    ]
+  },
+  {
+    "id": "st05-r03",
+    "kind": "review",
+    "stage": 5,
+    "skills": [
+      26
+    ],
+    "recalls": [],
+    "title": "Student course counts",
+    "prompt": "Show every student's name and their number of enrolments as enrolments, including 0.",
+    "dataset": "school",
+    "hints": [
+      "Every student must appear."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "enrolments"
+          ],
+          "rows": [
+            [
+              "Anya",
+              2
+            ],
+            [
+              "Bilal",
+              2
+            ],
+            [
+              "Cara",
+              2
+            ],
+            [
+              "Dmitri",
+              3
+            ],
+            [
+              "Esi",
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "name",
+            "enrolments"
+          ],
+          "rows": [
+            [
+              "Femi",
+              2
+            ],
+            [
+              "Gia",
+              2
+            ],
+            [
+              "Hao",
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT s.name, COUNT(e.id) AS enrolments FROM students s LEFT JOIN enrolments e ON e.student_id = s.id GROUP BY s.id, s.name;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT s.name, COUNT(*) AS enrolments FROM students s LEFT JOIN enrolments e ON e.student_id = s.id GROUP BY s.id, s.name;",
+        "why": "Counts 1 for no enrolments"
+      },
+      {
+        "sql": "SELECT s.name, COUNT(e.id) AS enrolments FROM students s JOIN enrolments e ON e.student_id = s.id GROUP BY s.id, s.name;",
+        "why": "Drops students with none"
+      }
+    ]
+  },
+  {
+    "id": "st05-r04",
+    "kind": "review",
+    "stage": 5,
+    "skills": [
+      30,
+      17
+    ],
+    "recalls": [],
+    "title": "Manager names",
+    "prompt": "Show each employee's name, and manager's name as manager, or No manager when missing.",
+    "dataset": "staff",
+    "hints": [
+      "Keep everyone, and replace NULLs."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "manager"
+          ],
+          "rows": [
+            [
+              "Asha",
+              "No manager"
+            ],
+            [
+              "Ben",
+              "Asha"
+            ],
+            [
+              "Chloe",
+              "Asha"
+            ],
+            [
+              "Dev",
+              "Asha"
+            ],
+            [
+              "Elena",
+              "Dev"
+            ],
+            [
+              "Farid",
+              "Dev"
+            ],
+            [
+              "Grace",
+              "Asha"
+            ],
+            [
+              "Hugo",
+              "No manager"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "manager"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              "No manager"
+            ],
+            [
+              "Jon",
+              "Ivy"
+            ],
+            [
+              "Kim",
+              "Ivy"
+            ],
+            [
+              "Leo",
+              "No manager"
+            ],
+            [
+              "Mia",
+              "Kim"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT e.name, COALESCE(m.name, 'No manager') AS manager FROM employees e LEFT JOIN employees m ON m.id = e.manager_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT e.name, m.name AS manager FROM employees e LEFT JOIN employees m ON m.id = e.manager_id;",
+        "why": "Leaves NULLs"
+      },
+      {
+        "sql": "SELECT e.name, COALESCE(m.name, 'No manager') AS manager FROM employees e JOIN employees m ON m.id = e.manager_id;",
+        "why": "Drops employees with no manager"
+      }
+    ]
+  },
+  {
+    "id": "st05-r05",
+    "kind": "review",
+    "stage": 5,
+    "skills": [
+      25,
+      12,
+      20
+    ],
+    "recalls": [],
+    "title": "Cost of what sold",
+    "prompt": "Show each product category and total cost of units sold as total_cost, using cost times quantity.",
+    "dataset": "shop",
+    "hints": [
+      "Join, multiply, and group."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true,
+      "decimals": 2
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "category",
+            "total_cost"
+          ],
+          "rows": [
+            [
+              "Home",
+              24
+            ],
+            [
+              "Kitchen",
+              52
+            ],
+            [
+              "Stationery",
+              9
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "category",
+            "total_cost"
+          ],
+          "rows": [
+            [
+              "Home",
+              25
+            ],
+            [
+              "Kitchen",
+              8
+            ],
+            [
+              "Stationery",
+              12
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT p.category, SUM(p.cost * i.quantity) AS total_cost FROM order_items i JOIN products p ON p.id = i.product_id GROUP BY p.category;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT p.category, SUM(p.cost) AS total_cost FROM order_items i JOIN products p ON p.id = i.product_id GROUP BY p.category;",
+        "why": "Ignores quantity"
+      },
+      {
+        "sql": "SELECT p.category, SUM(p.price * i.quantity) AS total_cost FROM order_items i JOIN products p ON p.id = i.product_id GROUP BY p.category;",
+        "why": "Uses price"
+      }
+    ]
+  },
+  {
+    "id": "st05-r06",
+    "kind": "review",
+    "stage": 5,
+    "skills": [
+      27
+    ],
+    "recalls": [],
+    "title": "Order counts by status",
+    "prompt": "Show every customer's name and their number of pending orders as pending, including 0.",
+    "dataset": "shop",
+    "hints": [
+      "Decide where the status filter belongs."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "pending"
+          ],
+          "rows": [
+            [
+              "Priya",
+              0
+            ],
+            [
+              "Marco",
+              0
+            ],
+            [
+              "Hana",
+              0
+            ],
+            [
+              "Luis",
+              1
+            ],
+            [
+              "Noor",
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "pending"
+          ],
+          "rows": [
+            [
+              "Ravi",
+              0
+            ],
+            [
+              "Sara",
+              1
+            ],
+            [
+              "Tom",
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name, COUNT(o.id) AS pending FROM customers c LEFT JOIN orders o ON o.customer_id = c.id AND o.status = 'pending' GROUP BY c.id, c.name;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name, COUNT(o.id) AS pending FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE o.status = 'pending' GROUP BY c.id, c.name;",
+        "why": "WHERE removes customers with none"
+      },
+      {
+        "sql": "SELECT c.name, COUNT(*) AS pending FROM customers c LEFT JOIN orders o ON o.customer_id = c.id AND o.status = 'pending' GROUP BY c.id, c.name;",
+        "why": "COUNT(*) shows 1 for none"
+      }
+    ]
+  },
+  {
+    "id": "st05-r07",
+    "kind": "review",
+    "stage": 5,
+    "skills": [
+      32,
+      21
+    ],
+    "recalls": [],
+    "title": "Retakers",
+    "prompt": "Show each student's name and course title for courses they've enrolled in more than once.",
+    "dataset": "school",
+    "hints": [
+      "Group by the student and course."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "title"
+          ],
+          "rows": [
+            [
+              "Bilal",
+              "Algebra"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "name",
+            "title"
+          ],
+          "rows": [
+            [
+              "Femi",
+              "Chemistry"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT s.name, c.title FROM enrolments e JOIN students s ON s.id = e.student_id JOIN courses c ON c.id = e.course_id GROUP BY s.id, s.name, c.id, c.title HAVING COUNT(*) > 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT s.name, c.title FROM enrolments e JOIN students s ON s.id = e.student_id JOIN courses c ON c.id = e.course_id GROUP BY s.id, s.name, c.id, c.title;",
+        "why": "Keeps everyone"
+      },
+      {
+        "sql": "SELECT s.name, c.title FROM enrolments e JOIN students s ON s.id = e.student_id JOIN courses c ON c.id = e.course_id GROUP BY s.id, s.name HAVING COUNT(*) > 1;",
+        "why": "Doesn't split by course"
+      }
+    ]
+  },
+  {
+    "id": "st05-r08",
+    "kind": "review",
+    "stage": 5,
+    "skills": [
+      30,
+      32
+    ],
+    "recalls": [],
+    "title": "Referred activity",
+    "prompt": "Show each referrer's username as referrer and the total minutes of the users they invited, as minutes, for those with sessions.",
+    "dataset": "app",
+    "hints": [
+      "Self join, then join sessions."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "referrer",
+            "minutes"
+          ],
+          "rows": [
+            [
+              "nova",
+              95
+            ],
+            [
+              "orbit",
+              42
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "referrer",
+            "minutes"
+          ],
+          "rows": [
+            [
+              "sable",
+              33
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT r.username AS referrer, SUM(s.minutes) AS minutes FROM users u JOIN users r ON r.id = u.referrer_id JOIN sessions s ON s.user_id = u.id GROUP BY r.id, r.username;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT r.username AS referrer, SUM(s.minutes) AS minutes FROM users u JOIN users r ON r.id = u.referrer_id JOIN sessions s ON s.user_id = r.id GROUP BY r.id, r.username;",
+        "why": "Counts the referrer's own minutes"
+      },
+      {
+        "sql": "SELECT r.username AS referrer, COUNT(*) AS minutes FROM users u JOIN users r ON r.id = u.referrer_id JOIN sessions s ON s.user_id = u.id GROUP BY r.id, r.username;",
+        "why": "Counts sessions"
+      }
+    ]
+  },
+  {
+    "id": "st05-r09",
+    "kind": "review",
+    "stage": 5,
+    "skills": [
+      29
+    ],
+    "recalls": [],
+    "title": "Real order totals",
+    "prompt": "Show each customer_id and the number of different products they've bought, as products.",
+    "dataset": "shop",
+    "hints": [
+      "A product can repeat across orders."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "customer_id",
+            "products"
+          ],
+          "rows": [
+            [
+              1,
+              3
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "customer_id",
+            "products"
+          ],
+          "rows": [
+            [
+              7,
+              2
+            ],
+            [
+              8,
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT o.customer_id, COUNT(DISTINCT i.product_id) AS products FROM orders o JOIN order_items i ON i.order_id = o.id GROUP BY o.customer_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT o.customer_id, COUNT(i.product_id) AS products FROM orders o JOIN order_items i ON i.order_id = o.id GROUP BY o.customer_id;",
+        "why": "Counts repeats"
+      },
+      {
+        "sql": "SELECT o.customer_id, COUNT(DISTINCT o.id) AS products FROM orders o JOIN order_items i ON i.order_id = o.id GROUP BY o.customer_id;",
+        "why": "Counts orders"
+      }
+    ]
+  },
+  {
+    "id": "st05-r10",
+    "kind": "review",
+    "stage": 5,
+    "skills": [
+      30,
+      16
+    ],
+    "recalls": [],
+    "title": "Temperature jumps",
+    "prompt": "Show each city and date where the temperature rose by at least 3 degrees from the day before, with the rise as rise.",
+    "dataset": "weather",
+    "hints": [
+      "Self join on city and the previous date."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "city",
+            "reading_date",
+            "rise"
+          ],
+          "rows": []
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "UPDATE readings SET temp_c = 5 WHERE id = 2;",
+        "expected": {
+          "columns": [
+            "city",
+            "reading_date",
+            "rise"
+          ],
+          "rows": [
+            [
+              "Oslo",
+              "2024-03-02",
+              3
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT t.city, t.reading_date, t.temp_c - y.temp_c AS rise FROM readings t JOIN readings y ON y.city = t.city AND y.reading_date = date(t.reading_date, '-1 day') WHERE t.temp_c - y.temp_c >= 3;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT t.city, t.reading_date, t.temp_c - y.temp_c AS rise FROM readings t JOIN readings y ON y.city = t.city AND y.reading_date = date(t.reading_date, '-1 day') WHERE t.temp_c - y.temp_c > 3;",
+        "why": "Leaves out exactly 3"
+      },
+      {
+        "sql": "SELECT t.city, t.reading_date, t.temp_c - y.temp_c AS rise FROM readings t JOIN readings y ON y.reading_date = date(t.reading_date, '-1 day') WHERE t.temp_c - y.temp_c >= 3;",
+        "why": "Compares across cities"
+      }
+    ]
+  },
+  {
+    "id": "st05-r11",
+    "kind": "review",
+    "stage": 5,
+    "skills": [
+      31,
+      26
+    ],
+    "recalls": [],
+    "title": "Missing combinations",
+    "prompt": "For every category and customer city, show category, city, and how many products of that category were bought by that city's customers, as bought, including 0.",
+    "dataset": "shop",
+    "hints": [
+      "Build the grid first."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "category",
+            "city",
+            "bought"
+          ],
+          "rows": [
+            [
+              "Home",
+              "Pune",
+              0
+            ],
+            [
+              "Home",
+              "Rome",
+              0
+            ],
+            [
+              "Home",
+              "Tokyo",
+              1
+            ],
+            [
+              "Kitchen",
+              "Pune",
+              1
+            ],
+            [
+              "Kitchen",
+              "Rome",
+              2
+            ],
+            [
+              "Kitchen",
+              "Tokyo",
+              1
+            ],
+            [
+              "Stationery",
+              "Pune",
+              2
+            ],
+            [
+              "Stationery",
+              "Rome",
+              0
+            ],
+            [
+              "Stationery",
+              "Tokyo",
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "category",
+            "city",
+            "bought"
+          ],
+          "rows": [
+            [
+              "Home",
+              "Lima",
+              0
+            ],
+            [
+              "Home",
+              "Oslo",
+              1
+            ],
+            [
+              "Kitchen",
+              "Lima",
+              0
+            ],
+            [
+              "Kitchen",
+              "Oslo",
+              2
+            ],
+            [
+              "Stationery",
+              "Lima",
+              1
+            ],
+            [
+              "Stationery",
+              "Oslo",
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT k.category, t.city, COUNT(b.product_id) AS bought FROM (SELECT DISTINCT category FROM products) k CROSS JOIN (SELECT DISTINCT city FROM customers) t LEFT JOIN (SELECT p.category, c.city, i.product_id FROM order_items i JOIN orders o ON o.id = i.order_id JOIN customers c ON c.id = o.customer_id JOIN products p ON p.id = i.product_id) b ON b.category = k.category AND b.city = t.city GROUP BY k.category, t.city;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT p.category, c.city, COUNT(*) AS bought FROM order_items i JOIN orders o ON o.id = i.order_id JOIN customers c ON c.id = o.customer_id JOIN products p ON p.id = i.product_id GROUP BY p.category, c.city;",
+        "why": "Drops empty combinations"
+      },
+      {
+        "sql": "SELECT k.category, t.city, COUNT(*) AS bought FROM (SELECT DISTINCT category FROM products) k CROSS JOIN (SELECT DISTINCT city FROM customers) t LEFT JOIN (SELECT p.category, c.city, i.product_id FROM order_items i JOIN orders o ON o.id = i.order_id JOIN customers c ON c.id = o.customer_id JOIN products p ON p.id = i.product_id) b ON b.category = k.category AND b.city = t.city GROUP BY k.category, t.city;",
+        "why": "COUNT(*) shows 1 for none"
+      }
+    ]
+  },
+  {
+    "id": "st05-r12",
+    "kind": "review",
+    "stage": 5,
+    "skills": [
+      26,
+      17
+    ],
+    "recalls": [],
+    "title": "Spend per person",
+    "prompt": "Show every customer's name and their total spend as spend, with 0 for no orders.",
+    "dataset": "cafe",
+    "hints": [
+      "SUM over nothing gives NULL."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Corner Cafe",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "spend"
+          ],
+          "rows": [
+            [
+              "Priya",
+              8
+            ],
+            [
+              "Marco",
+              3
+            ],
+            [
+              "Hana",
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM orders; DELETE FROM customers; INSERT INTO customers VALUES (5, 'Lena'), (6, 'Omar'), (8, 'Zuri'); INSERT INTO orders VALUES (9, 6, 'Mocha', 5.0), (10, 9, 'Toast', 2.5), (11, 6, 'Bun', 1.5);",
+        "expected": {
+          "columns": [
+            "name",
+            "spend"
+          ],
+          "rows": [
+            [
+              "Lena",
+              0
+            ],
+            [
+              "Omar",
+              6.5
+            ],
+            [
+              "Zuri",
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name, COALESCE(SUM(o.amount), 0) AS spend FROM customers c LEFT JOIN orders o ON o.customer_id = c.id GROUP BY c.id, c.name;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name, SUM(o.amount) AS spend FROM customers c LEFT JOIN orders o ON o.customer_id = c.id GROUP BY c.id, c.name;",
+        "why": "Shows NULL"
+      },
+      {
+        "sql": "SELECT c.name, COALESCE(SUM(o.amount), 0) AS spend FROM customers c JOIN orders o ON o.customer_id = c.id GROUP BY c.id, c.name;",
+        "why": "Drops customers with no orders"
+      }
+    ]
+  },
+  {
+    "id": "st05-r13",
+    "kind": "review",
+    "stage": 5,
+    "skills": [
+      27,
+      28
+    ],
+    "recalls": [],
+    "title": "Departments without bonuses",
+    "prompt": "Show the name of departments where no employee has a bonus above 0, including empty departments.",
+    "dataset": "staff",
+    "hints": [
+      "Filter in ON, then test for NULL."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Support"
+            ],
+            [
+              "Legal"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Ops"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT d.name FROM departments d LEFT JOIN employees e ON e.department_id = d.id AND e.bonus > 0 WHERE e.id IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT d.name FROM departments d LEFT JOIN employees e ON e.department_id = d.id WHERE e.bonus IS NULL;",
+        "why": "An empty bonus doesn't mean everyone has none"
+      },
+      {
+        "sql": "SELECT d.name FROM departments d LEFT JOIN employees e ON e.department_id = d.id WHERE e.id IS NULL;",
+        "why": "Finds only empty departments"
+      }
+    ]
+  },
+  {
+    "id": "st05-r14",
+    "kind": "review",
+    "stage": 5,
+    "skills": [
+      25,
+      21
+    ],
+    "recalls": [],
+    "title": "Users on two devices",
+    "prompt": "Show the username of users who used more than one device.",
+    "dataset": "app",
+    "hints": [
+      "Count different devices per user."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "username"
+          ],
+          "rows": [
+            [
+              "nova"
+            ],
+            [
+              "quark"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "username"
+          ],
+          "rows": [
+            [
+              "sable"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT u.username FROM users u JOIN sessions s ON s.user_id = u.id GROUP BY u.id, u.username HAVING COUNT(DISTINCT s.device) > 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT u.username FROM users u JOIN sessions s ON s.user_id = u.id GROUP BY u.id, u.username HAVING COUNT(s.device) > 1;",
+        "why": "Counts sessions"
+      },
+      {
+        "sql": "SELECT u.username FROM users u JOIN sessions s ON s.user_id = u.id GROUP BY u.id, u.username;",
+        "why": "Keeps everyone"
+      }
+    ]
+  },
+  {
+    "id": "st05-r15",
+    "kind": "review",
+    "stage": 5,
+    "skills": [
+      32,
+      19
+    ],
+    "recalls": [],
+    "title": "Average spend per city",
+    "prompt": "Show each customer city and its average line value as avg_line (price times quantity), rounded to 2 decimals, highest first.",
+    "dataset": "shop",
+    "hints": [
+      "Join across four tables."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "city",
+            "avg_line"
+          ],
+          "rows": [
+            [
+              "Tokyo",
+              23.75
+            ],
+            [
+              "Pune",
+              16.67
+            ],
+            [
+              "Rome",
+              13.5
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "city",
+            "avg_line"
+          ],
+          "rows": [
+            [
+              "Oslo",
+              25.33
+            ],
+            [
+              "Lima",
+              25
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.city, ROUND(AVG(p.price * i.quantity), 2) AS avg_line FROM customers c JOIN orders o ON o.customer_id = c.id JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id GROUP BY c.city ORDER BY avg_line DESC;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.city, ROUND(AVG(p.price), 2) AS avg_line FROM customers c JOIN orders o ON o.customer_id = c.id JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id GROUP BY c.city ORDER BY avg_line DESC;",
+        "why": "Ignores quantity"
+      },
+      {
+        "sql": "SELECT c.city, ROUND(AVG(p.price * i.quantity), 2) AS avg_line FROM customers c JOIN orders o ON o.customer_id = c.id JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id GROUP BY c.city ORDER BY avg_line;",
+        "why": "Sorts lowest first"
+      }
+    ]
+  }
+]

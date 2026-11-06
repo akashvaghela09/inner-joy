@@ -1,0 +1,823 @@
+[
+  {
+    "id": "s26-01",
+    "skill": 26,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Keep every customer",
+    "prompt": "Show every customer's name and their order id as order_id. Customers with no orders must stay. Replace the ___.",
+    "dataset": "shop",
+    "starterSql": "SELECT c.name, o.id AS order_id\nFROM customers c\n___ JOIN orders o ON o.customer_id = c.id;",
+    "hints": [
+      "The table that must keep all its rows comes first."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "order_id"
+          ],
+          "rows": [
+            [
+              "Priya",
+              1
+            ],
+            [
+              "Priya",
+              3
+            ],
+            [
+              "Marco",
+              2
+            ],
+            [
+              "Hana",
+              4
+            ],
+            [
+              "Hana",
+              6
+            ],
+            [
+              "Luis",
+              5
+            ],
+            [
+              "Noor",
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "order_id"
+          ],
+          "rows": [
+            [
+              "Ravi",
+              11
+            ],
+            [
+              "Ravi",
+              13
+            ],
+            [
+              "Sara",
+              12
+            ],
+            [
+              "Tom",
+              null
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name, o.id AS order_id FROM customers c LEFT JOIN orders o ON o.customer_id = c.id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name, o.id AS order_id FROM customers c JOIN orders o ON o.customer_id = c.id;",
+        "why": "Drops customers with no orders"
+      },
+      {
+        "sql": "SELECT c.name, o.id AS order_id FROM orders o LEFT JOIN customers c ON o.customer_id = c.id;",
+        "why": "Keeps orders, not customers"
+      }
+    ]
+  },
+  {
+    "id": "s26-02",
+    "skill": 26,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [],
+    "title": "Departments and staff",
+    "prompt": "Show every department's name as department, and each employee's name as employee. Departments with no staff must stay.",
+    "dataset": "staff",
+    "hints": [
+      "Start FROM departments."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "department",
+            "employee"
+          ],
+          "rows": [
+            [
+              "Engineering",
+              "Asha"
+            ],
+            [
+              "Engineering",
+              "Ben"
+            ],
+            [
+              "Engineering",
+              "Chloe"
+            ],
+            [
+              "Sales",
+              "Dev"
+            ],
+            [
+              "Sales",
+              "Elena"
+            ],
+            [
+              "Sales",
+              "Farid"
+            ],
+            [
+              "Support",
+              "Grace"
+            ],
+            [
+              "Legal",
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "department",
+            "employee"
+          ],
+          "rows": [
+            [
+              "Design",
+              "Ivy"
+            ],
+            [
+              "Design",
+              "Jon"
+            ],
+            [
+              "Finance",
+              "Kim"
+            ],
+            [
+              "Finance",
+              "Mia"
+            ],
+            [
+              "Ops",
+              null
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT d.name AS department, e.name AS employee FROM departments d LEFT JOIN employees e ON e.department_id = d.id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT d.name AS department, e.name AS employee FROM departments d JOIN employees e ON e.department_id = d.id;",
+        "why": "Drops empty departments"
+      },
+      {
+        "sql": "SELECT d.name AS department, e.name AS employee FROM employees e LEFT JOIN departments d ON e.department_id = d.id;",
+        "why": "Keeps employees, not departments"
+      }
+    ]
+  },
+  {
+    "id": "s26-03",
+    "skill": 26,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      18,
+      20
+    ],
+    "title": "Counting with zeros",
+    "prompt": "Show each customer's name and number of orders, as orders. Customers with no orders must show 0.",
+    "dataset": "shop",
+    "hints": [
+      "COUNT a column from the right table."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "orders"
+          ],
+          "rows": [
+            [
+              "Priya",
+              2
+            ],
+            [
+              "Marco",
+              1
+            ],
+            [
+              "Hana",
+              2
+            ],
+            [
+              "Luis",
+              1
+            ],
+            [
+              "Noor",
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "orders"
+          ],
+          "rows": [
+            [
+              "Ravi",
+              2
+            ],
+            [
+              "Sara",
+              1
+            ],
+            [
+              "Tom",
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name, COUNT(o.id) AS orders FROM customers c LEFT JOIN orders o ON o.customer_id = c.id GROUP BY c.id, c.name;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name, COUNT(*) AS orders FROM customers c LEFT JOIN orders o ON o.customer_id = c.id GROUP BY c.id, c.name;",
+        "why": "COUNT(*) counts the empty row as 1"
+      },
+      {
+        "sql": "SELECT c.name, COUNT(o.id) AS orders FROM customers c JOIN orders o ON o.customer_id = c.id GROUP BY c.id, c.name;",
+        "why": "Drops customers with no orders"
+      }
+    ]
+  },
+  {
+    "id": "s26-04",
+    "skill": 26,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      20
+    ],
+    "title": "Every course's enrolments",
+    "prompt": "Show each course's title and its average grade as average, rounded to 1 decimal. Courses with no grades show NULL.",
+    "dataset": "school",
+    "hints": [
+      "AVG over no values gives NULL."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title",
+            "average"
+          ],
+          "rows": [
+            [
+              "Algebra",
+              74.8
+            ],
+            [
+              "Geometry",
+              74
+            ],
+            [
+              "Biology",
+              82
+            ],
+            [
+              "Poetry",
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "title",
+            "average"
+          ],
+          "rows": [
+            [
+              "Chemistry",
+              60
+            ],
+            [
+              "Drama",
+              95
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.title, ROUND(AVG(e.grade), 1) AS average FROM courses c LEFT JOIN enrolments e ON e.course_id = c.id GROUP BY c.id, c.title;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.title, ROUND(AVG(e.grade), 1) AS average FROM courses c JOIN enrolments e ON e.course_id = c.id GROUP BY c.id, c.title;",
+        "why": "Drops courses without enrolments"
+      },
+      {
+        "sql": "SELECT c.title, AVG(e.grade) AS average FROM courses c LEFT JOIN enrolments e ON e.course_id = c.id GROUP BY c.id, c.title;",
+        "why": "Doesn't round"
+      }
+    ]
+  },
+  {
+    "id": "s26-05",
+    "skill": 26,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      17,
+      9
+    ],
+    "title": "Zero instead of NULL",
+    "prompt": "Show each product's name and total units sold, as units. Products that never sold must show 0, not NULL.",
+    "dataset": "shop",
+    "hints": [
+      "SUM over nothing is NULL, so use COALESCE."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "units"
+          ],
+          "rows": [
+            [
+              "Notebook",
+              4
+            ],
+            [
+              "Pen",
+              6
+            ],
+            [
+              "Mug",
+              3
+            ],
+            [
+              "Kettle",
+              2
+            ],
+            [
+              "Lamp",
+              2
+            ],
+            [
+              "Rug",
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO products VALUES (10, 'Vase', 'Home', 5.0, 2.0);",
+        "expected": {
+          "columns": [
+            "name",
+            "units"
+          ],
+          "rows": [
+            [
+              "Stool",
+              1
+            ],
+            [
+              "Cup",
+              4
+            ],
+            [
+              "Ink",
+              2
+            ],
+            [
+              "Vase",
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT p.name, COALESCE(SUM(i.quantity), 0) AS units FROM products p LEFT JOIN order_items i ON i.product_id = p.id GROUP BY p.id, p.name;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT p.name, SUM(i.quantity) AS units FROM products p LEFT JOIN order_items i ON i.product_id = p.id GROUP BY p.id, p.name;",
+        "why": "Shows NULL"
+      },
+      {
+        "sql": "SELECT p.name, COALESCE(SUM(i.quantity), 0) AS units FROM products p JOIN order_items i ON i.product_id = p.id GROUP BY p.id, p.name;",
+        "why": "Drops unsold products"
+      }
+    ]
+  },
+  {
+    "id": "s26-06",
+    "skill": 26,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the lost rows",
+    "prompt": "This should show every employee's name and department as department, including employees with no department, but one is missing. Fix it.",
+    "dataset": "staff",
+    "starterSql": "SELECT e.name, d.name AS department\nFROM employees e\nJOIN departments d ON d.id = e.department_id;",
+    "hints": [
+      "An inner join drops unmatched rows."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "department"
+          ],
+          "rows": [
+            [
+              "Asha",
+              "Engineering"
+            ],
+            [
+              "Ben",
+              "Engineering"
+            ],
+            [
+              "Chloe",
+              "Engineering"
+            ],
+            [
+              "Dev",
+              "Sales"
+            ],
+            [
+              "Elena",
+              "Sales"
+            ],
+            [
+              "Farid",
+              "Sales"
+            ],
+            [
+              "Grace",
+              "Support"
+            ],
+            [
+              "Hugo",
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "department"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              "Design"
+            ],
+            [
+              "Jon",
+              "Design"
+            ],
+            [
+              "Kim",
+              "Finance"
+            ],
+            [
+              "Leo",
+              null
+            ],
+            [
+              "Mia",
+              "Finance"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT e.name, d.name AS department FROM employees e LEFT JOIN departments d ON d.id = e.department_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT e.name, d.name AS department FROM departments d LEFT JOIN employees e ON d.id = e.department_id;",
+        "why": "Keeps departments instead"
+      },
+      {
+        "sql": "SELECT e.name, e.department_id AS department FROM employees e;",
+        "why": "Doesn't show department names"
+      }
+    ]
+  },
+  {
+    "id": "s26-07",
+    "skill": 26,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      9,
+      17
+    ],
+    "title": "Name the gap",
+    "prompt": "Show each employee's name and department as department, using the text Unassigned for employees with no department.",
+    "dataset": "staff",
+    "hints": [
+      "COALESCE works on join results."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "department"
+          ],
+          "rows": [
+            [
+              "Asha",
+              "Engineering"
+            ],
+            [
+              "Ben",
+              "Engineering"
+            ],
+            [
+              "Chloe",
+              "Engineering"
+            ],
+            [
+              "Dev",
+              "Sales"
+            ],
+            [
+              "Elena",
+              "Sales"
+            ],
+            [
+              "Farid",
+              "Sales"
+            ],
+            [
+              "Grace",
+              "Support"
+            ],
+            [
+              "Hugo",
+              "Unassigned"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "department"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              "Design"
+            ],
+            [
+              "Jon",
+              "Design"
+            ],
+            [
+              "Kim",
+              "Finance"
+            ],
+            [
+              "Leo",
+              "Unassigned"
+            ],
+            [
+              "Mia",
+              "Finance"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT e.name, COALESCE(d.name, 'Unassigned') AS department FROM employees e LEFT JOIN departments d ON d.id = e.department_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT e.name, d.name AS department FROM employees e LEFT JOIN departments d ON d.id = e.department_id;",
+        "why": "Leaves NULL"
+      },
+      {
+        "sql": "SELECT e.name, COALESCE(d.name, 'Unassigned') AS department FROM employees e JOIN departments d ON d.id = e.department_id;",
+        "why": "Drops employees with no department"
+      }
+    ]
+  },
+  {
+    "id": "s26-08",
+    "skill": 26,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      17,
+      18
+    ],
+    "title": "Department report",
+    "prompt": "Show every department's name as department, its staff count as staff, and its total salary as total_salary, with 0 for empty departments. Sort by department.",
+    "dataset": "staff",
+    "hints": [
+      "Count and sum from the right table, with COALESCE."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "department",
+            "staff",
+            "total_salary"
+          ],
+          "rows": [
+            [
+              "Engineering",
+              3,
+              310000
+            ],
+            [
+              "Legal",
+              0,
+              0
+            ],
+            [
+              "Sales",
+              3,
+              190000
+            ],
+            [
+              "Support",
+              1,
+              48000
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "department",
+            "staff",
+            "total_salary"
+          ],
+          "rows": [
+            [
+              "Design",
+              2,
+              160000
+            ],
+            [
+              "Finance",
+              2,
+              125000
+            ],
+            [
+              "Ops",
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT d.name AS department, COUNT(e.id) AS staff, COALESCE(SUM(e.salary), 0) AS total_salary FROM departments d LEFT JOIN employees e ON e.department_id = d.id GROUP BY d.id, d.name ORDER BY department;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT d.name AS department, COUNT(*) AS staff, COALESCE(SUM(e.salary), 0) AS total_salary FROM departments d LEFT JOIN employees e ON e.department_id = d.id GROUP BY d.id, d.name ORDER BY department;",
+        "why": "COUNT(*) shows 1 for empty departments"
+      },
+      {
+        "sql": "SELECT d.name AS department, COUNT(e.id) AS staff, SUM(e.salary) AS total_salary FROM departments d LEFT JOIN employees e ON e.department_id = d.id GROUP BY d.id, d.name ORDER BY department;",
+        "why": "Shows NULL for empty departments"
+      }
+    ]
+  }
+]

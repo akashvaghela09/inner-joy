@@ -1,0 +1,15 @@
+{
+  "skill": 31,
+  "summary": "CROSS JOIN pairs every row in one table with every row in another. It has no matching condition.",
+  "points": [
+    "The result has the row counts multiplied together, so it can get large.",
+    "It's useful for creating every possible combination, such as each student with each course.",
+    "A LEFT JOIN from that grid then fills in what happened, leaving 0 where nothing did.",
+    "An accidental missing ON has the same effect, which is usually a bug."
+  ],
+  "example": {
+    "dataset": "school",
+    "sql": "SELECT s.name, c.title, COUNT(e.id) AS attempts\nFROM students s\nCROSS JOIN courses c\nLEFT JOIN enrolments e ON e.student_id = s.id AND e.course_id = c.id\nGROUP BY s.id, s.name, c.id, c.title;",
+    "explanation": "Every student and course pair appears, including pairs with zero attempts."
+  }
+}

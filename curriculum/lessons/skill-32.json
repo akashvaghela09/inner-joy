@@ -1,0 +1,15 @@
+{
+  "skill": 32,
+  "summary": "Joining several tables is just one join after another, each adding a table.",
+  "points": [
+    "Each new JOIN needs its own ON linking it to a table already in the query.",
+    "Follow the keys like a path: customers to orders to order_items to products.",
+    "Build it one join at a time and check the rows at each step.",
+    "If any step must keep unmatched rows, later joins usually must be LEFT JOINs too."
+  ],
+  "example": {
+    "dataset": "shop",
+    "sql": "SELECT c.name, p.name AS product, i.quantity\nFROM customers c\nJOIN orders o ON o.customer_id = c.id\nJOIN order_items i ON i.order_id = o.id\nJOIN products p ON p.id = i.product_id;",
+    "explanation": "The query walks from customer to product through two linking tables."
+  }
+}

@@ -1,0 +1,695 @@
+[
+  {
+    "id": "s24-01",
+    "skill": 24,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [
+      20
+    ],
+    "title": "Orders per customer",
+    "prompt": "Show each customer_id and how many orders it has, as orders. This reveals the one-to-many link. Replace the ___.",
+    "dataset": "shop",
+    "starterSql": "SELECT customer_id, COUNT(*) AS orders\nFROM orders\nGROUP BY ___;",
+    "hints": [
+      "Group by the foreign key."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "customer_id",
+            "orders"
+          ],
+          "rows": [
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "customer_id",
+            "orders"
+          ],
+          "rows": [
+            [
+              7,
+              2
+            ],
+            [
+              8,
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT customer_id, COUNT(*) AS orders FROM orders GROUP BY customer_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT customer_id, COUNT(*) AS orders FROM orders GROUP BY id;",
+        "why": "Groups by order"
+      },
+      {
+        "sql": "SELECT customer_id, COUNT(*) AS orders FROM orders;",
+        "why": "Doesn't group"
+      }
+    ]
+  },
+  {
+    "id": "s24-02",
+    "skill": 24,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [],
+    "title": "Items per order",
+    "prompt": "Show each order_id and how many rows it has in order_items, as line_items.",
+    "dataset": "shop",
+    "hints": [
+      "One row is one product in one order."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "order_id",
+            "line_items"
+          ],
+          "rows": [
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              6,
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "order_id",
+            "line_items"
+          ],
+          "rows": [
+            [
+              11,
+              2
+            ],
+            [
+              12,
+              1
+            ],
+            [
+              13,
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT order_id, COUNT(*) AS line_items FROM order_items GROUP BY order_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT order_id, SUM(quantity) AS line_items FROM order_items GROUP BY order_id;",
+        "why": "Adds units, not rows"
+      },
+      {
+        "sql": "SELECT product_id, COUNT(*) AS line_items FROM order_items GROUP BY product_id;",
+        "why": "Groups by product"
+      }
+    ]
+  },
+  {
+    "id": "s24-03",
+    "skill": 24,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      20
+    ],
+    "title": "Many on the other side",
+    "prompt": "A student can have many enrolments. Show the student_id of students with more than one enrolment.",
+    "dataset": "school",
+    "hints": [
+      "Filter the groups."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "student_id"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ],
+            [
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring'); INSERT INTO enrolments VALUES (15, 8, 5, 50, '2024-spring');",
+        "expected": {
+          "columns": [
+            "student_id"
+          ],
+          "rows": [
+            [
+              6
+            ],
+            [
+              7
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT student_id FROM enrolments GROUP BY student_id HAVING COUNT(*) > 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT student_id FROM enrolments GROUP BY student_id;",
+        "why": "Keeps everyone"
+      },
+      {
+        "sql": "SELECT id FROM enrolments GROUP BY id HAVING COUNT(*) > 1;",
+        "why": "An id is unique, so this is empty"
+      }
+    ]
+  },
+  {
+    "id": "s24-04",
+    "skill": 24,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      3
+    ],
+    "title": "Sessions per user",
+    "prompt": "Show each user_id and its number of sessions, as sessions.",
+    "dataset": "app",
+    "hints": [
+      "sessions.user_id is the foreign key."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "user_id",
+            "sessions"
+          ],
+          "rows": [
+            [
+              1,
+              3
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "user_id",
+            "sessions"
+          ],
+          "rows": [
+            [
+              7,
+              3
+            ],
+            [
+              8,
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT user_id, COUNT(*) AS sessions FROM sessions GROUP BY user_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT user_id, COUNT(*) AS sessions FROM sessions GROUP BY session_date;",
+        "why": "Groups by date"
+      },
+      {
+        "sql": "SELECT id, COUNT(*) AS sessions FROM sessions GROUP BY id;",
+        "why": "Groups by session"
+      }
+    ]
+  },
+  {
+    "id": "s24-05",
+    "skill": 24,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      3
+    ],
+    "title": "What one row means",
+    "prompt": "One order can have many rows in order_items. Show the row count as item_rows, and the number of different orders as orders.",
+    "dataset": "shop",
+    "hints": [
+      "COUNT(DISTINCT order_id) counts real orders."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "item_rows",
+            "orders"
+          ],
+          "rows": [
+            [
+              9,
+              6
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "item_rows",
+            "orders"
+          ],
+          "rows": [
+            [
+              4,
+              3
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT COUNT(*) AS item_rows, COUNT(DISTINCT order_id) AS orders FROM order_items;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT COUNT(*) AS item_rows, COUNT(*) AS orders FROM order_items;",
+        "why": "Treats each row as an order"
+      },
+      {
+        "sql": "SELECT COUNT(DISTINCT product_id) AS item_rows, COUNT(DISTINCT order_id) AS orders FROM order_items;",
+        "why": "Counts products instead of rows"
+      }
+    ]
+  },
+  {
+    "id": "s24-06",
+    "skill": 24,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the grain",
+    "prompt": "This should show how many times each product was sold, as times_sold, with one row per product_id. It runs but the grain is wrong. Fix it.",
+    "dataset": "shop",
+    "starterSql": "SELECT product_id, COUNT(*) AS times_sold\nFROM order_items\nGROUP BY order_id;",
+    "hints": [
+      "Group by what each result row should represent."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "product_id",
+            "times_sold"
+          ],
+          "rows": [
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              5,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "product_id",
+            "times_sold"
+          ],
+          "rows": [
+            [
+              7,
+              1
+            ],
+            [
+              8,
+              2
+            ],
+            [
+              9,
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT product_id, COUNT(*) AS times_sold FROM order_items GROUP BY product_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT product_id, COUNT(*) AS times_sold FROM order_items;",
+        "why": "Doesn't group"
+      },
+      {
+        "sql": "SELECT product_id, SUM(quantity) AS times_sold FROM order_items GROUP BY product_id;",
+        "why": "Adds units instead"
+      }
+    ]
+  },
+  {
+    "id": "s24-07",
+    "skill": 24,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      3
+    ],
+    "title": "Many-to-many",
+    "prompt": "Students and courses connect through enrolments. Show each course_id and how many different students it has, as students.",
+    "dataset": "school",
+    "hints": [
+      "A student can retake a course, so use DISTINCT."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "course_id",
+            "students"
+          ],
+          "rows": [
+            [
+              1,
+              3
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              3
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "course_id",
+            "students"
+          ],
+          "rows": [
+            [
+              5,
+              2
+            ],
+            [
+              6,
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT course_id, COUNT(DISTINCT student_id) AS students FROM enrolments GROUP BY course_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT course_id, COUNT(*) AS students FROM enrolments GROUP BY course_id;",
+        "why": "Counts retakes twice"
+      },
+      {
+        "sql": "SELECT student_id, COUNT(DISTINCT course_id) AS students FROM enrolments GROUP BY student_id;",
+        "why": "Groups by student"
+      }
+    ]
+  },
+  {
+    "id": "s24-08",
+    "skill": 24,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      20
+    ],
+    "title": "Customer per month",
+    "prompt": "Show each customer_id and month like 2024-01 as month, with their number of orders as orders. One result row is one customer in one month.",
+    "dataset": "shop",
+    "hints": [
+      "Group by two values."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "customer_id",
+            "month",
+            "orders"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-01",
+              1
+            ],
+            [
+              1,
+              "2024-02",
+              1
+            ],
+            [
+              2,
+              "2024-01",
+              1
+            ],
+            [
+              3,
+              "2024-02",
+              1
+            ],
+            [
+              3,
+              "2024-03",
+              1
+            ],
+            [
+              4,
+              "2024-03",
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO orders VALUES (14, 7, '2024-02-02', 'shipped');",
+        "expected": {
+          "columns": [
+            "customer_id",
+            "month",
+            "orders"
+          ],
+          "rows": [
+            [
+              7,
+              "2024-02",
+              2
+            ],
+            [
+              7,
+              "2024-03",
+              1
+            ],
+            [
+              8,
+              "2024-03",
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT customer_id, strftime('%Y-%m', order_date) AS month, COUNT(*) AS orders FROM orders GROUP BY customer_id, month;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT customer_id, strftime('%Y-%m', order_date) AS month, COUNT(*) AS orders FROM orders GROUP BY customer_id;",
+        "why": "Merges a customer's months"
+      },
+      {
+        "sql": "SELECT customer_id, strftime('%Y-%m', order_date) AS month, COUNT(*) AS orders FROM orders GROUP BY month;",
+        "why": "Merges customers"
+      }
+    ]
+  }
+]

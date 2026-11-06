@@ -1,0 +1,1283 @@
+[
+  {
+    "id": "st05-c01",
+    "kind": "checkpoint",
+    "stage": 5,
+    "skills": [
+      26,
+      30
+    ],
+    "sourceProblem": 6,
+    "recalls": [],
+    "title": "Usernames and referrers",
+    "prompt": "Show every username, and the id of the user who invited them, renamed invited_by. Users nobody invited must show NULL.",
+    "dataset": "app",
+    "hints": [
+      "This needs only one table, but keep all rows."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "username",
+            "invited_by"
+          ],
+          "rows": [
+            [
+              "nova",
+              null
+            ],
+            [
+              "orbit",
+              1
+            ],
+            [
+              "pixel",
+              1
+            ],
+            [
+              "quark",
+              2
+            ],
+            [
+              "raven",
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "username",
+            "invited_by"
+          ],
+          "rows": [
+            [
+              "sable",
+              null
+            ],
+            [
+              "tulip",
+              7
+            ],
+            [
+              "umber",
+              7
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT u.username, r.id AS invited_by FROM users u LEFT JOIN users r ON r.id = u.referrer_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT u.username, r.id AS invited_by FROM users u JOIN users r ON r.id = u.referrer_id;",
+        "why": "Drops users nobody invited"
+      },
+      {
+        "sql": "SELECT u.username, u.id AS invited_by FROM users u;",
+        "why": "Shows their own id"
+      }
+    ]
+  },
+  {
+    "id": "st05-c02",
+    "kind": "checkpoint",
+    "stage": 5,
+    "skills": [
+      25,
+      32
+    ],
+    "sourceProblem": 7,
+    "recalls": [],
+    "title": "Sale details",
+    "prompt": "For every order item, show its product's name, the order's date, and the quantity.",
+    "dataset": "shop",
+    "hints": [
+      "Join order_items to two other tables."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "order_date",
+            "quantity"
+          ],
+          "rows": [
+            [
+              "Notebook",
+              "2024-01-05",
+              3
+            ],
+            [
+              "Pen",
+              "2024-01-05",
+              2
+            ],
+            [
+              "Mug",
+              "2024-01-17",
+              1
+            ],
+            [
+              "Kettle",
+              "2024-02-03",
+              1
+            ],
+            [
+              "Lamp",
+              "2024-02-20",
+              2
+            ],
+            [
+              "Notebook",
+              "2024-02-20",
+              1
+            ],
+            [
+              "Mug",
+              "2024-03-02",
+              2
+            ],
+            [
+              "Kettle",
+              "2024-03-15",
+              1
+            ],
+            [
+              "Pen",
+              "2024-03-15",
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "order_date",
+            "quantity"
+          ],
+          "rows": [
+            [
+              "Stool",
+              "2024-02-28",
+              1
+            ],
+            [
+              "Cup",
+              "2024-02-28",
+              3
+            ],
+            [
+              "Ink",
+              "2024-03-01",
+              2
+            ],
+            [
+              "Cup",
+              "2024-03-31",
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT p.name, o.order_date, i.quantity FROM order_items i JOIN products p ON p.id = i.product_id JOIN orders o ON o.id = i.order_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT p.name, o.order_date, i.quantity FROM order_items i JOIN products p ON p.id = i.product_id JOIN orders o;",
+        "why": "A join has no condition"
+      },
+      {
+        "sql": "SELECT i.product_id, o.order_date, i.quantity FROM order_items i JOIN orders o ON o.id = i.order_id;",
+        "why": "Doesn't show names"
+      }
+    ]
+  },
+  {
+    "id": "st05-c03",
+    "kind": "checkpoint",
+    "stage": 5,
+    "skills": [
+      9,
+      20
+    ],
+    "sourceProblem": 8,
+    "recalls": [],
+    "title": "No grade yet",
+    "prompt": "A student has an unfinished enrolment when it has no grade. Show each student_id with unfinished enrolments and how many, as unfinished.",
+    "dataset": "school",
+    "hints": [
+      "No join is needed. Filter, then count."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "student_id",
+            "unfinished"
+          ],
+          "rows": [
+            [
+              3,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "student_id",
+            "unfinished"
+          ],
+          "rows": [
+            [
+              7,
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT student_id, COUNT(*) AS unfinished FROM enrolments WHERE grade IS NULL GROUP BY student_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT student_id, COUNT(grade) AS unfinished FROM enrolments WHERE grade IS NULL GROUP BY student_id;",
+        "why": "COUNT(grade) ignores NULLs"
+      },
+      {
+        "sql": "SELECT student_id, COUNT(*) AS unfinished FROM enrolments GROUP BY student_id;",
+        "why": "Counts all enrolments"
+      }
+    ]
+  },
+  {
+    "id": "st05-c04",
+    "kind": "checkpoint",
+    "stage": 5,
+    "skills": [
+      30,
+      16
+    ],
+    "sourceProblem": 9,
+    "recalls": [],
+    "title": "Rainier than yesterday",
+    "prompt": "Show each reading's id where rainfall was higher than the same city's rainfall on the previous calendar day.",
+    "dataset": "weather",
+    "hints": [
+      "Join on the previous date, not the previous id."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": []
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "UPDATE readings SET rainfall_mm = 3.0 WHERE id = 2; UPDATE readings SET reading_date = '2024-03-08' WHERE id = 4; INSERT INTO readings VALUES (9, 'Oslo', '2024-03-07', 1, 0.5);",
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              2
+            ],
+            [
+              4
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT t.id FROM readings t JOIN readings y ON y.city = t.city AND y.reading_date = date(t.reading_date, '-1 day') WHERE t.rainfall_mm > y.rainfall_mm;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT t.id FROM readings t JOIN readings y ON y.id = t.id - 1 WHERE t.rainfall_mm > y.rainfall_mm;",
+        "why": "The previous row isn't the previous day"
+      },
+      {
+        "sql": "SELECT t.id FROM readings t JOIN readings y ON y.city = t.city AND y.reading_date = date(t.reading_date, '-1 day') WHERE t.rainfall_mm < y.rainfall_mm;",
+        "why": "Finds drier days"
+      }
+    ]
+  },
+  {
+    "id": "st05-c05",
+    "kind": "checkpoint",
+    "stage": 5,
+    "skills": [
+      16,
+      19,
+      20
+    ],
+    "sourceProblem": 10,
+    "recalls": [],
+    "title": "Average session gap",
+    "prompt": "Each user's first and last session are the earliest and latest date. Show each user_id and the days between them as span, rounded to 1 decimal.",
+    "dataset": "app",
+    "hints": [
+      "Use MIN, MAX, and julianday."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "user_id",
+            "span"
+          ],
+          "rows": [
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              4,
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "user_id",
+            "span"
+          ],
+          "rows": [
+            [
+              7,
+              2
+            ],
+            [
+              8,
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT user_id, ROUND(julianday(MAX(session_date)) - julianday(MIN(session_date)), 1) AS span FROM sessions GROUP BY user_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT user_id, ROUND(julianday(MIN(session_date)) - julianday(MAX(session_date)), 1) AS span FROM sessions GROUP BY user_id;",
+        "why": "Subtracts the wrong way round"
+      },
+      {
+        "sql": "SELECT user_id, COUNT(*) AS span FROM sessions GROUP BY user_id;",
+        "why": "Counts sessions"
+      }
+    ]
+  },
+  {
+    "id": "st05-c06",
+    "kind": "checkpoint",
+    "stage": 5,
+    "skills": [
+      25,
+      9
+    ],
+    "sourceProblem": 11,
+    "recalls": [],
+    "title": "Low or missing discount",
+    "prompt": "Show each product's name and discount for order items whose discount is under 1 or wasn't recorded.",
+    "dataset": "shop",
+    "hints": [
+      "Handle missing values explicitly."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "discount"
+          ],
+          "rows": [
+            [
+              "Notebook",
+              null
+            ],
+            [
+              "Pen",
+              0.5
+            ],
+            [
+              "Mug",
+              null
+            ],
+            [
+              "Lamp",
+              null
+            ],
+            [
+              "Notebook",
+              null
+            ],
+            [
+              "Kettle",
+              null
+            ],
+            [
+              "Pen",
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); UPDATE order_items SET discount = 0.5 WHERE order_id = 12;",
+        "expected": {
+          "columns": [
+            "name",
+            "discount"
+          ],
+          "rows": [
+            [
+              "Cup",
+              null
+            ],
+            [
+              "Ink",
+              0.5
+            ],
+            [
+              "Cup",
+              null
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT p.name, i.discount FROM order_items i JOIN products p ON p.id = i.product_id WHERE i.discount < 1 OR i.discount IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT p.name, i.discount FROM order_items i JOIN products p ON p.id = i.product_id WHERE i.discount < 1;",
+        "why": "Drops missing discounts"
+      },
+      {
+        "sql": "SELECT p.name, i.discount FROM order_items i JOIN products p ON p.id = i.product_id WHERE i.discount IS NULL;",
+        "why": "Drops low discounts"
+      }
+    ]
+  },
+  {
+    "id": "st05-c07",
+    "kind": "checkpoint",
+    "stage": 5,
+    "skills": [
+      31,
+      26,
+      11
+    ],
+    "sourceProblem": 12,
+    "recalls": [],
+    "title": "Every attempt count",
+    "prompt": "For every student and course, show student_id, name, title, and attempts, sorted by student_id then title. Pairs with none show 0.",
+    "dataset": "school",
+    "hints": [
+      "Grid, then LEFT JOIN, then group."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "student_id",
+            "name",
+            "title",
+            "attempts"
+          ],
+          "rows": [
+            [
+              1,
+              "Anya",
+              "Algebra",
+              1
+            ],
+            [
+              1,
+              "Anya",
+              "Biology",
+              1
+            ],
+            [
+              1,
+              "Anya",
+              "Geometry",
+              0
+            ],
+            [
+              1,
+              "Anya",
+              "Poetry",
+              0
+            ],
+            [
+              2,
+              "Bilal",
+              "Algebra",
+              2
+            ],
+            [
+              2,
+              "Bilal",
+              "Biology",
+              0
+            ],
+            [
+              2,
+              "Bilal",
+              "Geometry",
+              0
+            ],
+            [
+              2,
+              "Bilal",
+              "Poetry",
+              0
+            ],
+            [
+              3,
+              "Cara",
+              "Algebra",
+              0
+            ],
+            [
+              3,
+              "Cara",
+              "Biology",
+              1
+            ],
+            [
+              3,
+              "Cara",
+              "Geometry",
+              1
+            ],
+            [
+              3,
+              "Cara",
+              "Poetry",
+              0
+            ],
+            [
+              4,
+              "Dmitri",
+              "Algebra",
+              1
+            ],
+            [
+              4,
+              "Dmitri",
+              "Biology",
+              1
+            ],
+            [
+              4,
+              "Dmitri",
+              "Geometry",
+              1
+            ],
+            [
+              4,
+              "Dmitri",
+              "Poetry",
+              0
+            ],
+            [
+              5,
+              "Esi",
+              "Algebra",
+              0
+            ],
+            [
+              5,
+              "Esi",
+              "Biology",
+              0
+            ],
+            [
+              5,
+              "Esi",
+              "Geometry",
+              0
+            ],
+            [
+              5,
+              "Esi",
+              "Poetry",
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "student_id",
+            "name",
+            "title",
+            "attempts"
+          ],
+          "rows": [
+            [
+              6,
+              "Femi",
+              "Chemistry",
+              2
+            ],
+            [
+              6,
+              "Femi",
+              "Drama",
+              0
+            ],
+            [
+              7,
+              "Gia",
+              "Chemistry",
+              1
+            ],
+            [
+              7,
+              "Gia",
+              "Drama",
+              1
+            ],
+            [
+              8,
+              "Hao",
+              "Chemistry",
+              0
+            ],
+            [
+              8,
+              "Hao",
+              "Drama",
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT s.id AS student_id, s.name, c.title, COUNT(e.id) AS attempts FROM students s CROSS JOIN courses c LEFT JOIN enrolments e ON e.student_id = s.id AND e.course_id = c.id GROUP BY s.id, s.name, c.id, c.title ORDER BY s.id, c.title;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT s.id AS student_id, s.name, c.title, COUNT(*) AS attempts FROM students s CROSS JOIN courses c LEFT JOIN enrolments e ON e.student_id = s.id AND e.course_id = c.id GROUP BY s.id, s.name, c.id, c.title ORDER BY s.id, c.title;",
+        "why": "COUNT(*) shows 1 for none"
+      },
+      {
+        "sql": "SELECT s.id AS student_id, s.name, c.title, COUNT(e.id) AS attempts FROM students s JOIN enrolments e ON e.student_id = s.id JOIN courses c ON c.id = e.course_id GROUP BY s.id, s.name, c.id, c.title ORDER BY s.id, c.title;",
+        "why": "Drops pairs with none"
+      }
+    ]
+  },
+  {
+    "id": "st05-c08",
+    "kind": "checkpoint",
+    "stage": 5,
+    "skills": [
+      30,
+      21
+    ],
+    "sourceProblem": 13,
+    "recalls": [],
+    "title": "Managers of many",
+    "prompt": "Show the name of employees who manage at least 2 people.",
+    "dataset": "staff",
+    "hints": [
+      "Group by manager, then look up the name."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Asha"
+            ],
+            [
+              "Dev"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET manager_id = 13 WHERE id = 12;",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Kim"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT m.name FROM employees e JOIN employees m ON m.id = e.manager_id GROUP BY m.id, m.name HAVING COUNT(*) >= 2;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT m.name FROM employees e JOIN employees m ON m.id = e.manager_id GROUP BY m.id, m.name HAVING COUNT(*) > 2;",
+        "why": "Leaves out exactly 2"
+      },
+      {
+        "sql": "SELECT e.name FROM employees e JOIN employees m ON m.id = e.manager_id GROUP BY e.id, e.name HAVING COUNT(*) >= 2;",
+        "why": "Groups by employee"
+      }
+    ]
+  },
+  {
+    "id": "st05-c09",
+    "kind": "checkpoint",
+    "stage": 5,
+    "skills": [
+      26,
+      22,
+      17
+    ],
+    "sourceProblem": 14,
+    "recalls": [],
+    "title": "Shipping rate",
+    "prompt": "A customer's shipping rate is their shipped orders divided by all their orders, and 0 if they have none. Show each customer's id as customer_id and rate, rounded to 2 decimals.",
+    "dataset": "shop",
+    "hints": [
+      "LEFT JOIN, a conditional sum, and a safe default."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "customer_id",
+            "rate"
+          ],
+          "rows": [
+            [
+              1,
+              0.5
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              4,
+              0
+            ],
+            [
+              5,
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "customer_id",
+            "rate"
+          ],
+          "rows": [
+            [
+              7,
+              0.5
+            ],
+            [
+              8,
+              0
+            ],
+            [
+              9,
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.id AS customer_id, ROUND(COALESCE(SUM(CASE WHEN o.status = 'shipped' THEN 1.0 ELSE 0 END) / COUNT(o.id), 0), 2) AS rate FROM customers c LEFT JOIN orders o ON o.customer_id = c.id GROUP BY c.id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.id AS customer_id, ROUND(SUM(CASE WHEN o.status = 'shipped' THEN 1 ELSE 0 END) / COUNT(o.id), 2) AS rate FROM customers c LEFT JOIN orders o ON o.customer_id = c.id GROUP BY c.id;",
+        "why": "Integer division, with NULL for no orders"
+      },
+      {
+        "sql": "SELECT o.customer_id, ROUND(SUM(CASE WHEN o.status = 'shipped' THEN 1.0 ELSE 0 END) / COUNT(o.id), 2) AS rate FROM orders o GROUP BY o.customer_id;",
+        "why": "Drops customers with no orders"
+      }
+    ]
+  },
+  {
+    "id": "st05-c10",
+    "kind": "checkpoint",
+    "stage": 5,
+    "skills": [
+      26,
+      19,
+      17
+    ],
+    "sourceProblem": 16,
+    "recalls": [],
+    "title": "Average price paid",
+    "prompt": "Prices vary by product. For each product, show its id as product_id and its average price paid per unit as average_price: total price times quantity, divided by total units. Products with no sales show 0. Round to 2 decimals.",
+    "dataset": "shop",
+    "hints": [
+      "A weighted average needs SUM divided by SUM."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "product_id",
+            "average_price"
+          ],
+          "rows": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              1.5
+            ],
+            [
+              3,
+              9
+            ],
+            [
+              4,
+              35
+            ],
+            [
+              5,
+              25
+            ],
+            [
+              6,
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "product_id",
+            "average_price"
+          ],
+          "rows": [
+            [
+              7,
+              40
+            ],
+            [
+              8,
+              9
+            ],
+            [
+              9,
+              12.5
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT p.id AS product_id, ROUND(COALESCE(SUM(p.price * i.quantity) / SUM(i.quantity), 0), 2) AS average_price FROM products p LEFT JOIN order_items i ON i.product_id = p.id GROUP BY p.id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT p.id AS product_id, ROUND(SUM(p.price * i.quantity) / SUM(i.quantity), 2) AS average_price FROM products p LEFT JOIN order_items i ON i.product_id = p.id GROUP BY p.id;",
+        "why": "Shows NULL for no sales"
+      },
+      {
+        "sql": "SELECT p.id AS product_id, ROUND(COALESCE(SUM(p.price * i.quantity) / SUM(i.quantity), 0), 2) AS average_price FROM products p JOIN order_items i ON i.product_id = p.id GROUP BY p.id;",
+        "why": "Drops unsold products"
+      }
+    ]
+  },
+  {
+    "id": "st05-c11",
+    "kind": "checkpoint",
+    "stage": 5,
+    "skills": [
+      25,
+      19
+    ],
+    "sourceProblem": 17,
+    "recalls": [],
+    "title": "Average by course",
+    "prompt": "Show each course's id as course_id and its average grade, rounded to 2 decimals, as average. Ignore courses with no enrolments.",
+    "dataset": "school",
+    "hints": [
+      "Join, then average."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "course_id",
+            "average"
+          ],
+          "rows": [
+            [
+              1,
+              74.75
+            ],
+            [
+              2,
+              74
+            ],
+            [
+              3,
+              82
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring'); INSERT INTO enrolments VALUES (15, 8, 5, 61, '2024-spring');",
+        "expected": {
+          "columns": [
+            "course_id",
+            "average"
+          ],
+          "rows": [
+            [
+              5,
+              60.33
+            ],
+            [
+              6,
+              95
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.id AS course_id, ROUND(AVG(e.grade), 2) AS average FROM courses c JOIN enrolments e ON e.course_id = c.id GROUP BY c.id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.id AS course_id, AVG(e.grade) AS average FROM courses c JOIN enrolments e ON e.course_id = c.id GROUP BY c.id;",
+        "why": "Doesn't round"
+      },
+      {
+        "sql": "SELECT c.id AS course_id, ROUND(AVG(e.grade), 2) AS average FROM courses c LEFT JOIN enrolments e ON e.course_id = c.id GROUP BY c.id;",
+        "why": "Keeps courses with no enrolments"
+      }
+    ]
+  },
+  {
+    "id": "st05-c12",
+    "kind": "checkpoint",
+    "stage": 5,
+    "skills": [
+      30,
+      19,
+      11
+    ],
+    "sourceProblem": 30,
+    "recalls": [],
+    "title": "Report summary",
+    "prompt": "Show each manager's id as manager_id, name, their number of direct reports as reports, and the average salary of those reports rounded to a whole number as avg_salary, sorted by id.",
+    "dataset": "staff",
+    "hints": [
+      "Self join, then group by manager."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "manager_id",
+            "name",
+            "reports",
+            "avg_salary"
+          ],
+          "rows": [
+            [
+              1,
+              "Asha",
+              4,
+              77000
+            ],
+            [
+              4,
+              "Dev",
+              2,
+              60000
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET salary = 70001 WHERE id = 12;",
+        "expected": {
+          "columns": [
+            "manager_id",
+            "name",
+            "reports",
+            "avg_salary"
+          ],
+          "rows": [
+            [
+              11,
+              "Ivy",
+              2,
+              70001
+            ],
+            [
+              13,
+              "Kim",
+              1,
+              55000
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT m.id AS manager_id, m.name, COUNT(*) AS reports, ROUND(AVG(e.salary)) AS avg_salary FROM employees e JOIN employees m ON m.id = e.manager_id GROUP BY m.id, m.name ORDER BY m.id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT m.id AS manager_id, m.name, COUNT(*) AS reports, ROUND(AVG(m.salary)) AS avg_salary FROM employees e JOIN employees m ON m.id = e.manager_id GROUP BY m.id, m.name ORDER BY m.id;",
+        "why": "Averages the manager's salary"
+      },
+      {
+        "sql": "SELECT m.id AS manager_id, m.name, COUNT(*) AS reports, AVG(e.salary) AS avg_salary FROM employees e JOIN employees m ON m.id = e.manager_id GROUP BY m.id, m.name ORDER BY m.id;",
+        "why": "Doesn't round"
+      }
+    ]
+  },
+  {
+    "id": "st05-c13",
+    "kind": "checkpoint",
+    "stage": 5,
+    "skills": [
+      32,
+      21,
+      16
+    ],
+    "sourceProblem": 49,
+    "recalls": [],
+    "title": "February best sellers",
+    "prompt": "Show the name of products with at least 2 units sold in February 2024, and those units as units.",
+    "dataset": "shop",
+    "hints": [
+      "Filter the date range, then total per product."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "units"
+          ],
+          "rows": [
+            [
+              "Lamp",
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); UPDATE orders SET order_date = '2024-02-29' WHERE id IN (11, 12);",
+        "expected": {
+          "columns": [
+            "name",
+            "units"
+          ],
+          "rows": [
+            [
+              "Cup",
+              3
+            ],
+            [
+              "Ink",
+              2
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT p.name, SUM(i.quantity) AS units FROM order_items i JOIN orders o ON o.id = i.order_id JOIN products p ON p.id = i.product_id WHERE o.order_date BETWEEN '2024-02-01' AND '2024-02-29' GROUP BY p.id, p.name HAVING SUM(i.quantity) >= 2;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT p.name, SUM(i.quantity) AS units FROM order_items i JOIN orders o ON o.id = i.order_id JOIN products p ON p.id = i.product_id GROUP BY p.id, p.name HAVING SUM(i.quantity) >= 2;",
+        "why": "Ignores the date"
+      },
+      {
+        "sql": "SELECT p.name, SUM(i.quantity) AS units FROM order_items i JOIN orders o ON o.id = i.order_id JOIN products p ON p.id = i.product_id WHERE o.order_date BETWEEN '2024-02-01' AND '2024-02-29' GROUP BY p.id, p.name HAVING SUM(i.quantity) > 2;",
+        "why": "Leaves out exactly 2"
+      }
+    ]
+  }
+]

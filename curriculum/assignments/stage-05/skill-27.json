@@ -1,0 +1,734 @@
+[
+  {
+    "id": "s27-01",
+    "skill": 27,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Filter in ON",
+    "prompt": "Show every customer's name and their shipped order's id as shipped_order. Customers with no shipped order must stay, showing NULL. Replace the ___.",
+    "dataset": "shop",
+    "starterSql": "SELECT c.name, o.id AS shipped_order\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id AND ___;",
+    "hints": [
+      "Add the status check to the ON condition."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "shipped_order"
+          ],
+          "rows": [
+            [
+              "Priya",
+              1
+            ],
+            [
+              "Marco",
+              2
+            ],
+            [
+              "Hana",
+              4
+            ],
+            [
+              "Hana",
+              6
+            ],
+            [
+              "Luis",
+              null
+            ],
+            [
+              "Noor",
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "shipped_order"
+          ],
+          "rows": [
+            [
+              "Ravi",
+              11
+            ],
+            [
+              "Sara",
+              null
+            ],
+            [
+              "Tom",
+              null
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name, o.id AS shipped_order FROM customers c LEFT JOIN orders o ON o.customer_id = c.id AND o.status = 'shipped';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name, o.id AS shipped_order FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE o.status = 'shipped';",
+        "why": "WHERE removes customers with none"
+      },
+      {
+        "sql": "SELECT c.name, o.id AS shipped_order FROM customers c LEFT JOIN orders o ON o.customer_id = c.id;",
+        "why": "Includes other statuses"
+      }
+    ]
+  },
+  {
+    "id": "s27-02",
+    "skill": 27,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      6
+    ],
+    "title": "Departments' top earners",
+    "prompt": "Show every department's name as department and the name of any employee in it earning over 90000, as earner. Departments with no such employee stay with NULL.",
+    "dataset": "staff",
+    "hints": [
+      "Put the salary check in ON."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "department",
+            "earner"
+          ],
+          "rows": [
+            [
+              "Engineering",
+              "Asha"
+            ],
+            [
+              "Engineering",
+              "Ben"
+            ],
+            [
+              "Engineering",
+              "Chloe"
+            ],
+            [
+              "Sales",
+              null
+            ],
+            [
+              "Support",
+              null
+            ],
+            [
+              "Legal",
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "department",
+            "earner"
+          ],
+          "rows": [
+            [
+              "Design",
+              null
+            ],
+            [
+              "Finance",
+              null
+            ],
+            [
+              "Ops",
+              null
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT d.name AS department, e.name AS earner FROM departments d LEFT JOIN employees e ON e.department_id = d.id AND e.salary > 90000;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT d.name AS department, e.name AS earner FROM departments d LEFT JOIN employees e ON e.department_id = d.id WHERE e.salary > 90000;",
+        "why": "Removes departments without one"
+      },
+      {
+        "sql": "SELECT d.name AS department, e.name AS earner FROM departments d LEFT JOIN employees e ON e.department_id = d.id;",
+        "why": "Ignores the salary"
+      }
+    ]
+  },
+  {
+    "id": "s27-03",
+    "skill": 27,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      6
+    ],
+    "title": "When WHERE is right",
+    "prompt": "Show every customer's name and order id as order_id for orders with the status shipped only. Here, customers without a shipped order should be removed.",
+    "dataset": "shop",
+    "hints": [
+      "WHERE removes those rows on purpose."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "order_id"
+          ],
+          "rows": [
+            [
+              "Priya",
+              1
+            ],
+            [
+              "Marco",
+              2
+            ],
+            [
+              "Hana",
+              4
+            ],
+            [
+              "Hana",
+              6
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "order_id"
+          ],
+          "rows": [
+            [
+              "Ravi",
+              11
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name, o.id AS order_id FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE o.status = 'shipped';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name, o.id AS order_id FROM customers c LEFT JOIN orders o ON o.customer_id = c.id AND o.status = 'shipped';",
+        "why": "Keeps customers without one"
+      },
+      {
+        "sql": "SELECT c.name, o.id AS order_id FROM customers c LEFT JOIN orders o ON o.customer_id = c.id;",
+        "why": "Includes other statuses"
+      }
+    ]
+  },
+  {
+    "id": "s27-04",
+    "skill": 27,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      6
+    ],
+    "title": "Autumn results",
+    "prompt": "Show every student's name and their grades from the 2024-autumn term. Students with no autumn enrolment stay with a NULL grade.",
+    "dataset": "school",
+    "hints": [
+      "The term check goes in ON."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "grade"
+          ],
+          "rows": [
+            [
+              "Anya",
+              null
+            ],
+            [
+              "Bilal",
+              71
+            ],
+            [
+              "Cara",
+              null
+            ],
+            [
+              "Dmitri",
+              74
+            ],
+            [
+              "Dmitri",
+              88
+            ],
+            [
+              "Esi",
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring'); UPDATE enrolments SET term = '2024-autumn' WHERE id = 14;",
+        "expected": {
+          "columns": [
+            "name",
+            "grade"
+          ],
+          "rows": [
+            [
+              "Femi",
+              null
+            ],
+            [
+              "Gia",
+              95
+            ],
+            [
+              "Hao",
+              null
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT s.name, e.grade FROM students s LEFT JOIN enrolments e ON e.student_id = s.id AND e.term = '2024-autumn';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT s.name, e.grade FROM students s LEFT JOIN enrolments e ON e.student_id = s.id WHERE e.term = '2024-autumn';",
+        "why": "Removes students with no autumn enrolment"
+      },
+      {
+        "sql": "SELECT s.name, e.grade FROM students s LEFT JOIN enrolments e ON e.student_id = s.id;",
+        "why": "Includes other terms"
+      }
+    ]
+  },
+  {
+    "id": "s27-05",
+    "skill": 27,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      9
+    ],
+    "title": "Counting a subset",
+    "prompt": "Show each customer's name and how many shipped orders they have, as shipped. Customers with none must show 0.",
+    "dataset": "shop",
+    "hints": [
+      "Filter in ON, then COUNT a right-table column."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "shipped"
+          ],
+          "rows": [
+            [
+              "Priya",
+              1
+            ],
+            [
+              "Marco",
+              1
+            ],
+            [
+              "Hana",
+              2
+            ],
+            [
+              "Luis",
+              0
+            ],
+            [
+              "Noor",
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "shipped"
+          ],
+          "rows": [
+            [
+              "Ravi",
+              1
+            ],
+            [
+              "Sara",
+              0
+            ],
+            [
+              "Tom",
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name, COUNT(o.id) AS shipped FROM customers c LEFT JOIN orders o ON o.customer_id = c.id AND o.status = 'shipped' GROUP BY c.id, c.name;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name, COUNT(o.id) AS shipped FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE o.status = 'shipped' GROUP BY c.id, c.name;",
+        "why": "Removes customers with none"
+      },
+      {
+        "sql": "SELECT c.name, COUNT(*) AS shipped FROM customers c LEFT JOIN orders o ON o.customer_id = c.id AND o.status = 'shipped' GROUP BY c.id, c.name;",
+        "why": "COUNT(*) shows 1 for none"
+      }
+    ]
+  },
+  {
+    "id": "s27-06",
+    "skill": 27,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [
+      4
+    ],
+    "title": "Fix the disappearing rows",
+    "prompt": "This should show every product's name and how many units sold in order 4, as units, keeping unsold products with NULL. It has the condition in the wrong place. Fix it.",
+    "dataset": "shop",
+    "starterSql": "SELECT p.name, i.quantity AS units\nFROM products p\nLEFT JOIN order_items i ON i.product_id = p.id\nWHERE i.order_id = 4;",
+    "hints": [
+      "Move the condition to ON."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "units"
+          ],
+          "rows": [
+            [
+              "Notebook",
+              1
+            ],
+            [
+              "Pen",
+              null
+            ],
+            [
+              "Mug",
+              null
+            ],
+            [
+              "Kettle",
+              null
+            ],
+            [
+              "Lamp",
+              2
+            ],
+            [
+              "Rug",
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); UPDATE order_items SET order_id = 4 WHERE order_id = 11;",
+        "expected": {
+          "columns": [
+            "name",
+            "units"
+          ],
+          "rows": [
+            [
+              "Stool",
+              1
+            ],
+            [
+              "Cup",
+              3
+            ],
+            [
+              "Ink",
+              null
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT p.name, i.quantity AS units FROM products p LEFT JOIN order_items i ON i.product_id = p.id AND i.order_id = 4;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT p.name, i.quantity AS units FROM products p LEFT JOIN order_items i ON i.product_id = p.id;",
+        "why": "Includes other orders"
+      },
+      {
+        "sql": "SELECT p.name, i.quantity AS units FROM products p JOIN order_items i ON i.product_id = p.id AND i.order_id = 4;",
+        "why": "Drops unsold products"
+      }
+    ]
+  },
+  {
+    "id": "s27-07",
+    "skill": 27,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      16
+    ],
+    "title": "Sessions in a window",
+    "prompt": "Show every user's username and the number of their sessions on or after 2024-01-04, as recent. Users with none must show 0.",
+    "dataset": "app",
+    "hints": [
+      "Put the date check in ON."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "username",
+            "recent"
+          ],
+          "rows": [
+            [
+              "nova",
+              0
+            ],
+            [
+              "orbit",
+              1
+            ],
+            [
+              "pixel",
+              2
+            ],
+            [
+              "quark",
+              2
+            ],
+            [
+              "raven",
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "username",
+            "recent"
+          ],
+          "rows": [
+            [
+              "sable",
+              3
+            ],
+            [
+              "tulip",
+              1
+            ],
+            [
+              "umber",
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT u.username, COUNT(s.id) AS recent FROM users u LEFT JOIN sessions s ON s.user_id = u.id AND s.session_date >= '2024-01-04' GROUP BY u.id, u.username;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT u.username, COUNT(s.id) AS recent FROM users u LEFT JOIN sessions s ON s.user_id = u.id WHERE s.session_date >= '2024-01-04' GROUP BY u.id, u.username;",
+        "why": "Removes users with none"
+      },
+      {
+        "sql": "SELECT u.username, COUNT(s.id) AS recent FROM users u LEFT JOIN sessions s ON s.user_id = u.id GROUP BY u.id, u.username;",
+        "why": "Ignores the date"
+      }
+    ]
+  },
+  {
+    "id": "s27-08",
+    "skill": 27,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      6
+    ],
+    "title": "Filters on both sides",
+    "prompt": "For customers from Rome only, show each name and their shipped order count, as shipped. A Rome customer with none shows 0.",
+    "dataset": "shop",
+    "hints": [
+      "Filter customers in WHERE and orders in ON."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "shipped"
+          ],
+          "rows": [
+            [
+              "Marco",
+              1
+            ],
+            [
+              "Luis",
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "UPDATE customers SET city = 'Rome' WHERE id IN (1, 5); UPDATE customers SET city = 'Lima' WHERE id IN (2, 4);",
+        "expected": {
+          "columns": [
+            "name",
+            "shipped"
+          ],
+          "rows": [
+            [
+              "Priya",
+              1
+            ],
+            [
+              "Noor",
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name, COUNT(o.id) AS shipped FROM customers c LEFT JOIN orders o ON o.customer_id = c.id AND o.status = 'shipped' WHERE c.city = 'Rome' GROUP BY c.id, c.name;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name, COUNT(o.id) AS shipped FROM customers c LEFT JOIN orders o ON o.customer_id = c.id AND o.status = 'shipped' GROUP BY c.id, c.name;",
+        "why": "Includes every city"
+      },
+      {
+        "sql": "SELECT c.name, COUNT(o.id) AS shipped FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE c.city = 'Rome' AND o.status = 'shipped' GROUP BY c.id, c.name;",
+        "why": "Removes Rome customers with none"
+      }
+    ]
+  }
+]

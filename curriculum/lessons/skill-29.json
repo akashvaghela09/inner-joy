@@ -1,0 +1,15 @@
+{
+  "skill": 29,
+  "summary": "A join repeats rows, and that can silently inflate totals.",
+  "points": [
+    "Joining one row to three matches gives three rows, so summing a column from the one side counts it three times.",
+    "Compare row counts before and after a join to spot this.",
+    "COUNT(DISTINCT key) counts the real items after a join.",
+    "To be safe, summarise the many side first, then join the result."
+  ],
+  "example": {
+    "dataset": "shop",
+    "sql": "SELECT COUNT(*) AS joined_rows, COUNT(DISTINCT o.id) AS real_orders\nFROM orders o\nJOIN order_items i ON i.order_id = o.id;",
+    "explanation": "Each order repeats once per item, so counting rows overstates the number of orders."
+  }
+}

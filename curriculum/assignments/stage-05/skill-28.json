@@ -1,0 +1,529 @@
+[
+  {
+    "id": "s28-01",
+    "skill": 28,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Customers without orders",
+    "prompt": "Show the name of customers who have never placed an order. Replace the ___.",
+    "dataset": "shop",
+    "starterSql": "SELECT c.name\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id\nWHERE ___;",
+    "hints": [
+      "Keep rows where the right table's key is NULL."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Noor"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Tom"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE o.id IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name FROM customers c JOIN orders o ON o.customer_id = c.id;",
+        "why": "Finds customers with orders"
+      },
+      {
+        "sql": "SELECT c.name FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE o.id = NULL;",
+        "why": "= NULL never matches"
+      }
+    ]
+  },
+  {
+    "id": "s28-02",
+    "skill": 28,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      9
+    ],
+    "title": "Empty departments",
+    "prompt": "Show the name of departments with no employees.",
+    "dataset": "staff",
+    "hints": [
+      "Same pattern, starting from departments."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Legal"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Ops"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT d.name FROM departments d LEFT JOIN employees e ON e.department_id = d.id WHERE e.id IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT d.name FROM departments d JOIN employees e ON e.department_id = d.id;",
+        "why": "Finds departments with staff"
+      },
+      {
+        "sql": "SELECT e.name FROM employees e WHERE e.department_id IS NULL;",
+        "why": "Finds employees with no department"
+      }
+    ]
+  },
+  {
+    "id": "s28-03",
+    "skill": 28,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      26
+    ],
+    "title": "Never sold",
+    "prompt": "Show the name of products that don't appear in any order item.",
+    "dataset": "shop",
+    "hints": [
+      "Start from products."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Rug"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO products VALUES (10, 'Vase', 'Home', 5.0, 2.0);",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Vase"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT p.name FROM products p LEFT JOIN order_items i ON i.product_id = p.id WHERE i.product_id IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT p.name FROM products p JOIN order_items i ON i.product_id = p.id;",
+        "why": "Finds sold products"
+      },
+      {
+        "sql": "SELECT p.name FROM order_items i LEFT JOIN products p ON i.product_id = p.id WHERE p.id IS NULL;",
+        "why": "Looks the wrong way round"
+      }
+    ]
+  },
+  {
+    "id": "s28-04",
+    "skill": 28,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [],
+    "title": "Unused courses",
+    "prompt": "Show the title of courses with no enrolments.",
+    "dataset": "school",
+    "hints": [
+      "Check the enrolment id for NULL."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title"
+          ],
+          "rows": [
+            [
+              "Poetry"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring'); INSERT INTO courses VALUES (9, 'Latin', 'Arts');",
+        "expected": {
+          "columns": [
+            "title"
+          ],
+          "rows": [
+            [
+              "Latin"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.title FROM courses c LEFT JOIN enrolments e ON e.course_id = c.id WHERE e.id IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.title FROM courses c JOIN enrolments e ON e.course_id = c.id;",
+        "why": "Finds courses with enrolments"
+      },
+      {
+        "sql": "SELECT c.title FROM courses c LEFT JOIN enrolments e ON e.course_id = c.id WHERE e.grade IS NULL;",
+        "why": "A real enrolment can have no grade"
+      }
+    ]
+  },
+  {
+    "id": "s28-05",
+    "skill": 28,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      9
+    ],
+    "title": "Orders with a broken link",
+    "prompt": "Show the item of orders whose customer_id matches no customer.",
+    "dataset": "cafe",
+    "hints": [
+      "Start from orders this time."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Corner Cafe",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "item"
+          ],
+          "rows": [
+            [
+              "Tea"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM orders; DELETE FROM customers; INSERT INTO customers VALUES (5, 'Lena'), (6, 'Omar'), (8, 'Zuri'); INSERT INTO orders VALUES (9, 6, 'Mocha', 5.0), (10, 9, 'Toast', 2.5), (11, 6, 'Bun', 1.5);",
+        "expected": {
+          "columns": [
+            "item"
+          ],
+          "rows": [
+            [
+              "Toast"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT o.item FROM orders o LEFT JOIN customers c ON c.id = o.customer_id WHERE c.id IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT o.item FROM orders o JOIN customers c ON c.id = o.customer_id;",
+        "why": "Finds valid orders"
+      },
+      {
+        "sql": "SELECT c.name FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE o.id IS NULL;",
+        "why": "Finds customers instead"
+      }
+    ]
+  },
+  {
+    "id": "s28-06",
+    "skill": 28,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the test",
+    "prompt": "This should find customers with no orders, but returns nothing because it tests the wrong column. Fix it.",
+    "dataset": "shop",
+    "starterSql": "SELECT c.name\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id\nWHERE c.id IS NULL;",
+    "hints": [
+      "Test a column from the right table."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Noor"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Tom"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE o.id IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name FROM customers c LEFT JOIN orders o ON o.customer_id = c.id;",
+        "why": "Removes the filter"
+      },
+      {
+        "sql": "SELECT c.name FROM customers c JOIN orders o ON o.customer_id = c.id WHERE o.id IS NULL;",
+        "why": "An inner join has no NULL matches"
+      }
+    ]
+  },
+  {
+    "id": "s28-07",
+    "skill": 28,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      9
+    ],
+    "title": "No shipped orders",
+    "prompt": "Show the name of customers with no shipped order. Customers with only other statuses count as having none.",
+    "dataset": "shop",
+    "hints": [
+      "Filter in ON, then test for NULL."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Luis"
+            ],
+            [
+              "Noor"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Sara"
+            ],
+            [
+              "Tom"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name FROM customers c LEFT JOIN orders o ON o.customer_id = c.id AND o.status = 'shipped' WHERE o.id IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE o.id IS NULL;",
+        "why": "Misses customers with only other statuses"
+      },
+      {
+        "sql": "SELECT c.name FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE o.status <> 'shipped';",
+        "why": "Keeps customers with shipped orders too"
+      }
+    ]
+  },
+  {
+    "id": "s28-08",
+    "skill": 28,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      18,
+      20
+    ],
+    "title": "Visits without purchases",
+    "prompt": "Show each customer city and how many of its customers never ordered, as inactive. Only list cities with at least one.",
+    "dataset": "shop",
+    "hints": [
+      "Anti-join, then group."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "city",
+            "inactive"
+          ],
+          "rows": [
+            [
+              "Pune",
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "city",
+            "inactive"
+          ],
+          "rows": [
+            [
+              "Oslo",
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.city, COUNT(*) AS inactive FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE o.id IS NULL GROUP BY c.city;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.city, COUNT(*) AS inactive FROM customers c GROUP BY c.city;",
+        "why": "Counts every customer"
+      },
+      {
+        "sql": "SELECT c.city, COUNT(o.id) AS inactive FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE o.id IS NULL GROUP BY c.city;",
+        "why": "Counting a NULL column gives 0"
+      }
+    ]
+  }
+]
