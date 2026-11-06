@@ -1,0 +1,7 @@
+{
+  "id": "trail-club",
+  "title": "Trail Club",
+  "story": "A local hiking club records the trails its members walk.",
+  "schemaSql": "CREATE TABLE trails (id INTEGER PRIMARY KEY, name TEXT NOT NULL, region TEXT NOT NULL, length_km REAL NOT NULL, elevation_m INTEGER NOT NULL);",
+  "seedSql": "INSERT INTO trails VALUES (1, 'Cedar Loop', 'North', 8.5, 320), (2, 'Fox Ridge', 'East', 14.0, 870), (3, 'Mill Stream', 'South', 5.2, 90), (4, 'Stone Pass', 'North', 21.3, 1450);"
+}

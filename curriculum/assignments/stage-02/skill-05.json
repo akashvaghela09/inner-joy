@@ -1,0 +1,300 @@
+[
+  {
+    "id": "s05-01",
+    "skill": 5,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Pick two columns",
+    "prompt": "Show the title and price of every book. Replace the ___ in the query with the missing column.",
+    "dataset": "bookshop",
+    "starterSql": "SELECT title, ___\nFROM books;",
+    "hints": ["The column you need is named price."],
+    "check": { "mode": "result", "ordered": false, "columnNames": true },
+    "cases": [
+      {
+        "name": "Bookshop catalogue",
+        "hidden": false,
+        "expected": {
+          "columns": ["title", "price"],
+          "rows": [["The Salt Road", 18.5], ["Quiet Engines", 24.0], ["Paper Lanterns", 12.0], ["River of Glass", 15.5], ["Small Planets", 30.0], ["The Last Ferry", 9.0]]
+        }
+      },
+      {
+        "name": "A different catalogue",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015);",
+        "expected": { "columns": ["title", "price"], "rows": [["Copper Moon", 20.0], ["North Light", 7.5]] }
+      }
+    ],
+    "solutions": ["SELECT title, price FROM books;"],
+    "wrongSolutions": [
+      { "sql": "SELECT title FROM books;", "why": "Leaves out the price" },
+      { "sql": "SELECT * FROM books;", "why": "Returns extra columns" },
+      { "sql": "SELECT price, title FROM books;", "why": "Returns the columns in the wrong order" }
+    ]
+  },
+  {
+    "id": "s05-02",
+    "skill": 5,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [1],
+    "title": "See the whole table",
+    "prompt": "Show every column and every row from the books table.",
+    "dataset": "bookshop",
+    "hints": ["SELECT * returns every column."],
+    "check": { "mode": "result", "ordered": false, "columnNames": true },
+    "cases": [
+      {
+        "name": "Bookshop catalogue",
+        "hidden": false,
+        "expected": {
+          "columns": ["id", "title", "author", "genre", "price", "pages", "year"],
+          "rows": [
+            [1, "The Salt Road", "Mina Rao", "History", 18.5, 320, 2019],
+            [2, "Quiet Engines", "Tom Okafor", "Science", 24.0, 412, 2021],
+            [3, "Paper Lanterns", "Mina Rao", "Fiction", 12.0, 250, 2016],
+            [4, "River of Glass", "Lena Park", "Fiction", 15.5, 298, 2022],
+            [5, "Small Planets", "Tom Okafor", "Science", 30.0, 540, 2018],
+            [6, "The Last Ferry", "Ivan Cole", "Mystery", 9.0, 210, 2014]
+          ]
+        }
+      },
+      {
+        "name": "A different catalogue",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020);",
+        "expected": {
+          "columns": ["id", "title", "author", "genre", "price", "pages", "year"],
+          "rows": [[10, "Copper Moon", "Ada Hill", "Fantasy", 20.0, 100, 2020]]
+        }
+      }
+    ],
+    "solutions": ["SELECT * FROM books;", "SELECT id, title, author, genre, price, pages, year FROM books;"],
+    "wrongSolutions": [
+      { "sql": "SELECT title, author FROM books;", "why": "Returns only some columns" },
+      { "sql": "SELECT * FROM books LIMIT 1;", "why": "Returns only one row" }
+    ]
+  },
+  {
+    "id": "s05-03",
+    "skill": 5,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [],
+    "title": "Rename the columns",
+    "prompt": "Show each book's title as book_title and its author as written_by.",
+    "dataset": "bookshop",
+    "hints": ["Use AS after a column to give it a new name."],
+    "check": { "mode": "result", "ordered": false, "columnNames": true },
+    "cases": [
+      {
+        "name": "Bookshop catalogue",
+        "hidden": false,
+        "expected": {
+          "columns": ["book_title", "written_by"],
+          "rows": [["The Salt Road", "Mina Rao"], ["Quiet Engines", "Tom Okafor"], ["Paper Lanterns", "Mina Rao"], ["River of Glass", "Lena Park"], ["Small Planets", "Tom Okafor"], ["The Last Ferry", "Ivan Cole"]]
+        }
+      },
+      {
+        "name": "A different catalogue",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020);",
+        "expected": { "columns": ["book_title", "written_by"], "rows": [["Copper Moon", "Ada Hill"]] }
+      }
+    ],
+    "solutions": ["SELECT title AS book_title, author AS written_by FROM books;", "SELECT title book_title, author written_by FROM books;"],
+    "wrongSolutions": [
+      { "sql": "SELECT title, author FROM books;", "why": "Doesn't rename the columns" },
+      { "sql": "SELECT author AS book_title, title AS written_by FROM books;", "why": "Swaps the two values" }
+    ]
+  },
+  {
+    "id": "s05-04",
+    "skill": 5,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [],
+    "title": "A new table",
+    "prompt": "The hiking club wants a simple list of its trails. Show each trail's name as trail and its length_km as distance_km.",
+    "dataset": "trail-club",
+    "hints": ["The table is called trails. The steps are the same as for books."],
+    "check": { "mode": "result", "ordered": false, "columnNames": true },
+    "cases": [
+      {
+        "name": "Club trails",
+        "hidden": false,
+        "expected": {
+          "columns": ["trail", "distance_km"],
+          "rows": [["Cedar Loop", 8.5], ["Fox Ridge", 14.0], ["Mill Stream", 5.2], ["Stone Pass", 21.3]]
+        }
+      },
+      {
+        "name": "Different trails",
+        "hidden": true,
+        "setupSql": "DELETE FROM trails; INSERT INTO trails VALUES (7, 'Birch Walk', 'West', 3.1, 40), (8, 'High Moor', 'East', 12.6, 610);",
+        "expected": { "columns": ["trail", "distance_km"], "rows": [["Birch Walk", 3.1], ["High Moor", 12.6]] }
+      }
+    ],
+    "solutions": ["SELECT name AS trail, length_km AS distance_km FROM trails;"],
+    "wrongSolutions": [
+      { "sql": "SELECT name, length_km FROM trails;", "why": "Doesn't rename the columns" },
+      { "sql": "SELECT name AS trail, elevation_m AS distance_km FROM trails;", "why": "Uses elevation instead of length" }
+    ]
+  },
+  {
+    "id": "s05-05",
+    "skill": 5,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [],
+    "title": "A name with a space",
+    "prompt": "Show each book's title under a column named exactly Book Title, including the space.",
+    "dataset": "bookshop",
+    "hints": ["A name containing a space needs double quotes around it."],
+    "check": { "mode": "result", "ordered": false, "columnNames": true },
+    "cases": [
+      {
+        "name": "Bookshop catalogue",
+        "hidden": false,
+        "expected": {
+          "columns": ["Book Title"],
+          "rows": [["The Salt Road"], ["Quiet Engines"], ["Paper Lanterns"], ["River of Glass"], ["Small Planets"], ["The Last Ferry"]]
+        }
+      },
+      {
+        "name": "A different catalogue",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015);",
+        "expected": { "columns": ["Book Title"], "rows": [["North Light"]] }
+      }
+    ],
+    "solutions": ["SELECT title AS \"Book Title\" FROM books;"],
+    "wrongSolutions": [
+      { "sql": "SELECT title AS Book_Title FROM books;", "why": "Uses an underscore instead of a space" },
+      { "sql": "SELECT title AS Book Title FROM books;", "why": "A name with a space needs quotes" },
+      { "sql": "SELECT title AS \"book title\" FROM books;", "why": "Uses different capital letters" }
+    ]
+  },
+  {
+    "id": "s05-06",
+    "skill": 5,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the query",
+    "prompt": "This query should show each book's title and price, but it fails. Read the error and fix the query.",
+    "dataset": "bookshop",
+    "starterSql": "SELECT title, price,\nFROM books;",
+    "hints": ["Look at the punctuation just before FROM."],
+    "check": { "mode": "result", "ordered": false, "columnNames": true },
+    "cases": [
+      {
+        "name": "Bookshop catalogue",
+        "hidden": false,
+        "expected": {
+          "columns": ["title", "price"],
+          "rows": [["The Salt Road", 18.5], ["Quiet Engines", 24.0], ["Paper Lanterns", 12.0], ["River of Glass", 15.5], ["Small Planets", 30.0], ["The Last Ferry", 9.0]]
+        }
+      },
+      {
+        "name": "A different catalogue",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015);",
+        "expected": { "columns": ["title", "price"], "rows": [["North Light", 7.5]] }
+      }
+    ],
+    "solutions": ["SELECT title, price\nFROM books;"],
+    "wrongSolutions": [
+      { "sql": "SELECT title FROM books;", "why": "Removes the price instead of fixing the error" },
+      { "sql": "SELECT price, title FROM books;", "why": "Changes the column order" }
+    ]
+  },
+  {
+    "id": "s05-07",
+    "skill": 5,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [],
+    "title": "Add a calculated column",
+    "prompt": "The shop is adding a 20% tax. Show each book's title and its price multiplied by 1.2, in a column named price_with_tax.",
+    "dataset": "bookshop",
+    "hints": ["A column can be a calculation, such as price * 1.2. Give it a name with AS."],
+    "check": { "mode": "result", "ordered": false, "columnNames": true, "decimals": 2 },
+    "cases": [
+      {
+        "name": "Bookshop catalogue",
+        "hidden": false,
+        "expected": {
+          "columns": ["title", "price_with_tax"],
+          "rows": [["The Salt Road", 22.2], ["Quiet Engines", 28.8], ["Paper Lanterns", 14.4], ["River of Glass", 18.6], ["Small Planets", 36.0], ["The Last Ferry", 10.8]]
+        }
+      },
+      {
+        "name": "A different catalogue",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015);",
+        "expected": { "columns": ["title", "price_with_tax"], "rows": [["Copper Moon", 24.0], ["North Light", 9.0]] }
+      }
+    ],
+    "solutions": ["SELECT title, price * 1.2 AS price_with_tax FROM books;", "SELECT title, price + price * 0.2 AS price_with_tax FROM books;"],
+    "wrongSolutions": [
+      { "sql": "SELECT title, price AS price_with_tax FROM books;", "why": "Doesn't apply the tax" },
+      { "sql": "SELECT title, price * 0.2 AS price_with_tax FROM books;", "why": "Returns only the tax amount" },
+      { "sql": "SELECT title, price * 1.2 FROM books;", "why": "Doesn't name the calculated column" }
+    ]
+  },
+  {
+    "id": "s05-08",
+    "skill": 5,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [2],
+    "title": "Build a shelf label",
+    "prompt": "Create data for shelf labels. Show each book's title as book, the fixed text paperback as format, and an estimated reading time of 2 minutes per page as minutes_to_read.",
+    "dataset": "bookshop",
+    "hints": ["Text values go in single quotes.", "A fixed value can be selected like a column: 'paperback' AS format."],
+    "check": { "mode": "result", "ordered": false, "columnNames": true },
+    "cases": [
+      {
+        "name": "Bookshop catalogue",
+        "hidden": false,
+        "expected": {
+          "columns": ["book", "format", "minutes_to_read"],
+          "rows": [
+            ["The Salt Road", "paperback", 640],
+            ["Quiet Engines", "paperback", 824],
+            ["Paper Lanterns", "paperback", 500],
+            ["River of Glass", "paperback", 596],
+            ["Small Planets", "paperback", 1080],
+            ["The Last Ferry", "paperback", 420]
+          ]
+        }
+      },
+      {
+        "name": "A different catalogue",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015);",
+        "expected": {
+          "columns": ["book", "format", "minutes_to_read"],
+          "rows": [["Copper Moon", "paperback", 200], ["North Light", "paperback", 360]]
+        }
+      }
+    ],
+    "solutions": ["SELECT title AS book, 'paperback' AS format, pages * 2 AS minutes_to_read FROM books;"],
+    "wrongSolutions": [
+      { "sql": "SELECT title AS book, paperback AS format, pages * 2 AS minutes_to_read FROM books;", "why": "Treats the text as a column because it has no quotes" },
+      { "sql": "SELECT title AS book, 'paperback' AS format, pages / 2 AS minutes_to_read FROM books;", "why": "Divides instead of multiplying" },
+      { "sql": "SELECT title AS book, 'paperback' AS format, pages AS minutes_to_read FROM books;", "why": "Doesn't calculate the reading time" }
+    ]
+  }
+]

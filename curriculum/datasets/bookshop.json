@@ -1,0 +1,7 @@
+{
+  "id": "bookshop",
+  "title": "Bookshop",
+  "story": "A small independent bookshop keeps its catalogue in one table.",
+  "schemaSql": "CREATE TABLE books (id INTEGER PRIMARY KEY, title TEXT NOT NULL, author TEXT NOT NULL, genre TEXT NOT NULL, price REAL NOT NULL, pages INTEGER NOT NULL, year INTEGER NOT NULL);",
+  "seedSql": "INSERT INTO books VALUES (1, 'The Salt Road', 'Mina Rao', 'History', 18.5, 320, 2019), (2, 'Quiet Engines', 'Tom Okafor', 'Science', 24.0, 412, 2021), (3, 'Paper Lanterns', 'Mina Rao', 'Fiction', 12.0, 250, 2016), (4, 'River of Glass', 'Lena Park', 'Fiction', 15.5, 298, 2022), (5, 'Small Planets', 'Tom Okafor', 'Science', 30.0, 540, 2018), (6, 'The Last Ferry', 'Ivan Cole', 'Mystery', 9.0, 210, 2014);"
+}
