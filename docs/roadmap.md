@@ -1,16 +1,17 @@
 # Roadmap
 
-We finish and verify the curriculum first, then build the application around it.
+We work in small slices that combine content and interface, so each can shape the other. We scale up the content only after the slice's structure is approved.
 
 | # | Milestone | Status | Depends on |
 |---:|---|---|---|
 | 0 | Feasibility prototype | Done | - |
-| 1 | Curriculum foundations | In progress | 0 |
-| 2 | Stage 2 content | Next | 1 |
+| 1 | Curriculum foundations | Done | 0 |
+| 1.5 | Working slice | In review | 1 |
+| 2 | Stage 2 content | Next | 1.5 |
 | 3 | Complete curriculum | Planned | 2 |
 | 4 | UX and visual design | Planned | 3 |
-| 5 | Application foundation and engine | Planned | 3 |
-| 6 | UI components and styling | Planned | 4, 5 |
+| 5 | Application foundation and engine | Partly done | 1.5 |
+| 6 | UI components and styling | Partly done | 4, 5 |
 | 7 | Learning experience | Planned | 6 |
 | 8 | Manual review | Planned | 7 |
 | 9 | Documentation | Planned | 7 |
@@ -36,11 +37,25 @@ We finish and verify the curriculum first, then build the application around it.
 
 **Done when:** the format and validator handle a complete skill.
 
+### Milestone 1.5: Working slice
+
+A small set of assignments running in a real interface, used to judge the structure before scaling up.
+
+- [x] Write skills 5 and 6 in full
+- [x] Add one sample each of a stage review, a checkpoint, a multi-table assignment, and a data-changing assignment
+- [x] Extend the format and validator for reviews and checkpoints
+- [x] Build the sidebar, assignment screen, data panel, hints, and test results
+- [x] Save progress and drafts in the browser
+- [x] Add light and dark themes and a phone layout
+- [ ] Review the slice and agree on changes
+
+**Done when:** the assignment structure and interface are approved.
+
 ### Milestone 2: Stage 2 content
 
-- [ ] Write skills 6-11, the remaining Stage 2 skills
-- [ ] Add 10 stage reviews
-- [ ] Add 4 original checkpoints
+- [ ] Write skills 7-11, the remaining Stage 2 skills
+- [ ] Add the other 9 stage reviews
+- [ ] Add the other 3 original checkpoints
 - [ ] Trial a sample with peers using a generated Markdown pack and the current prototype
 - [ ] Revise the ladder and format based on their feedback
 
@@ -76,12 +91,12 @@ We finish and verify the curriculum first, then build the application around it.
 
 ### Milestone 5: Application foundation and engine
 
-- [ ] Restructure the prototype around the curriculum data
-- [ ] Remove the prototype's grader test (`src/grader.test.ts`)
+- [x] Restructure the prototype around the curriculum data
+- [x] Remove the prototype's grader test
 - [ ] Generate the content bundle and remove solutions from it
-- [ ] Add routing using hash URLs, which work on GitHub Pages
-- [ ] Support multi-table datasets and all comparison options
-- [ ] Add query timeouts by stopping and restarting the worker
+- [x] Add routing using hash URLs, which work on GitHub Pages
+- [x] Support multi-table datasets and all comparison options
+- [x] Add query timeouts by stopping and restarting the worker
 - [ ] Add row limits for oversized results
 - [ ] Save progress in IndexedDB, with JSON export and import
 - [ ] Fix the known `Rows changed` count after a rollback
@@ -90,7 +105,7 @@ We finish and verify the curriculum first, then build the application around it.
 
 ### Milestone 6: UI components and styling
 
-**Styling approach:** CSS Modules with design tokens as CSS variables. This adds no runtime cost and makes theming straightforward.
+**Styling approach:** CSS Modules with design tokens as CSS variables. This adds no runtime cost and makes theming straightforward. The working slice has a first version to refine.
 
 | Group | Components |
 |---|---|

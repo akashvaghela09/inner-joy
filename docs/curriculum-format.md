@@ -7,7 +7,10 @@ curriculum/
 ├── skill-map.json              # stages, skills, prerequisites, recall plan, checkpoints
 ├── datasets/<id>.json          # shared tables and sample rows
 ├── assignments/
-│   └── stage-02/skill-05.json  # one file per skill
+│   └── stage-02/
+│       ├── skill-05.json       # one file per skill
+│       ├── review.json         # stage reviews
+│       └── checkpoint.json     # stage checkpoints
 ├── tools/grade.ts              # runs SQL and compares results
 └── curriculum.test.ts          # validates everything above
 ```
@@ -40,6 +43,18 @@ Run `npm test` to validate the curriculum.
 | `cases` | Visible and hidden test cases |
 | `solutions` | Correct queries, which must pass every case |
 | `wrongSolutions` | Common mistakes and why they're wrong. Each must fail at least one case |
+
+### Reviews and checkpoints
+
+These use the same fields, with a few differences:
+
+| Field | Meaning |
+|---|---|
+| `id` | `st<stage>-r<number>` for reviews and `st<stage>-c<number>` for checkpoints, such as `st02-c01` |
+| `kind` | `review` or `checkpoint` |
+| `stage` | The stage it belongs to, replacing `skill` and `step` |
+| `skills` | The skills it tests |
+| `sourceProblem` | For checkpoints only: the concept's number in the [SQL 50 assessment](sql-50-assessment.md) |
 
 ## Comparison options
 
