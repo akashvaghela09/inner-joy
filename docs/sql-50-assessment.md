@@ -208,6 +208,8 @@ Three differences return results without any error, so they need explicit teachi
 
 ## Draft curriculum order
 
+> Superseded by the [curriculum plan](curriculum-plan.md). This early draft is kept as a record of the assessment.
+
 This reordering teaches each concept before it's needed. The source numbers show which concepts each module should cover, not problems to copy. Modules with few source problems need original problems added.
 
 | Module | Teaches | Source concepts from problems | Count | Avg level |
