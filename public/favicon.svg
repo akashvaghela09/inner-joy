@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <title>Inner Joy</title>
+  <style>
+    .mark { color: #0969da; }
+    @media (prefers-color-scheme: dark) {
+      .mark { color: #4493f8; }
+    }
+  </style>
+  <g class="mark">
+    <path fill="currentColor" d="M12 6.23a6.75 6.75 0 0 1 0 11.54 6.75 6.75 0 0 1 0-11.54Z" />
+    <circle cx="8.5" cy="12" r="6.75" stroke="currentColor" stroke-width="2" />
+    <circle cx="15.5" cy="12" r="6.75" stroke="currentColor" stroke-width="2" />
+  </g>
+</svg>
