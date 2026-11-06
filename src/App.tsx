@@ -16,7 +16,7 @@ export function App() {
 
   return (
     <main style={{ maxWidth: 800, margin: "0 auto", padding: 16, fontFamily: "sans-serif" }}>
-      <h1>SQL Practice</h1>
+      <h1>Inner Joy</h1>
       <nav style={{ display: "flex", gap: 8 }}>
         <button onClick={() => setView("problem")} aria-pressed={view === "problem"}>
           Problem
