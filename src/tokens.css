@@ -1,39 +1,54 @@
 :root {
   color-scheme: light;
-  --bg: #faf7f2;
-  --surface: #ffffff;
-  --surface-muted: #f3eee6;
-  --text: #2b2622;
-  --text-muted: #685f56;
-  --border: #e0d8cc;
-  --accent: #b5470f;
-  --accent-text: #ffffff;
-  --accent-soft: #fbe9dc;
-  --success: #17703a;
-  --success-soft: #e3f3e8;
-  --danger: #ad2a1f;
-  --danger-soft: #fbe7e4;
-  --radius: 10px;
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --canvas: #ffffff;
+  --canvas-subtle: #f6f8fa;
+  --text: #1f2328;
+  --text-muted: #59636e;
+  --border: #d1d9e0;
+  --border-muted: #e6eaef;
+  --border-control: #818b98;
+  --accent: #0969da;
+  --accent-emphasis: #0550ae;
+  --accent-tint: #ddf4ff;
+  --success: #1a7f37;
+  --success-tint: #dafbe1;
+  --danger: #cf222e;
+  --danger-tint: #ffebe9;
+  --attention: #9a6700;
+  --attention-tint: #fff8c5;
+  --primary: #1a7f37;
+  --primary-hover: #116329;
+  --bar-track: #e6eaef;
+  --bar-done: #1a7f37;
+  --bar-available: #c8d1da;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    --bg: #1b1815;
-    --surface: #25211d;
-    --surface-muted: #2f2a25;
-    --text: #f3eee7;
-    --text-muted: #b8aea3;
-    --border: #413a33;
-    --accent: #f59a5d;
-    --accent-text: #2b1608;
-    --accent-soft: #43291a;
-    --success: #6fd394;
-    --success-soft: #1d3626;
-    --danger: #f59b90;
-    --danger-soft: #45221e;
+    --canvas: #0d1117;
+    --canvas-subtle: #161b22;
+    --text: #e6edf3;
+    --text-muted: #9198a1;
+    --border: #30363d;
+    --border-muted: #21262d;
+    --border-control: #6e7681;
+    --accent: #4493f8;
+    --accent-emphasis: #1f6feb;
+    --accent-tint: #121d2f;
+    --success: #3fb950;
+    --success-tint: #12261e;
+    --danger: #f85149;
+    --danger-tint: #25171c;
+    --attention: #d29922;
+    --attention-tint: #272115;
+    --primary: #238636;
+    --primary-hover: #1a7f37;
+    --bar-track: #21262d;
+    --bar-done: #2ea043;
+    --bar-available: #3a414a;
   }
 }
 
@@ -41,12 +56,13 @@
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
-  background: var(--bg);
+  background: var(--canvas);
   color: var(--text);
   font-family: var(--font-sans);
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.5;
 }
 
@@ -54,11 +70,48 @@ h1,
 h2,
 h3,
 h4,
-p {
+p,
+ul,
+ol {
   margin: 0;
+  padding: 0;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.93em;
 }
 
 :focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline-offset: 1px;
+}
+
+details > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }

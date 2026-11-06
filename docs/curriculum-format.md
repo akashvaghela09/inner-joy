@@ -84,4 +84,5 @@ These use the same fields, with a few differences:
 - A correct solution fails a case, or a wrong solution passes every case.
 - A starter query for a guided or fix-the-bug assignment already works.
 - An assignment lacks a visible case or a hidden case.
+- A visible case changes the dataset, so the data shown to learners wouldn't match it.
 - A query that hard-codes the visible answer can pass.

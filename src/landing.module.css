@@ -1,0 +1,243 @@
+.landing {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 16px 48px;
+}
+
+.intro {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.subtitle {
+  margin-top: 4px;
+  color: var(--text-muted);
+}
+
+.continue {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.overall {
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.overallLabel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-bottom: 8px;
+}
+
+.overallName {
+  font-weight: 600;
+}
+
+.stage {
+  border-bottom: 1px solid var(--border);
+  scroll-margin-top: 8px;
+}
+
+.stageSummary {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) 200px 180px;
+  gap: 8px 12px;
+  align-items: center;
+  min-height: 48px;
+  padding: 8px;
+}
+
+.stageSummary:hover,
+.skillSummary:hover,
+.assignmentRow:hover {
+  background: var(--canvas-subtle);
+}
+
+.chevron {
+  color: var(--text-muted);
+  transition: transform 0.1s;
+}
+
+details[open] > summary .chevron {
+  transform: rotate(90deg);
+}
+
+.stageName {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.stageNumber {
+  margin-right: 8px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.count {
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: right;
+}
+
+.skills {
+  padding: 0 0 12px 24px;
+}
+
+.skill {
+  border-top: 1px solid var(--border-muted);
+}
+
+.skillSummary,
+.skillPlain {
+  display: grid;
+  grid-template-columns: 16px 16px minmax(0, 1fr) auto auto;
+  gap: 2px 8px;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px;
+}
+
+.skillPlain {
+  grid-template-columns: 16px 16px minmax(0, 1fr) auto;
+}
+
+.skillTitle {
+  font-weight: 600;
+}
+
+.skillPlain .skillTitle {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.skillOutcome {
+  display: block;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.cells {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.cell {
+  width: 10px;
+  height: 10px;
+  background: var(--bar-track);
+  border-radius: 2px;
+}
+
+.cellDone {
+  background: var(--bar-done);
+}
+
+.cellAttempted {
+  background: var(--bar-available);
+}
+
+.cellUnwritten {
+  background: transparent;
+  border: 1px dashed var(--border);
+}
+
+.cellGap {
+  width: 1px;
+  height: 12px;
+  margin: 0 3px;
+  background: var(--border-control);
+}
+
+.assignments {
+  padding: 0 0 8px 40px;
+}
+
+.assignmentRow {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) 150px 44px;
+  gap: 8px;
+  align-items: center;
+  min-height: 36px;
+  padding: 4px 8px;
+  border-top: 1px solid var(--border-muted);
+  color: var(--text);
+}
+
+.assignmentRow:hover {
+  text-decoration: none;
+}
+
+.assignmentTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assignmentType {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.extraTag {
+  color: var(--text-muted);
+  font-size: 12px;
+  text-align: right;
+}
+
+.playgroundLine {
+  margin-top: 24px;
+  color: var(--text-muted);
+}
+
+@media (max-width: 720px) {
+  .stageSummary {
+    grid-template-columns: 16px minmax(0, 1fr);
+  }
+
+  .stageSummary > .count,
+  .stageSummary > .stageBar {
+    grid-column: 2;
+    text-align: left;
+  }
+
+  .skills {
+    padding-left: 8px;
+  }
+
+  .skillSummary,
+  .skillPlain {
+    grid-template-columns: 16px 16px minmax(0, 1fr) auto;
+  }
+
+  .skillSummary .cells {
+    display: none;
+  }
+
+  .assignments {
+    padding-left: 12px;
+  }
+
+  .assignmentRow {
+    grid-template-columns: 16px minmax(0, 1fr) 40px;
+  }
+
+  .assignmentType {
+    display: none;
+  }
+}

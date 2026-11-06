@@ -47,6 +47,7 @@ A small set of assignments running in a real interface, used to judge the struct
 - [x] Build the sidebar, assignment screen, data panel, hints, and test results
 - [x] Save progress and drafts in the browser
 - [x] Add light and dark themes and a phone layout
+- [x] Redesign the interface after a UX review: landing page, split workbench, tabs, and progress model
 - [ ] Review the slice and agree on changes
 
 **Done when:** the assignment structure and interface are approved.
@@ -93,7 +94,7 @@ A small set of assignments running in a real interface, used to judge the struct
 
 - [x] Restructure the prototype around the curriculum data
 - [x] Remove the prototype's grader test
-- [ ] Generate the content bundle and remove solutions from it
+- [ ] Generate the content bundle, removing wrong-solution SQL that the app doesn't use
 - [x] Add routing using hash URLs, which work on GitHub Pages
 - [x] Support multi-table datasets and all comparison options
 - [x] Add query timeouts by stopping and restarting the worker
@@ -105,7 +106,7 @@ A small set of assignments running in a real interface, used to judge the struct
 
 ### Milestone 6: UI components and styling
 
-**Styling approach:** CSS Modules with design tokens as CSS variables. This adds no runtime cost and makes theming straightforward. The working slice has a first version to refine.
+**Styling approach:** CSS Modules with design tokens as CSS variables, in a precise, GitHub-inspired style. Layouts use rows and dividers instead of cards. The working slice has a first version to refine.
 
 | Group | Components |
 |---|---|

@@ -134,6 +134,13 @@ describe("assignments", () => {
       expect(assignment.cases.some((testCase) => testCase.hidden)).toBe(true);
     });
 
+    it("shows learners the data its visible cases run on", () => {
+      // The data panel shows the base dataset, so a visible case can't change it.
+      for (const testCase of assignment.cases.filter((candidate) => !candidate.hidden)) {
+        expect(testCase.setupSql).toBeUndefined();
+      }
+    });
+
     it("passes every case with each correct solution", () => {
       expect(assignment.solutions.length).toBeGreaterThan(0);
       for (const sql of assignment.solutions) {

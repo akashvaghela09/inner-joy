@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import type { Dataset } from "../../curriculum/tools/grade";
-import styles from "../app.module.css";
 import type { TableDescription } from "../protocol";
+import ui from "../ui.module.css";
+import wb from "../workbench.module.css";
 import { sendToWorker } from "../workerClient";
 import { ResultTable } from "./ResultTable";
 
-export function DataPanel({ dataset }: { dataset: Dataset }) {
+export function DataSection({ dataset, label }: { dataset: Dataset; label: string }) {
   const [tables, setTables] = useState<TableDescription[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,18 +25,20 @@ export function DataPanel({ dataset }: { dataset: Dataset }) {
   }, [dataset]);
 
   return (
-    <details className={styles.panel} open>
-      <summary>Data: {dataset.title}</summary>
-      <div className={styles.panelBody}>
-        <p className={styles.story}>{dataset.story}</p>
-        {error && <pre role="alert" className={styles.error}>{error}</pre>}
-        {tables?.map((table) => (
-          <div key={table.name}>
-            <h3 className={styles.tableName}>{table.name}</h3>
-            <ResultTable columns={table.columns} rows={table.rows} />
-          </div>
-        ))}
-      </div>
-    </details>
+    <section aria-label={label}>
+      <h2 className={wb.sectionLabel}>{label}</h2>
+      <p className={wb.story}>{dataset.story}</p>
+      {error && (
+        <pre role="alert" className={ui.errorBox}>
+          {error}
+        </pre>
+      )}
+      {tables?.map((table) => (
+        <div key={table.name}>
+          <h3 className={wb.tableName}>{table.name}</h3>
+          <ResultTable columns={table.columns} rows={table.rows} />
+        </div>
+      ))}
+    </section>
   );
 }
