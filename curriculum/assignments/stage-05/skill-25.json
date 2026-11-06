@@ -1,0 +1,37 @@
+[
+  {
+    "id": "s25-02",
+    "skill": 25,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [3],
+    "title": "Who ordered what",
+    "prompt": "Show each order's item along with the name of the customer who placed it. Leave out orders that don't match a known customer.",
+    "dataset": "cafe",
+    "hints": ["orders.customer_id points to customers.id. Connect them with JOIN ... ON."],
+    "check": { "mode": "result", "ordered": false, "columnNames": true },
+    "cases": [
+      {
+        "name": "Cafe orders",
+        "hidden": false,
+        "expected": { "columns": ["name", "item"], "rows": [["Priya", "Latte"], ["Marco", "Bagel"], ["Priya", "Scone"]] }
+      },
+      {
+        "name": "Different orders",
+        "hidden": true,
+        "setupSql": "DELETE FROM orders; DELETE FROM customers; INSERT INTO customers VALUES (5, 'Lena'), (6, 'Omar'); INSERT INTO orders VALUES (9, 6, 'Mocha', 5.0), (10, 8, 'Toast', 2.5);",
+        "expected": { "columns": ["name", "item"], "rows": [["Omar", "Mocha"]] }
+      }
+    ],
+    "solutions": [
+      "SELECT customers.name, orders.item FROM orders JOIN customers ON customers.id = orders.customer_id;",
+      "SELECT c.name, o.item FROM customers c INNER JOIN orders o ON o.customer_id = c.id;"
+    ],
+    "wrongSolutions": [
+      { "sql": "SELECT customers.name, orders.item FROM orders LEFT JOIN customers ON customers.id = orders.customer_id;", "why": "Keeps an order with no known customer" },
+      { "sql": "SELECT customers.name, orders.item FROM orders JOIN customers;", "why": "Pairs every order with every customer" },
+      { "sql": "SELECT customers.name, orders.item FROM orders JOIN customers ON customers.id = orders.id;", "why": "Joins on the wrong column" }
+    ]
+  }
+]

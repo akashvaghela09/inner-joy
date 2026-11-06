@@ -1,0 +1,34 @@
+[
+  {
+    "id": "st02-c01",
+    "kind": "checkpoint",
+    "stage": 2,
+    "skills": [5, 6, 7],
+    "sourceProblem": 1,
+    "recalls": [],
+    "title": "Budget fiction shelf",
+    "prompt": "The shop is setting up a budget fiction shelf. Show the id of every book that is in the Fiction genre and also costs less than 14.",
+    "dataset": "bookshop",
+    "hints": ["AND requires both conditions to be true."],
+    "check": { "mode": "result", "ordered": false, "columnNames": true },
+    "cases": [
+      {
+        "name": "Bookshop catalogue",
+        "hidden": false,
+        "expected": { "columns": ["id"], "rows": [[3]] }
+      },
+      {
+        "name": "A different catalogue",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (20, 'Ember Bay', 'Ann Cho', 'Fiction', 11.0, 150, 2017), (21, 'Long Tide', 'Sol Ruiz', 'Poetry', 12.0, 90, 2019), (22, 'Old Maps', 'Ken Ito', 'Fiction', 16.0, 205, 2020), (24, 'Grey Wren', 'Ann Cho', 'Fiction', 14.0, 111, 2022);",
+        "expected": { "columns": ["id"], "rows": [[20]] }
+      }
+    ],
+    "solutions": ["SELECT id FROM books WHERE genre = 'Fiction' AND price < 14;"],
+    "wrongSolutions": [
+      { "sql": "SELECT id FROM books WHERE genre = 'Fiction' OR price < 14;", "why": "OR accepts a book meeting just one condition" },
+      { "sql": "SELECT id FROM books WHERE genre = 'Fiction' AND price <= 14;", "why": "Includes a book costing exactly 14" },
+      { "sql": "SELECT title FROM books WHERE genre = 'Fiction' AND price < 14;", "why": "Returns the title instead of the id" }
+    ]
+  }
+]

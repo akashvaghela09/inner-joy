@@ -96,12 +96,26 @@ describe("assignments", () => {
     const dataset = () => datasets.get(assignment.dataset)!;
 
     it("has valid fields", () => {
-      const skill = skillById.get(assignment.skill);
-      expect(skill).toBeDefined();
-      expect(id).toBe(`s${String(assignment.skill).padStart(2, "0")}-${String(assignment.step).padStart(2, "0")}`);
-      expect(assignment.stepType).toBe(LADDER[assignment.step - 1]);
-      expect(assignment.required).toBe(assignment.step <= 5);
-      expect(assignment.step).toBeLessThanOrEqual(stageOfSkill.get(assignment.skill)!.assignmentsPerSkill);
+      if (assignment.kind) {
+        const stage = stages.find((candidate) => candidate.id === assignment.stage);
+        expect(stage).toBeDefined();
+        const letter = assignment.kind === "review" ? "r" : "c";
+        expect(id).toMatch(new RegExp(`^st${String(assignment.stage).padStart(2, "0")}-${letter}\\d{2}$`));
+        expect(assignment.skills?.length).toBeGreaterThan(0);
+        for (const skillId of assignment.skills ?? []) expect(stageOfSkill.get(skillId)!.id).toBeLessThanOrEqual(stage!.id);
+        if (assignment.sourceProblem !== undefined) {
+          expect(assignment.kind).toBe("checkpoint");
+          expect(stage!.checkpoints.sourceProblems).toContain(assignment.sourceProblem);
+        }
+      } else {
+        const skill = skillById.get(assignment.skill!);
+        const step = assignment.step!;
+        expect(skill).toBeDefined();
+        expect(id).toBe(`s${String(assignment.skill).padStart(2, "0")}-${String(step).padStart(2, "0")}`);
+        expect(assignment.stepType).toBe(LADDER[step - 1]);
+        expect(assignment.required).toBe(step <= 5);
+        expect(step).toBeLessThanOrEqual(stageOfSkill.get(assignment.skill!)!.assignmentsPerSkill);
+      }
       expect(datasets.has(assignment.dataset)).toBe(true);
       expect(assignment.title).not.toBe("");
       expect(assignment.prompt).not.toBe("");
@@ -111,7 +125,8 @@ describe("assignments", () => {
 
     it("recalls at most two planned skills", () => {
       expect(assignment.recalls.length).toBeLessThanOrEqual(2);
-      for (const recall of assignment.recalls) expect(skillById.get(assignment.skill)!.recalls).toContain(recall);
+      if (assignment.kind) return;
+      for (const recall of assignment.recalls) expect(skillById.get(assignment.skill!)!.recalls).toContain(recall);
     });
 
     it("has visible and hidden cases", () => {
@@ -147,7 +162,7 @@ describe("assignments", () => {
     });
 
     it("provides a starter that needs fixing where required", () => {
-      if (!MUST_START_BROKEN.includes(assignment.stepType)) return;
+      if (!MUST_START_BROKEN.includes(assignment.stepType ?? "")) return;
       expect(assignment.starterSql).toBeTruthy();
       expect(passesAllCases(SQL, dataset(), assignment, assignment.starterSql!)).toBe(false);
     });
@@ -157,7 +172,8 @@ describe("assignments", () => {
 describe("planned recalls", () => {
   it("are all earlier than the assignment's skill", () => {
     for (const assignment of assignments) {
-      for (const recall of assignment.recalls) expect(recall).toBeLessThan(assignment.skill);
+      if (assignment.kind) continue;
+      for (const recall of assignment.recalls) expect(recall).toBeLessThan(assignment.skill!);
     }
   });
 });

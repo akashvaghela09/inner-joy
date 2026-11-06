@@ -1,0 +1,32 @@
+[
+  {
+    "id": "st02-r01",
+    "kind": "review",
+    "stage": 2,
+    "skills": [5, 6],
+    "recalls": [],
+    "title": "Trails in miles",
+    "prompt": "A visitor from abroad wants the North region's trails in miles. Show each trail's name, and its length multiplied by 0.62 as miles.",
+    "dataset": "trail-club",
+    "hints": ["You'll need a filter and a calculated column."],
+    "check": { "mode": "result", "ordered": false, "columnNames": true, "decimals": 2 },
+    "cases": [
+      {
+        "name": "Club trails",
+        "hidden": false,
+        "expected": { "columns": ["name", "miles"], "rows": [["Cedar Loop", 5.27], ["Stone Pass", 13.21]] }
+      },
+      {
+        "name": "Different trails",
+        "hidden": true,
+        "setupSql": "DELETE FROM trails; INSERT INTO trails VALUES (8, 'High Moor', 'East', 12.6, 610), (10, 'Ash Hollow', 'North', 10.0, 200);",
+        "expected": { "columns": ["name", "miles"], "rows": [["Ash Hollow", 6.2]] }
+      }
+    ],
+    "solutions": ["SELECT name, length_km * 0.62 AS miles FROM trails WHERE region = 'North';"],
+    "wrongSolutions": [
+      { "sql": "SELECT name, length_km AS miles FROM trails WHERE region = 'North';", "why": "Doesn't convert the length" },
+      { "sql": "SELECT name, length_km * 0.62 AS miles FROM trails;", "why": "Includes every region" }
+    ]
+  }
+]

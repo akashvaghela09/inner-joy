@@ -1,0 +1,7 @@
+{
+  "id": "cafe",
+  "title": "Corner Cafe",
+  "story": "A neighbourhood cafe tracks its regular customers and their orders in two connected tables.",
+  "schemaSql": "CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT NOT NULL); CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, item TEXT NOT NULL, amount REAL NOT NULL);",
+  "seedSql": "INSERT INTO customers VALUES (1, 'Priya'), (2, 'Marco'), (3, 'Hana'); INSERT INTO orders VALUES (1, 1, 'Latte', 4.5), (2, 2, 'Bagel', 3.0), (3, 1, 'Scone', 3.5), (4, 7, 'Tea', 2.0);"
+}

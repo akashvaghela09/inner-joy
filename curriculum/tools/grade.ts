@@ -29,10 +29,18 @@ export type TestCase = {
 
 export type Assignment = {
   id: string;
-  skill: number;
-  step: number;
-  stepType: string;
-  required: boolean;
+  /** Omitted for ordinary skill assignments. */
+  kind?: "review" | "checkpoint";
+  // Skill assignments only.
+  skill?: number;
+  step?: number;
+  stepType?: string;
+  required?: boolean;
+  // Reviews and checkpoints only.
+  stage?: number;
+  skills?: number[];
+  /** A checkpoint's concept source, numbered as in docs/sql-50-assessment.md. */
+  sourceProblem?: number;
   recalls: number[];
   title: string;
   prompt: string;
@@ -47,16 +55,24 @@ export type Assignment = {
 
 export type CaseOutcome = { passed: boolean; actual?: ResultSet; error?: string };
 
-function lastResult(db: Database, sql: string): ResultSet | null {
-  let last: ResultSet | null = null;
+export function runStatements(db: Database, sql: string): ResultSet[] {
+  const results: ResultSet[] = [];
   // Stepping each statement keeps the columns of a SELECT that returns no rows.
   for (const stmt of db.iterateStatements(sql)) {
     const columns = stmt.getColumnNames();
     const rows: Value[][] = [];
     while (stmt.step()) rows.push(stmt.get() as Value[]);
-    if (columns.length > 0) last = { columns, rows };
+    if (columns.length > 0) results.push({ columns, rows });
   }
-  return last;
+  return results;
+}
+
+export function createCaseDb(SQL: SqlJsStatic, dataset: Dataset, testCase?: TestCase): Database {
+  const db = new SQL.Database();
+  db.run(dataset.schemaSql);
+  db.run(dataset.seedSql);
+  if (testCase?.setupSql) db.run(testCase.setupSql);
+  return db;
 }
 
 function normalise(rows: Value[][], check: Check): string[] {
@@ -79,16 +95,12 @@ export function resultsMatch(actual: ResultSet, expected: ResultSet, check: Chec
 
 export function runCase(SQL: SqlJsStatic, dataset: Dataset, assignment: Assignment, testCase: TestCase, sql: string): CaseOutcome {
   const { check } = assignment;
-  const db = new SQL.Database();
+  const db = createCaseDb(SQL, dataset, testCase);
   try {
-    db.run(dataset.schemaSql);
-    db.run(dataset.seedSql);
-    if (testCase.setupSql) db.run(testCase.setupSql);
-
-    let actual: ResultSet | null;
+    let actual: ResultSet | undefined;
     try {
-      actual = lastResult(db, sql);
-      if (check.mode === "table") actual = lastResult(db, check.sql ?? "");
+      actual = runStatements(db, sql).at(-1);
+      if (check.mode === "table") actual = runStatements(db, check.sql ?? "").at(-1);
     } catch (err) {
       return { passed: false, error: err instanceof Error ? err.message : String(err) };
     }

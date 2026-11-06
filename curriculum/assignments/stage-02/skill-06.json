@@ -1,0 +1,259 @@
+[
+  {
+    "id": "s06-01",
+    "skill": 6,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Keep only one genre",
+    "prompt": "Show the title and genre of every Fiction book. Replace the ___ with the right value.",
+    "dataset": "bookshop",
+    "starterSql": "SELECT title, genre\nFROM books\nWHERE genre = ___;",
+    "hints": ["Text values go in single quotes, and capital letters must match: 'Fiction'."],
+    "check": { "mode": "result", "ordered": false, "columnNames": true },
+    "cases": [
+      {
+        "name": "Bookshop catalogue",
+        "hidden": false,
+        "expected": { "columns": ["title", "genre"], "rows": [["Paper Lanterns", "Fiction"], ["River of Glass", "Fiction"]] }
+      },
+      {
+        "name": "A different catalogue",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (20, 'Ember Bay', 'Ann Cho', 'Fiction', 11.0, 150, 2017), (21, 'Long Tide', 'Sol Ruiz', 'Poetry', 14.0, 90, 2019), (22, 'Old Maps', 'Ken Ito', 'Fiction', 16.0, 205, 2020);",
+        "expected": { "columns": ["title", "genre"], "rows": [["Ember Bay", "Fiction"], ["Old Maps", "Fiction"]] }
+      }
+    ],
+    "solutions": ["SELECT title, genre\nFROM books\nWHERE genre = 'Fiction';"],
+    "wrongSolutions": [
+      { "sql": "SELECT title, genre FROM books WHERE genre = 'fiction';", "why": "Text comparison is case-sensitive" },
+      { "sql": "SELECT title, genre FROM books;", "why": "Doesn't filter the rows" },
+      { "sql": "SELECT title, genre FROM books WHERE genre <> 'Fiction';", "why": "Keeps every genre except Fiction" }
+    ]
+  },
+  {
+    "id": "s06-02",
+    "skill": 6,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [],
+    "title": "Under a price limit",
+    "prompt": "Show the title and price of books that cost less than 15. A book costing exactly 15 shouldn't appear.",
+    "dataset": "bookshop",
+    "hints": ["Numbers don't need quotes. Use the < operator."],
+    "check": { "mode": "result", "ordered": false, "columnNames": true },
+    "cases": [
+      {
+        "name": "Bookshop catalogue",
+        "hidden": false,
+        "expected": { "columns": ["title", "price"], "rows": [["Paper Lanterns", 12.0], ["The Last Ferry", 9.0]] }
+      },
+      {
+        "name": "A book priced exactly at the limit",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (20, 'Ember Bay', 'Ann Cho', 'Fiction', 11.0, 150, 2017), (23, 'Even Keel', 'Ann Cho', 'Poetry', 15.0, 100, 2021), (22, 'Old Maps', 'Ken Ito', 'Fiction', 16.0, 205, 2020);",
+        "expected": { "columns": ["title", "price"], "rows": [["Ember Bay", 11.0]] }
+      }
+    ],
+    "solutions": ["SELECT title, price FROM books WHERE price < 15;"],
+    "wrongSolutions": [
+      { "sql": "SELECT title, price FROM books WHERE price <= 15;", "why": "Includes a book costing exactly 15" },
+      { "sql": "SELECT title, price FROM books WHERE price > 15;", "why": "Selects the more expensive books" }
+    ]
+  },
+  {
+    "id": "s06-03",
+    "skill": 6,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [],
+    "title": "Everything except one",
+    "prompt": "Show the title and genre of every book that isn't in the Science genre.",
+    "dataset": "bookshop",
+    "hints": ["<> means not equal."],
+    "check": { "mode": "result", "ordered": false, "columnNames": true },
+    "cases": [
+      {
+        "name": "Bookshop catalogue",
+        "hidden": false,
+        "expected": {
+          "columns": ["title", "genre"],
+          "rows": [["The Salt Road", "History"], ["Paper Lanterns", "Fiction"], ["River of Glass", "Fiction"], ["The Last Ferry", "Mystery"]]
+        }
+      },
+      {
+        "name": "A different catalogue",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023), (21, 'Long Tide', 'Sol Ruiz', 'Poetry', 14.0, 90, 2019);",
+        "expected": { "columns": ["title", "genre"], "rows": [["Long Tide", "Poetry"]] }
+      }
+    ],
+    "solutions": ["SELECT title, genre FROM books WHERE genre <> 'Science';", "SELECT title, genre FROM books WHERE genre != 'Science';"],
+    "wrongSolutions": [
+      { "sql": "SELECT title, genre FROM books WHERE genre = 'Science';", "why": "Keeps only Science" },
+      { "sql": "SELECT title, genre FROM books WHERE genre <> 'science';", "why": "The lowercase value matches nothing, so no book is removed" }
+    ]
+  },
+  {
+    "id": "s06-04",
+    "skill": 6,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [5],
+    "title": "Tough climbs",
+    "prompt": "The hiking club calls a trail tough if it climbs at least 870 metres. Show the name and elevation_m of the tough trails.",
+    "dataset": "trail-club",
+    "hints": ["At least includes the value itself, so use >=."],
+    "check": { "mode": "result", "ordered": false, "columnNames": true },
+    "cases": [
+      {
+        "name": "Club trails",
+        "hidden": false,
+        "expected": { "columns": ["name", "elevation_m"], "rows": [["Fox Ridge", 870], ["Stone Pass", 1450]] }
+      },
+      {
+        "name": "Different trails",
+        "hidden": true,
+        "setupSql": "DELETE FROM trails; INSERT INTO trails VALUES (7, 'Birch Walk', 'West', 3.1, 40), (8, 'High Moor', 'East', 12.6, 610), (9, 'Crag Top', 'West', 9.9, 900);",
+        "expected": { "columns": ["name", "elevation_m"], "rows": [["Crag Top", 900]] }
+      }
+    ],
+    "solutions": ["SELECT name, elevation_m FROM trails WHERE elevation_m >= 870;"],
+    "wrongSolutions": [
+      { "sql": "SELECT name, elevation_m FROM trails WHERE elevation_m > 870;", "why": "Leaves out a trail of exactly 870 metres" },
+      { "sql": "SELECT name, elevation_m FROM trails WHERE length_km >= 870;", "why": "Filters on the wrong column" }
+    ]
+  },
+  {
+    "id": "s06-05",
+    "skill": 6,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [2],
+    "title": "When nothing matches",
+    "prompt": "Show the title and year of books published in 2020. If no book matches, the correct result is an empty table, so don't try to force a row.",
+    "dataset": "bookshop",
+    "hints": ["An empty result is a valid answer. Filter on the exact year."],
+    "check": { "mode": "result", "ordered": false, "columnNames": true },
+    "cases": [
+      {
+        "name": "Bookshop catalogue, no match",
+        "hidden": false,
+        "expected": { "columns": ["title", "year"], "rows": [] }
+      },
+      {
+        "name": "A catalogue with a match",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015);",
+        "expected": { "columns": ["title", "year"], "rows": [["Copper Moon", 2020]] }
+      }
+    ],
+    "solutions": ["SELECT title, year FROM books WHERE year = 2020;"],
+    "wrongSolutions": [
+      { "sql": "SELECT title, year FROM books WHERE year > 2020;", "why": "Returns later years instead" },
+      { "sql": "SELECT title, year FROM books WHERE year = 2021;", "why": "Uses the wrong year" },
+      { "sql": "SELECT title, year FROM books WHERE year = 1999;", "why": "Returns an empty table every time, without checking for 2020" }
+    ]
+  },
+  {
+    "id": "s06-06",
+    "skill": 6,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the comparison",
+    "prompt": "This query should show the title of books that cost more than 20, but it fails. Fix it.",
+    "dataset": "bookshop",
+    "starterSql": "SELECT title\nFROM books\nWHERE price = > 20;",
+    "hints": ["Read the error, then look closely at the comparison operator."],
+    "check": { "mode": "result", "ordered": false, "columnNames": true },
+    "cases": [
+      {
+        "name": "Bookshop catalogue",
+        "hidden": false,
+        "expected": { "columns": ["title"], "rows": [["Quiet Engines"], ["Small Planets"]] }
+      },
+      {
+        "name": "A book priced exactly at the limit",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": { "columns": ["title"], "rows": [["Sky Atlas"]] }
+      }
+    ],
+    "solutions": ["SELECT title\nFROM books\nWHERE price > 20;"],
+    "wrongSolutions": [
+      { "sql": "SELECT title FROM books WHERE price >= 20;", "why": "Includes a book costing exactly 20" },
+      { "sql": "SELECT title FROM books WHERE price = 20;", "why": "Matches only an exact price" }
+    ]
+  },
+  {
+    "id": "s06-07",
+    "skill": 6,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [5],
+    "title": "Compare two columns",
+    "prompt": "A book counts as a bargain when its pages are greater than 20 times its price. Show the title of each bargain as bargain_book.",
+    "dataset": "bookshop",
+    "hints": ["WHERE can compare a column with a calculation: pages > price * 20."],
+    "check": { "mode": "result", "ordered": false, "columnNames": true },
+    "cases": [
+      {
+        "name": "Bookshop catalogue",
+        "hidden": false,
+        "expected": { "columns": ["bargain_book"], "rows": [["Paper Lanterns"], ["The Last Ferry"]] }
+      },
+      {
+        "name": "A different catalogue",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015);",
+        "expected": { "columns": ["bargain_book"], "rows": [["North Light"]] }
+      }
+    ],
+    "solutions": ["SELECT title AS bargain_book FROM books WHERE pages > price * 20;"],
+    "wrongSolutions": [
+      { "sql": "SELECT title AS bargain_book FROM books WHERE pages < price * 20;", "why": "Reverses the comparison" },
+      { "sql": "SELECT title AS bargain_book FROM books WHERE pages > price;", "why": "Forgets to multiply the price" },
+      { "sql": "SELECT title FROM books WHERE pages > price * 20;", "why": "Doesn't rename the column" }
+    ]
+  },
+  {
+    "id": "s06-08",
+    "skill": 6,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [5],
+    "title": "An author sale",
+    "prompt": "The shop is taking 2 off every Mina Rao book. Show each of her books' titles as book, and the reduced price as sale_price.",
+    "dataset": "bookshop",
+    "hints": ["Filter with WHERE, and calculate the new price in SELECT."],
+    "check": { "mode": "result", "ordered": false, "columnNames": true, "decimals": 2 },
+    "cases": [
+      {
+        "name": "Bookshop catalogue",
+        "hidden": false,
+        "expected": { "columns": ["book", "sale_price"], "rows": [["The Salt Road", 16.5], ["Paper Lanterns", 10.0]] }
+      },
+      {
+        "name": "A different catalogue",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (30, 'Tin Sky', 'Mina Rao', 'Poetry', 5.0, 50, 2010), (31, 'Ash Garden', 'Ann Cho', 'Fiction', 9.0, 120, 2012);",
+        "expected": { "columns": ["book", "sale_price"], "rows": [["Tin Sky", 3.0]] }
+      }
+    ],
+    "solutions": ["SELECT title AS book, price - 2 AS sale_price FROM books WHERE author = 'Mina Rao';"],
+    "wrongSolutions": [
+      { "sql": "SELECT title AS book, price AS sale_price FROM books WHERE author = 'Mina Rao';", "why": "Doesn't apply the reduction" },
+      { "sql": "SELECT title AS book, price - 2 AS sale_price FROM books WHERE author = 'Mina';", "why": "The author's full name must match" },
+      { "sql": "SELECT title AS book, price - 2 AS sale_price FROM books;", "why": "Discounts every book" }
+    ]
+  }
+]
