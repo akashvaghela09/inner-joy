@@ -1,0 +1,538 @@
+[
+  {
+    "id": "s19-01",
+    "skill": 19,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Total salary",
+    "prompt": "Show the total of all salaries, as total_pay. Replace the ___.",
+    "dataset": "staff",
+    "starterSql": "SELECT ___(salary) AS total_pay\nFROM employees;",
+    "hints": [
+      "SUM adds values."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "total_pay"
+          ],
+          "rows": [
+            [
+              589000
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "total_pay"
+          ],
+          "rows": [
+            [
+              315000
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT SUM(salary) AS total_pay FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT COUNT(salary) AS total_pay FROM employees;",
+        "why": "Counts instead of adding"
+      },
+      {
+        "sql": "SELECT MAX(salary) AS total_pay FROM employees;",
+        "why": "Finds the highest"
+      }
+    ]
+  },
+  {
+    "id": "s19-02",
+    "skill": 19,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [],
+    "title": "Price range",
+    "prompt": "Show the cheapest price as lowest and the highest price as highest.",
+    "dataset": "bookshop",
+    "hints": [
+      "Use MIN and MAX."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "lowest",
+            "highest"
+          ],
+          "rows": [
+            [
+              9,
+              30
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": {
+          "columns": [
+            "lowest",
+            "highest"
+          ],
+          "rows": [
+            [
+              7.5,
+              25
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT MIN(price) AS lowest, MAX(price) AS highest FROM books;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT MAX(price) AS lowest, MIN(price) AS highest FROM books;",
+        "why": "Swaps them"
+      },
+      {
+        "sql": "SELECT MIN(price) AS lowest FROM books;",
+        "why": "Leaves out the highest"
+      }
+    ]
+  },
+  {
+    "id": "s19-03",
+    "skill": 19,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      13
+    ],
+    "title": "Average grade",
+    "prompt": "Show the average grade, rounded to 2 decimals, as average_grade. NULL grades don't count.",
+    "dataset": "school",
+    "hints": [
+      "AVG ignores NULLs automatically."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "average_grade"
+          ],
+          "rows": [
+            [
+              77.38
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "average_grade"
+          ],
+          "rows": [
+            [
+              71.67
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT ROUND(AVG(grade), 2) AS average_grade FROM enrolments;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT ROUND(SUM(grade) / COUNT(*), 2) AS average_grade FROM enrolments;",
+        "why": "Divides by every row, using integer division"
+      },
+      {
+        "sql": "SELECT AVG(grade) AS average_grade FROM enrolments;",
+        "why": "Doesn't round"
+      }
+    ]
+  },
+  {
+    "id": "s19-04",
+    "skill": 19,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [],
+    "title": "Earliest and latest hire",
+    "prompt": "Show the earliest hire_date as first_hire and the latest as last_hire.",
+    "dataset": "staff",
+    "hints": [
+      "MIN and MAX work on dates in this format."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "first_hire",
+            "last_hire"
+          ],
+          "rows": [
+            [
+              "2018-03-15",
+              "2024-01-10"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "first_hire",
+            "last_hire"
+          ],
+          "rows": [
+            [
+              "2019-02-01",
+              "2024-08-20"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT MIN(hire_date) AS first_hire, MAX(hire_date) AS last_hire FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT MAX(hire_date) AS first_hire, MIN(hire_date) AS last_hire FROM employees;",
+        "why": "Swaps them"
+      },
+      {
+        "sql": "SELECT MIN(hire_date) AS first_hire FROM employees;",
+        "why": "Leaves out the latest"
+      }
+    ]
+  },
+  {
+    "id": "s19-05",
+    "skill": 19,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      9,
+      13
+    ],
+    "title": "Average with missing values",
+    "prompt": "Bonuses can be missing. Show the average bonus counting only recorded bonuses as known_avg, and treating missing as 0 as overall_avg, both rounded to 2 decimals.",
+    "dataset": "staff",
+    "hints": [
+      "COALESCE changes what AVG sees."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "known_avg",
+            "overall_avg"
+          ],
+          "rows": [
+            [
+              4250,
+              2125
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "known_avg",
+            "overall_avg"
+          ],
+          "rows": [
+            [
+              400,
+              240
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT ROUND(AVG(bonus), 2) AS known_avg, ROUND(AVG(COALESCE(bonus, 0)), 2) AS overall_avg FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT ROUND(AVG(bonus), 2) AS known_avg, ROUND(AVG(bonus), 2) AS overall_avg FROM employees;",
+        "why": "Both ignore missing values"
+      },
+      {
+        "sql": "SELECT ROUND(AVG(COALESCE(bonus, 0)), 2) AS known_avg, ROUND(AVG(COALESCE(bonus, 0)), 2) AS overall_avg FROM employees;",
+        "why": "Both count missing as zero"
+      }
+    ]
+  },
+  {
+    "id": "s19-06",
+    "skill": 19,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the average",
+    "prompt": "This should show the average product price rounded to 2 decimals as average_price, but it fails. Fix it.",
+    "dataset": "shop",
+    "starterSql": "SELECT AVG(ROUND(price, 2) AS average_price\nFROM products;",
+    "hints": [
+      "ROUND wraps around AVG."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "average_price"
+          ],
+          "rows": [
+            [
+              22.42
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "average_price"
+          ],
+          "rows": [
+            [
+              20.5
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT ROUND(AVG(price), 2) AS average_price FROM products;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT AVG(price) AS average_price FROM products;",
+        "why": "Doesn't round"
+      },
+      {
+        "sql": "SELECT ROUND(MAX(price), 2) AS average_price FROM products;",
+        "why": "Finds the highest"
+      }
+    ]
+  },
+  {
+    "id": "s19-07",
+    "skill": 19,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      12
+    ],
+    "title": "Revenue from items",
+    "prompt": "Assume each order item sold for quantity times 10. Show the total as revenue.",
+    "dataset": "shop",
+    "hints": [
+      "Aggregates can take a calculation."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "revenue"
+          ],
+          "rows": [
+            [
+              170
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "revenue"
+          ],
+          "rows": [
+            [
+              70
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT SUM(quantity * 10) AS revenue FROM order_items;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT SUM(quantity) AS revenue FROM order_items;",
+        "why": "Doesn't multiply"
+      },
+      {
+        "sql": "SELECT COUNT(quantity * 10) AS revenue FROM order_items;",
+        "why": "Counts rows"
+      }
+    ]
+  },
+  {
+    "id": "s19-08",
+    "skill": 19,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      13,
+      18
+    ],
+    "title": "Oslo summary",
+    "prompt": "For Oslo readings only, show the number of readings as days, the average temperature rounded to 1 decimal as avg_temp, and the total rainfall as total_rain.",
+    "dataset": "weather",
+    "hints": [
+      "Filter first. Use three aggregates."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "days",
+            "avg_temp",
+            "total_rain"
+          ],
+          "rows": [
+            [
+              4,
+              4,
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL); UPDATE readings SET city = 'Oslo' WHERE id IN (14, 16);",
+        "expected": {
+          "columns": [
+            "days",
+            "avg_temp",
+            "total_rain"
+          ],
+          "rows": [
+            [
+              2,
+              16.5,
+              3
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT COUNT(*) AS days, ROUND(AVG(temp_c), 1) AS avg_temp, SUM(rainfall_mm) AS total_rain FROM readings WHERE city = 'Oslo';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT COUNT(*) AS days, ROUND(AVG(temp_c), 1) AS avg_temp, SUM(rainfall_mm) AS total_rain FROM readings;",
+        "why": "Doesn't filter"
+      },
+      {
+        "sql": "SELECT COUNT(rainfall_mm) AS days, ROUND(AVG(temp_c), 1) AS avg_temp, SUM(rainfall_mm) AS total_rain FROM readings WHERE city = 'Oslo';",
+        "why": "Skips a day with missing rain"
+      }
+    ]
+  }
+]

@@ -1,0 +1,1022 @@
+[
+  {
+    "id": "st03-r01",
+    "kind": "review",
+    "stage": 3,
+    "skills": [
+      12,
+      13
+    ],
+    "recalls": [],
+    "title": "Line totals",
+    "prompt": "Show each order item's order_id, product_id, and quantity times 2.5, rounded to 1 decimal, as weight.",
+    "dataset": "shop",
+    "hints": [
+      "Calculate, then round."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "order_id",
+            "product_id",
+            "weight"
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              7.5
+            ],
+            [
+              1,
+              2,
+              5
+            ],
+            [
+              2,
+              3,
+              2.5
+            ],
+            [
+              3,
+              4,
+              2.5
+            ],
+            [
+              4,
+              5,
+              5
+            ],
+            [
+              4,
+              1,
+              2.5
+            ],
+            [
+              5,
+              3,
+              5
+            ],
+            [
+              6,
+              4,
+              2.5
+            ],
+            [
+              6,
+              2,
+              10
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "order_id",
+            "product_id",
+            "weight"
+          ],
+          "rows": [
+            [
+              11,
+              7,
+              2.5
+            ],
+            [
+              11,
+              8,
+              7.5
+            ],
+            [
+              12,
+              9,
+              5
+            ],
+            [
+              13,
+              8,
+              2.5
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT order_id, product_id, ROUND(quantity * 2.5, 1) AS weight FROM order_items;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT order_id, product_id, quantity AS weight FROM order_items;",
+        "why": "Doesn't calculate"
+      },
+      {
+        "sql": "SELECT order_id, product_id, ROUND(quantity + 2.5, 1) AS weight FROM order_items;",
+        "why": "Adds instead"
+      }
+    ]
+  },
+  {
+    "id": "st03-r02",
+    "kind": "review",
+    "stage": 3,
+    "skills": [
+      14
+    ],
+    "recalls": [],
+    "title": "Short names",
+    "prompt": "Show the full_name of contacts whose name has at most 8 characters.",
+    "dataset": "contacts",
+    "hints": [
+      "Measure the text in WHERE."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "full_name"
+          ],
+          "rows": [
+            [
+              "Tim Lee"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3'); UPDATE contacts SET full_name = 'Ada Byron' WHERE id = 11; UPDATE contacts SET full_name = 'Bob Khan' WHERE id = 12;",
+        "expected": {
+          "columns": [
+            "full_name"
+          ],
+          "rows": [
+            [
+              "Bob Khan"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT full_name FROM contacts WHERE LENGTH(full_name) <= 8;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT full_name FROM contacts WHERE LENGTH(full_name) < 8;",
+        "why": "Leaves out exactly 8"
+      },
+      {
+        "sql": "SELECT full_name FROM contacts;",
+        "why": "Doesn't filter"
+      }
+    ]
+  },
+  {
+    "id": "st03-r03",
+    "kind": "review",
+    "stage": 3,
+    "skills": [
+      16,
+      17
+    ],
+    "recalls": [],
+    "title": "Weekend check",
+    "prompt": "SQLite's strftime('%w', date) gives 0 for Sunday and 6 for Saturday. Show each session's id and a column day_type: Weekend or Weekday.",
+    "dataset": "app",
+    "hints": [
+      "Combine a date function with CASE."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "day_type"
+          ],
+          "rows": [
+            [
+              1,
+              "Weekday"
+            ],
+            [
+              2,
+              "Weekday"
+            ],
+            [
+              3,
+              "Weekday"
+            ],
+            [
+              4,
+              "Weekday"
+            ],
+            [
+              5,
+              "Weekday"
+            ],
+            [
+              6,
+              "Weekday"
+            ],
+            [
+              7,
+              "Weekday"
+            ],
+            [
+              8,
+              "Weekday"
+            ],
+            [
+              9,
+              "Weekday"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "id",
+            "day_type"
+          ],
+          "rows": [
+            [
+              11,
+              "Weekday"
+            ],
+            [
+              12,
+              "Weekday"
+            ],
+            [
+              13,
+              "Weekday"
+            ],
+            [
+              14,
+              "Weekend"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, CASE WHEN strftime('%w', session_date) IN ('0', '6') THEN 'Weekend' ELSE 'Weekday' END AS day_type FROM sessions;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, CASE WHEN strftime('%w', session_date) IN (0, 6) THEN 'Weekend' ELSE 'Weekday' END AS day_type FROM sessions;",
+        "why": "strftime returns text, not numbers"
+      },
+      {
+        "sql": "SELECT id, 'Weekday' AS day_type FROM sessions;",
+        "why": "Doesn't check the date"
+      }
+    ]
+  },
+  {
+    "id": "st03-r04",
+    "kind": "review",
+    "stage": 3,
+    "skills": [
+      15,
+      17
+    ],
+    "recalls": [],
+    "title": "Sale tags",
+    "prompt": "Show each book's title and a tag named sale: the text On sale if its title contains an a or A, otherwise Regular.",
+    "dataset": "bookshop",
+    "hints": [
+      "LIKE works inside CASE."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title",
+            "sale"
+          ],
+          "rows": [
+            [
+              "The Salt Road",
+              "On sale"
+            ],
+            [
+              "Quiet Engines",
+              "Regular"
+            ],
+            [
+              "Paper Lanterns",
+              "On sale"
+            ],
+            [
+              "River of Glass",
+              "On sale"
+            ],
+            [
+              "Small Planets",
+              "On sale"
+            ],
+            [
+              "The Last Ferry",
+              "On sale"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023); UPDATE books SET title = 'Blue Fog' WHERE id = 10;",
+        "expected": {
+          "columns": [
+            "title",
+            "sale"
+          ],
+          "rows": [
+            [
+              "Blue Fog",
+              "Regular"
+            ],
+            [
+              "North Light",
+              "Regular"
+            ],
+            [
+              "Sky Atlas",
+              "On sale"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT title, CASE WHEN title LIKE '%a%' THEN 'On sale' ELSE 'Regular' END AS sale FROM books;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT title, CASE WHEN title LIKE 'a%' THEN 'On sale' ELSE 'Regular' END AS sale FROM books;",
+        "why": "Checks only the first letter"
+      },
+      {
+        "sql": "SELECT title, 'On sale' AS sale FROM books;",
+        "why": "Tags everything"
+      }
+    ]
+  },
+  {
+    "id": "st03-r05",
+    "kind": "review",
+    "stage": 3,
+    "skills": [
+      12,
+      17
+    ],
+    "recalls": [],
+    "title": "Pay with bonus",
+    "prompt": "Show each employee's name and their salary plus bonus as total, treating a missing bonus as 0.",
+    "dataset": "staff",
+    "hints": [
+      "A missing value would otherwise make the total NULL."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "total"
+          ],
+          "rows": [
+            [
+              "Asha",
+              130000
+            ],
+            [
+              "Ben",
+              95000
+            ],
+            [
+              "Chloe",
+              100000
+            ],
+            [
+              "Dev",
+              72000
+            ],
+            [
+              "Elena",
+              62000
+            ],
+            [
+              "Farid",
+              58000
+            ],
+            [
+              "Grace",
+              48000
+            ],
+            [
+              "Hugo",
+              41000
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "total"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              90900
+            ],
+            [
+              "Jon",
+              70000
+            ],
+            [
+              "Kim",
+              70300
+            ],
+            [
+              "Leo",
+              30000
+            ],
+            [
+              "Mia",
+              55000
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, salary + COALESCE(bonus, 0) AS total FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, salary + bonus AS total FROM employees;",
+        "why": "NULL bonuses give NULL totals"
+      },
+      {
+        "sql": "SELECT name, salary AS total FROM employees;",
+        "why": "Ignores bonuses"
+      }
+    ]
+  },
+  {
+    "id": "st03-r06",
+    "kind": "review",
+    "stage": 3,
+    "skills": [
+      14
+    ],
+    "recalls": [],
+    "title": "Email domains",
+    "prompt": "Everything after the @ is the domain. Show each employee's id and email domain, as domain, for employees with an email. instr(email, '@') gives the position of the @.",
+    "dataset": "staff",
+    "hints": [
+      "Start SUBSTR one position after the @."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "domain"
+          ],
+          "rows": [
+            [
+              1,
+              "acme.test"
+            ],
+            [
+              2,
+              "acme.test"
+            ],
+            [
+              4,
+              "acme.test"
+            ],
+            [
+              5,
+              "acme.test"
+            ],
+            [
+              6,
+              "acme.test"
+            ],
+            [
+              8,
+              "acme.test"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET email = 'ivy@sub.acme.test' WHERE id = 11;",
+        "expected": {
+          "columns": [
+            "id",
+            "domain"
+          ],
+          "rows": [
+            [
+              11,
+              "sub.acme.test"
+            ],
+            [
+              13,
+              "acme.test"
+            ],
+            [
+              14,
+              "acme.test"
+            ],
+            [
+              15,
+              "acme.test"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, SUBSTR(email, instr(email, '@') + 1) AS domain FROM employees WHERE email IS NOT NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, SUBSTR(email, instr(email, '@')) AS domain FROM employees WHERE email IS NOT NULL;",
+        "why": "Includes the @"
+      },
+      {
+        "sql": "SELECT id, SUBSTR(email, instr(email, '@') + 1) AS domain FROM employees;",
+        "why": "Keeps missing emails"
+      }
+    ]
+  },
+  {
+    "id": "st03-r07",
+    "kind": "review",
+    "stage": 3,
+    "skills": [
+      14,
+      16
+    ],
+    "recalls": [],
+    "title": "Month labels",
+    "prompt": "Show each reading's id and a label like Mar 2024, for March 2024 readings only, as label. Use the fixed text Mar.",
+    "dataset": "weather",
+    "hints": [
+      "Filter on the month, and build the label from the year."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "label"
+          ],
+          "rows": [
+            [
+              1,
+              "Mar 2024"
+            ],
+            [
+              2,
+              "Mar 2024"
+            ],
+            [
+              3,
+              "Mar 2024"
+            ],
+            [
+              4,
+              "Mar 2024"
+            ],
+            [
+              5,
+              "Mar 2024"
+            ],
+            [
+              6,
+              "Mar 2024"
+            ],
+            [
+              7,
+              "Mar 2024"
+            ],
+            [
+              8,
+              "Mar 2024"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL); UPDATE readings SET reading_date = '2024-03-09' WHERE id = 11;",
+        "expected": {
+          "columns": [
+            "id",
+            "label"
+          ],
+          "rows": [
+            [
+              11,
+              "Mar 2024"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, 'Mar ' || strftime('%Y', reading_date) AS label FROM readings WHERE strftime('%Y-%m', reading_date) = '2024-03';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, 'Mar ' || strftime('%Y', reading_date) AS label FROM readings;",
+        "why": "Doesn't filter"
+      },
+      {
+        "sql": "SELECT id, 'Mar' || strftime('%Y', reading_date) AS label FROM readings WHERE strftime('%Y-%m', reading_date) = '2024-03';",
+        "why": "Leaves out the space"
+      }
+    ]
+  },
+  {
+    "id": "st03-r08",
+    "kind": "review",
+    "stage": 3,
+    "skills": [
+      13,
+      17
+    ],
+    "recalls": [],
+    "title": "Effective discount",
+    "prompt": "Show each order item's order_id, product_id, and discount, with missing discounts as 0, rounded to 1 decimal, as discount.",
+    "dataset": "shop",
+    "hints": [
+      "Replace, then round."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "order_id",
+            "product_id",
+            "discount"
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              0
+            ],
+            [
+              1,
+              2,
+              0.5
+            ],
+            [
+              2,
+              3,
+              0
+            ],
+            [
+              3,
+              4,
+              5
+            ],
+            [
+              4,
+              5,
+              0
+            ],
+            [
+              4,
+              1,
+              0
+            ],
+            [
+              5,
+              3,
+              1
+            ],
+            [
+              6,
+              4,
+              0
+            ],
+            [
+              6,
+              2,
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "order_id",
+            "product_id",
+            "discount"
+          ],
+          "rows": [
+            [
+              11,
+              7,
+              4
+            ],
+            [
+              11,
+              8,
+              0
+            ],
+            [
+              12,
+              9,
+              0
+            ],
+            [
+              13,
+              8,
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT order_id, product_id, ROUND(COALESCE(discount, 0), 1) AS discount FROM order_items;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT order_id, product_id, discount FROM order_items;",
+        "why": "Leaves NULLs"
+      },
+      {
+        "sql": "SELECT order_id, product_id, COALESCE(discount, 1) AS discount FROM order_items;",
+        "why": "Uses the wrong replacement"
+      }
+    ]
+  },
+  {
+    "id": "st03-r09",
+    "kind": "review",
+    "stage": 3,
+    "skills": [
+      14
+    ],
+    "recalls": [],
+    "title": "Mail merge",
+    "prompt": "Show a greeting for each contact in London, as greeting: Hello, followed by a comma and space, then their name in lowercase.",
+    "dataset": "contacts",
+    "hints": [
+      "Filter, then join text."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "greeting"
+          ],
+          "rows": [
+            [
+              "Hello, ada lovelace"
+            ],
+            [
+              "Hello, alan turing"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3'); UPDATE contacts SET city = 'London', full_name = 'MARY J' WHERE id = 11;",
+        "expected": {
+          "columns": [
+            "greeting"
+          ],
+          "rows": [
+            [
+              "Hello, mary j"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT 'Hello, ' || LOWER(full_name) AS greeting FROM contacts WHERE city = 'London';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT 'Hello, ' || full_name AS greeting FROM contacts WHERE city = 'London';",
+        "why": "Doesn't lowercase"
+      },
+      {
+        "sql": "SELECT 'Hello, ' || LOWER(full_name) AS greeting FROM contacts;",
+        "why": "Doesn't filter"
+      }
+    ]
+  },
+  {
+    "id": "st03-r10",
+    "kind": "review",
+    "stage": 3,
+    "skills": [
+      9,
+      17
+    ],
+    "recalls": [],
+    "title": "Pass or fail",
+    "prompt": "Show each enrolment's id and a result: Pending with no grade, Pass from 60 upwards, otherwise Fail.",
+    "dataset": "school",
+    "hints": [
+      "Handle the missing grade first."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "result"
+          ],
+          "rows": [
+            [
+              1,
+              "Pass"
+            ],
+            [
+              2,
+              "Pass"
+            ],
+            [
+              3,
+              "Fail"
+            ],
+            [
+              4,
+              "Pass"
+            ],
+            [
+              5,
+              "Pending"
+            ],
+            [
+              6,
+              "Pass"
+            ],
+            [
+              7,
+              "Pass"
+            ],
+            [
+              8,
+              "Pass"
+            ],
+            [
+              9,
+              "Pass"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "id",
+            "result"
+          ],
+          "rows": [
+            [
+              11,
+              "Pass"
+            ],
+            [
+              12,
+              "Pass"
+            ],
+            [
+              13,
+              "Pending"
+            ],
+            [
+              14,
+              "Pass"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, CASE WHEN grade IS NULL THEN 'Pending' WHEN grade >= 60 THEN 'Pass' ELSE 'Fail' END AS result FROM enrolments;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, CASE WHEN grade >= 60 THEN 'Pass' ELSE 'Fail' END AS result FROM enrolments;",
+        "why": "Treats missing as Fail"
+      },
+      {
+        "sql": "SELECT id, CASE WHEN grade IS NULL THEN 'Pending' WHEN grade > 60 THEN 'Pass' ELSE 'Fail' END AS result FROM enrolments;",
+        "why": "A grade of 60 passes"
+      }
+    ]
+  }
+]

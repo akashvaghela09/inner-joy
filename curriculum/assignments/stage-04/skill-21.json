@@ -1,0 +1,556 @@
+[
+  {
+    "id": "s21-01",
+    "skill": 21,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Large departments",
+    "prompt": "Show each department_id with at least 3 employees, and the count as staff. Replace the ___.",
+    "dataset": "staff",
+    "starterSql": "SELECT department_id, COUNT(*) AS staff\nFROM employees\nGROUP BY department_id\nHAVING ___;",
+    "hints": [
+      "HAVING filters groups."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "department_id",
+            "staff"
+          ],
+          "rows": [
+            [
+              1,
+              3
+            ],
+            [
+              2,
+              3
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET department_id = 5 WHERE id = 14;",
+        "expected": {
+          "columns": [
+            "department_id",
+            "staff"
+          ],
+          "rows": [
+            [
+              5,
+              3
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT department_id, COUNT(*) AS staff FROM employees GROUP BY department_id HAVING COUNT(*) >= 3;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT department_id, COUNT(*) AS staff FROM employees GROUP BY department_id HAVING COUNT(*) > 3;",
+        "why": "Leaves out exactly 3"
+      },
+      {
+        "sql": "SELECT department_id, COUNT(*) AS staff FROM employees GROUP BY department_id;",
+        "why": "Doesn't filter groups"
+      }
+    ]
+  },
+  {
+    "id": "s21-02",
+    "skill": 21,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      18
+    ],
+    "title": "Repeat customers",
+    "prompt": "Show the customer_id of customers with more than one order.",
+    "dataset": "shop",
+    "hints": [
+      "Group, then filter the count."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "customer_id"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              3
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "customer_id"
+          ],
+          "rows": [
+            [
+              7
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT customer_id FROM orders GROUP BY customer_id HAVING COUNT(*) > 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT customer_id FROM orders GROUP BY customer_id;",
+        "why": "Keeps everyone"
+      },
+      {
+        "sql": "SELECT customer_id FROM orders GROUP BY customer_id HAVING COUNT(*) >= 1;",
+        "why": "Includes single orders"
+      }
+    ]
+  },
+  {
+    "id": "s21-03",
+    "skill": 21,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      6
+    ],
+    "title": "Filter both ways",
+    "prompt": "Using only shipped orders, show the customer_id of customers with at least 2 of them, and the count as shipped.",
+    "dataset": "shop",
+    "hints": [
+      "WHERE for rows, HAVING for groups."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "customer_id",
+            "shipped"
+          ],
+          "rows": [
+            [
+              3,
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO orders VALUES (14, 7, '2024-04-01', 'shipped');",
+        "expected": {
+          "columns": [
+            "customer_id",
+            "shipped"
+          ],
+          "rows": [
+            [
+              7,
+              2
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT customer_id, COUNT(*) AS shipped FROM orders WHERE status = 'shipped' GROUP BY customer_id HAVING COUNT(*) >= 2;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT customer_id, COUNT(*) AS shipped FROM orders GROUP BY customer_id HAVING COUNT(*) >= 2;",
+        "why": "Counts every status"
+      },
+      {
+        "sql": "SELECT customer_id, COUNT(*) AS shipped FROM orders WHERE status = 'shipped' GROUP BY customer_id;",
+        "why": "Keeps single orders"
+      }
+    ]
+  },
+  {
+    "id": "s21-04",
+    "skill": 21,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      19
+    ],
+    "title": "Strong courses",
+    "prompt": "Show each course_id with an average grade of at least 80, and the average rounded to 1 decimal as average.",
+    "dataset": "school",
+    "hints": [
+      "HAVING can use AVG."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "course_id",
+            "average"
+          ],
+          "rows": [
+            [
+              3,
+              82
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring'); UPDATE enrolments SET grade = 95 WHERE id = 13;",
+        "expected": {
+          "columns": [
+            "course_id",
+            "average"
+          ],
+          "rows": [
+            [
+              6,
+              95
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT course_id, ROUND(AVG(grade), 1) AS average FROM enrolments GROUP BY course_id HAVING AVG(grade) >= 80;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT course_id, ROUND(AVG(grade), 1) AS average FROM enrolments WHERE grade >= 80 GROUP BY course_id;",
+        "why": "Filters rows, not the average"
+      },
+      {
+        "sql": "SELECT course_id, ROUND(AVG(grade), 1) AS average FROM enrolments GROUP BY course_id;",
+        "why": "Keeps every course"
+      }
+    ]
+  },
+  {
+    "id": "s21-05",
+    "skill": 21,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      18
+    ],
+    "title": "Fully recorded cities",
+    "prompt": "Show each city where no rainfall reading is missing.",
+    "dataset": "weather",
+    "hints": [
+      "Compare COUNT(*) with COUNT(rainfall_mm)."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "city"
+          ],
+          "rows": []
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL); UPDATE readings SET rainfall_mm = 1.0 WHERE id = 16;",
+        "expected": {
+          "columns": [
+            "city"
+          ],
+          "rows": [
+            [
+              "Quito"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT city FROM readings GROUP BY city HAVING COUNT(*) = COUNT(rainfall_mm);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT DISTINCT city FROM readings WHERE rainfall_mm IS NOT NULL;",
+        "why": "A city with some missing values still appears"
+      },
+      {
+        "sql": "SELECT city FROM readings GROUP BY city;",
+        "why": "Keeps every city"
+      }
+    ]
+  },
+  {
+    "id": "s21-06",
+    "skill": 21,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the filter",
+    "prompt": "This should show each department_id with a total salary above 200000 as total, but it fails because an aggregate is in WHERE. Fix it.",
+    "dataset": "staff",
+    "starterSql": "SELECT department_id, SUM(salary) AS total\nFROM employees\nWHERE SUM(salary) > 200000\nGROUP BY department_id;",
+    "hints": [
+      "Move the condition to HAVING."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "department_id",
+            "total"
+          ],
+          "rows": [
+            [
+              1,
+              310000
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET salary = 210000 WHERE id = 11;",
+        "expected": {
+          "columns": [
+            "department_id",
+            "total"
+          ],
+          "rows": [
+            [
+              5,
+              280000
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT department_id, SUM(salary) AS total FROM employees GROUP BY department_id HAVING SUM(salary) > 200000;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT department_id, SUM(salary) AS total FROM employees GROUP BY department_id;",
+        "why": "Removes the filter"
+      },
+      {
+        "sql": "SELECT department_id, SUM(salary) AS total FROM employees WHERE salary > 200000 GROUP BY department_id;",
+        "why": "Checks single salaries"
+      }
+    ]
+  },
+  {
+    "id": "s21-07",
+    "skill": 21,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      18
+    ],
+    "title": "Duplicate days",
+    "prompt": "A user sometimes has two sessions on one day. Show each user_id and session_date with more than one session.",
+    "dataset": "app",
+    "hints": [
+      "Group by both columns."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "user_id",
+            "session_date"
+          ],
+          "rows": [
+            [
+              4,
+              "2024-01-10"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android'); INSERT INTO sessions VALUES (15, 8, '2024-03-02', 5, 'web');",
+        "expected": {
+          "columns": [
+            "user_id",
+            "session_date"
+          ],
+          "rows": [
+            [
+              8,
+              "2024-03-02"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT user_id, session_date FROM sessions GROUP BY user_id, session_date HAVING COUNT(*) > 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT user_id, session_date FROM sessions GROUP BY user_id HAVING COUNT(*) > 1;",
+        "why": "Groups only by user"
+      },
+      {
+        "sql": "SELECT user_id, session_date FROM sessions GROUP BY user_id, session_date;",
+        "why": "Keeps single sessions"
+      }
+    ]
+  },
+  {
+    "id": "s21-08",
+    "skill": 21,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      6,
+      19
+    ],
+    "title": "Big-ticket categories",
+    "prompt": "Considering only products costing over 2 to make, show each category with an average price above 15, and that average as average_price.",
+    "dataset": "shop",
+    "hints": [
+      "WHERE on cost, HAVING on average price."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "category",
+            "average_price"
+          ],
+          "rows": [
+            [
+              "Home",
+              42.5
+            ],
+            [
+              "Kitchen",
+              22
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); UPDATE products SET price = 16.0, cost = 3.0 WHERE id = 8; INSERT INTO products VALUES (10, 'Pot', 'Kitchen', 90.0, 1.0);",
+        "expected": {
+          "columns": [
+            "category",
+            "average_price"
+          ],
+          "rows": [
+            [
+              "Home",
+              40
+            ],
+            [
+              "Kitchen",
+              16
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT category, AVG(price) AS average_price FROM products WHERE cost > 2 GROUP BY category HAVING AVG(price) > 15;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT category, AVG(price) AS average_price FROM products GROUP BY category HAVING AVG(price) > 15;",
+        "why": "Doesn't filter by cost"
+      },
+      {
+        "sql": "SELECT category, AVG(price) AS average_price FROM products WHERE cost > 2 GROUP BY category;",
+        "why": "Doesn't filter groups"
+      }
+    ]
+  }
+]

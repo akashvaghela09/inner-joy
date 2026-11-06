@@ -1,0 +1,718 @@
+[
+  {
+    "id": "s20-01",
+    "skill": 20,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Staff per department",
+    "prompt": "Show each department_id and its number of employees, as staff. Replace the ___.",
+    "dataset": "staff",
+    "starterSql": "SELECT department_id, COUNT(*) AS staff\nFROM employees\nGROUP BY ___;",
+    "hints": [
+      "Group by the column you're summarising by."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "department_id",
+            "staff"
+          ],
+          "rows": [
+            [
+              null,
+              1
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "department_id",
+            "staff"
+          ],
+          "rows": [
+            [
+              null,
+              1
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              6,
+              2
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT department_id, COUNT(*) AS staff FROM employees GROUP BY department_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT department_id, COUNT(*) AS staff FROM employees;",
+        "why": "Without GROUP BY, there's one row"
+      },
+      {
+        "sql": "SELECT department_id, COUNT(*) AS staff FROM employees GROUP BY id;",
+        "why": "Groups by employee"
+      }
+    ]
+  },
+  {
+    "id": "s20-02",
+    "skill": 20,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      18
+    ],
+    "title": "Products per category",
+    "prompt": "Show each category, its number of products as products, and its average price as average_price.",
+    "dataset": "shop",
+    "hints": [
+      "One row per category."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "category",
+            "products",
+            "average_price"
+          ],
+          "rows": [
+            [
+              "Home",
+              2,
+              42.5
+            ],
+            [
+              "Kitchen",
+              2,
+              22
+            ],
+            [
+              "Stationery",
+              2,
+              2.75
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "category",
+            "products",
+            "average_price"
+          ],
+          "rows": [
+            [
+              "Home",
+              1,
+              40
+            ],
+            [
+              "Kitchen",
+              1,
+              9
+            ],
+            [
+              "Stationery",
+              1,
+              12.5
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT category, COUNT(*) AS products, AVG(price) AS average_price FROM products GROUP BY category;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT category, COUNT(*) AS products, AVG(cost) AS average_price FROM products GROUP BY category;",
+        "why": "Averages cost"
+      },
+      {
+        "sql": "SELECT category, COUNT(*) AS products FROM products GROUP BY category;",
+        "why": "Leaves out the average"
+      }
+    ]
+  },
+  {
+    "id": "s20-03",
+    "skill": 20,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [],
+    "title": "Grouped by two columns",
+    "prompt": "Show each combination of customer_id and status, with its number of orders as orders.",
+    "dataset": "shop",
+    "hints": [
+      "List both columns in GROUP BY."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "customer_id",
+            "status",
+            "orders"
+          ],
+          "rows": [
+            [
+              1,
+              "cancelled",
+              1
+            ],
+            [
+              1,
+              "shipped",
+              1
+            ],
+            [
+              2,
+              "shipped",
+              1
+            ],
+            [
+              3,
+              "shipped",
+              2
+            ],
+            [
+              4,
+              "pending",
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO orders VALUES (14, 7, '2024-04-01', 'shipped');",
+        "expected": {
+          "columns": [
+            "customer_id",
+            "status",
+            "orders"
+          ],
+          "rows": [
+            [
+              7,
+              "cancelled",
+              1
+            ],
+            [
+              7,
+              "shipped",
+              2
+            ],
+            [
+              8,
+              "pending",
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT customer_id, status, COUNT(*) AS orders FROM orders GROUP BY customer_id, status;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT customer_id, status, COUNT(*) AS orders FROM orders GROUP BY customer_id;",
+        "why": "Merges different statuses"
+      },
+      {
+        "sql": "SELECT customer_id, status, COUNT(*) AS orders FROM orders GROUP BY status;",
+        "why": "Merges different customers"
+      }
+    ]
+  },
+  {
+    "id": "s20-04",
+    "skill": 20,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      11
+    ],
+    "title": "City averages",
+    "prompt": "Show each city and its average temperature rounded to 1 decimal, as avg_temp, sorted by city.",
+    "dataset": "weather",
+    "hints": [
+      "Group, round, and sort."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "city",
+            "avg_temp"
+          ],
+          "rows": [
+            [
+              "Lima",
+              25.3
+            ],
+            [
+              "Oslo",
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "city",
+            "avg_temp"
+          ],
+          "rows": [
+            [
+              "Cairo",
+              39.7
+            ],
+            [
+              "Quito",
+              15.7
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT city, ROUND(AVG(temp_c), 1) AS avg_temp FROM readings GROUP BY city ORDER BY city;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT city, ROUND(AVG(temp_c), 1) AS avg_temp FROM readings GROUP BY reading_date ORDER BY city;",
+        "why": "Groups by date"
+      },
+      {
+        "sql": "SELECT city, ROUND(MAX(temp_c), 1) AS avg_temp FROM readings GROUP BY city ORDER BY city;",
+        "why": "Finds the highest"
+      }
+    ]
+  },
+  {
+    "id": "s20-05",
+    "skill": 20,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      18
+    ],
+    "title": "The NULL group",
+    "prompt": "Show each manager_id and the number of employees reporting to it, as reports. Employees with no manager form their own NULL row.",
+    "dataset": "staff",
+    "hints": [
+      "GROUP BY keeps NULL as a group."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "manager_id",
+            "reports"
+          ],
+          "rows": [
+            [
+              null,
+              1
+            ],
+            [
+              1,
+              4
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              99,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "manager_id",
+            "reports"
+          ],
+          "rows": [
+            [
+              null,
+              1
+            ],
+            [
+              11,
+              2
+            ],
+            [
+              13,
+              1
+            ],
+            [
+              77,
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT manager_id, COUNT(*) AS reports FROM employees GROUP BY manager_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT manager_id, COUNT(*) AS reports FROM employees WHERE manager_id IS NOT NULL GROUP BY manager_id;",
+        "why": "Removes the NULL group"
+      },
+      {
+        "sql": "SELECT manager_id, COUNT(manager_id) AS reports FROM employees GROUP BY manager_id;",
+        "why": "Counts NULLs as 0"
+      }
+    ]
+  },
+  {
+    "id": "s20-06",
+    "skill": 20,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the grouping",
+    "prompt": "This should show each status and its number of orders as orders, but the clauses are in the wrong place. Fix it.",
+    "dataset": "shop",
+    "starterSql": "SELECT status, COUNT(*) AS orders\nGROUP BY status\nFROM orders;",
+    "hints": [
+      "GROUP BY comes after FROM."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "status",
+            "orders"
+          ],
+          "rows": [
+            [
+              "cancelled",
+              1
+            ],
+            [
+              "pending",
+              1
+            ],
+            [
+              "shipped",
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO orders VALUES (14, 7, '2024-04-01', 'pending');",
+        "expected": {
+          "columns": [
+            "status",
+            "orders"
+          ],
+          "rows": [
+            [
+              "cancelled",
+              1
+            ],
+            [
+              "pending",
+              2
+            ],
+            [
+              "shipped",
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT status, COUNT(*) AS orders FROM orders GROUP BY status;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT status, COUNT(*) AS orders FROM orders;",
+        "why": "Doesn't group"
+      },
+      {
+        "sql": "SELECT status, COUNT(*) AS orders FROM orders GROUP BY id;",
+        "why": "Groups by order"
+      }
+    ]
+  },
+  {
+    "id": "s20-07",
+    "skill": 20,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      16,
+      11
+    ],
+    "title": "Monthly orders",
+    "prompt": "Show each month like 2024-01 as month, and its number of orders as orders, in date order.",
+    "dataset": "shop",
+    "hints": [
+      "Group by a calculated value."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "month",
+            "orders"
+          ],
+          "rows": [
+            [
+              "2024-01",
+              2
+            ],
+            [
+              "2024-02",
+              2
+            ],
+            [
+              "2024-03",
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "month",
+            "orders"
+          ],
+          "rows": [
+            [
+              "2024-02",
+              1
+            ],
+            [
+              "2024-03",
+              2
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT strftime('%Y-%m', order_date) AS month, COUNT(*) AS orders FROM orders GROUP BY month ORDER BY month;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT strftime('%Y-%m', order_date) AS month, COUNT(*) AS orders FROM orders GROUP BY order_date ORDER BY month;",
+        "why": "Groups by exact date"
+      },
+      {
+        "sql": "SELECT strftime('%m', order_date) AS month, COUNT(*) AS orders FROM orders GROUP BY month ORDER BY month;",
+        "why": "Leaves out the year"
+      }
+    ]
+  },
+  {
+    "id": "s20-08",
+    "skill": 20,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      11,
+      12
+    ],
+    "title": "Item revenue",
+    "prompt": "Show each order_id and its total units multiplied by 2 as value, highest value first. Break ties by order_id.",
+    "dataset": "shop",
+    "hints": [
+      "Use SUM with a calculation."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "order_id",
+            "value"
+          ],
+          "rows": [
+            [
+              1,
+              10
+            ],
+            [
+              6,
+              10
+            ],
+            [
+              4,
+              6
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "order_id",
+            "value"
+          ],
+          "rows": [
+            [
+              11,
+              8
+            ],
+            [
+              12,
+              4
+            ],
+            [
+              13,
+              2
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT order_id, SUM(quantity * 2) AS value FROM order_items GROUP BY order_id ORDER BY value DESC, order_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT order_id, SUM(quantity) AS value FROM order_items GROUP BY order_id ORDER BY value DESC, order_id;",
+        "why": "Doesn't multiply"
+      },
+      {
+        "sql": "SELECT order_id, SUM(quantity * 2) AS value FROM order_items GROUP BY order_id ORDER BY value, order_id;",
+        "why": "Sorts lowest first"
+      }
+    ]
+  }
+]

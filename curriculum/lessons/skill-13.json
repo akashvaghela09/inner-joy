@@ -1,0 +1,15 @@
+{
+  "skill": 13,
+  "summary": "CAST converts a value to another type, and ROUND controls how many decimals appear.",
+  "points": [
+    "ROUND(value, 2) rounds to two decimal places. ROUND(value) rounds to a whole number.",
+    "CAST(value AS INTEGER) drops the decimals rather than rounding them.",
+    "CAST(value AS REAL) makes a division keep its decimals.",
+    "CAST(value AS TEXT) turns a number into text."
+  ],
+  "example": {
+    "dataset": "app",
+    "sql": "SELECT id, minutes, ROUND(CAST(minutes AS REAL) / 60, 2) AS hours\nFROM sessions;",
+    "explanation": "CAST prevents integer division, then ROUND keeps the result readable."
+  }
+}

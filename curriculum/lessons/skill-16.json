@@ -1,0 +1,15 @@
+{
+  "skill": 16,
+  "summary": "SQLite stores dates as text and provides functions to work with them.",
+  "points": [
+    "strftime('%Y', date) gets the year, '%m' the month, and '%Y-%m' the year and month. The result is text.",
+    "date(d, '+1 day') moves a date, and handles month ends and leap years for you.",
+    "julianday(b) - julianday(a) gives the number of days between two dates.",
+    "SQLite has no YEAR(), MONTH(), or DATEDIFF() functions, which other databases have."
+  ],
+  "example": {
+    "dataset": "weather",
+    "sql": "SELECT reading_date, strftime('%Y-%m', reading_date) AS month, date(reading_date, '+1 day') AS next_day\nFROM readings;",
+    "explanation": "These functions read the date text and return new values, without changing the table."
+  }
+}

@@ -1,0 +1,828 @@
+[
+  {
+    "id": "st04-r01",
+    "kind": "review",
+    "stage": 4,
+    "skills": [
+      19,
+      20
+    ],
+    "recalls": [],
+    "title": "Category spread",
+    "prompt": "Show each category with its cheapest price as lowest and highest price as highest, sorted by category.",
+    "dataset": "shop",
+    "hints": [
+      "One row per category."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "category",
+            "lowest",
+            "highest"
+          ],
+          "rows": [
+            [
+              "Home",
+              25,
+              60
+            ],
+            [
+              "Kitchen",
+              9,
+              35
+            ],
+            [
+              "Stationery",
+              1.5,
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "category",
+            "lowest",
+            "highest"
+          ],
+          "rows": [
+            [
+              "Home",
+              40,
+              40
+            ],
+            [
+              "Kitchen",
+              9,
+              9
+            ],
+            [
+              "Stationery",
+              12.5,
+              12.5
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT category, MIN(price) AS lowest, MAX(price) AS highest FROM products GROUP BY category ORDER BY category;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT category, MAX(price) AS lowest, MIN(price) AS highest FROM products GROUP BY category ORDER BY category;",
+        "why": "Swaps the values"
+      },
+      {
+        "sql": "SELECT category, MIN(price) AS lowest, MAX(price) AS highest FROM products ORDER BY category;",
+        "why": "Doesn't group"
+      }
+    ]
+  },
+  {
+    "id": "st04-r02",
+    "kind": "review",
+    "stage": 4,
+    "skills": [
+      18,
+      20
+    ],
+    "recalls": [],
+    "title": "Active users per device",
+    "prompt": "Show each device and the number of different users on it, as users.",
+    "dataset": "app",
+    "hints": [
+      "Repeat sessions shouldn't count twice."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "device",
+            "users"
+          ],
+          "rows": [
+            [
+              "android",
+              1
+            ],
+            [
+              "ios",
+              2
+            ],
+            [
+              "web",
+              3
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "device",
+            "users"
+          ],
+          "rows": [
+            [
+              "android",
+              1
+            ],
+            [
+              "ios",
+              1
+            ],
+            [
+              "web",
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT device, COUNT(DISTINCT user_id) AS users FROM sessions GROUP BY device;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT device, COUNT(*) AS users FROM sessions GROUP BY device;",
+        "why": "Counts sessions"
+      },
+      {
+        "sql": "SELECT device, COUNT(user_id) AS users FROM sessions GROUP BY device;",
+        "why": "Counts repeats"
+      }
+    ]
+  },
+  {
+    "id": "st04-r03",
+    "kind": "review",
+    "stage": 4,
+    "skills": [
+      20,
+      21
+    ],
+    "recalls": [],
+    "title": "Busy students",
+    "prompt": "Show the student_id of students with at least 3 enrolments.",
+    "dataset": "school",
+    "hints": [
+      "Filter groups, not rows."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "student_id"
+          ],
+          "rows": [
+            [
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring'); INSERT INTO enrolments VALUES (15, 7, 5, 70, '2024-autumn');",
+        "expected": {
+          "columns": [
+            "student_id"
+          ],
+          "rows": [
+            [
+              7
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT student_id FROM enrolments GROUP BY student_id HAVING COUNT(*) >= 3;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT student_id FROM enrolments GROUP BY student_id HAVING COUNT(*) > 3;",
+        "why": "Leaves out exactly 3"
+      },
+      {
+        "sql": "SELECT student_id FROM enrolments GROUP BY student_id;",
+        "why": "Keeps everyone"
+      }
+    ]
+  },
+  {
+    "id": "st04-r04",
+    "kind": "review",
+    "stage": 4,
+    "skills": [
+      20,
+      22
+    ],
+    "recalls": [],
+    "title": "Bonus coverage",
+    "prompt": "Show each department_id and the percentage of its staff with a bonus above 0, rounded to 1 decimal, as covered_pct.",
+    "dataset": "staff",
+    "hints": [
+      "Use a conditional count."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "department_id",
+            "covered_pct"
+          ],
+          "rows": [
+            [
+              null,
+              0
+            ],
+            [
+              1,
+              66.7
+            ],
+            [
+              2,
+              33.3
+            ],
+            [
+              3,
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "department_id",
+            "covered_pct"
+          ],
+          "rows": [
+            [
+              null,
+              0
+            ],
+            [
+              5,
+              50
+            ],
+            [
+              6,
+              50
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT department_id, ROUND(SUM(CASE WHEN bonus > 0 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 1) AS covered_pct FROM employees GROUP BY department_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT department_id, ROUND(COUNT(bonus) * 100.0 / COUNT(*), 1) AS covered_pct FROM employees GROUP BY department_id;",
+        "why": "Counts a bonus of 0"
+      },
+      {
+        "sql": "SELECT department_id, SUM(CASE WHEN bonus > 0 THEN 1 ELSE 0 END) AS covered_pct FROM employees GROUP BY department_id;",
+        "why": "A count isn't a percentage"
+      }
+    ]
+  },
+  {
+    "id": "st04-r05",
+    "kind": "review",
+    "stage": 4,
+    "skills": [
+      19,
+      23
+    ],
+    "recalls": [],
+    "title": "Hottest day per city",
+    "prompt": "Show each city and its highest temperature as hottest, hottest city first.",
+    "dataset": "weather",
+    "hints": [
+      "Group, take the maximum, then sort."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "city",
+            "hottest"
+          ],
+          "rows": [
+            [
+              "Lima",
+              26
+            ],
+            [
+              "Oslo",
+              7
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "city",
+            "hottest"
+          ],
+          "rows": [
+            [
+              "Cairo",
+              41
+            ],
+            [
+              "Quito",
+              18
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT city, MAX(temp_c) AS hottest FROM readings GROUP BY city ORDER BY hottest DESC;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT city, MIN(temp_c) AS hottest FROM readings GROUP BY city ORDER BY hottest DESC;",
+        "why": "Finds the coldest"
+      },
+      {
+        "sql": "SELECT city, MAX(temp_c) AS hottest FROM readings GROUP BY city ORDER BY hottest;",
+        "why": "Sorts coldest first"
+      }
+    ]
+  },
+  {
+    "id": "st04-r06",
+    "kind": "review",
+    "stage": 4,
+    "skills": [
+      19,
+      21
+    ],
+    "recalls": [],
+    "title": "Heavy orders",
+    "prompt": "Show each order_id with more than 3 total units, and those units as units.",
+    "dataset": "shop",
+    "hints": [
+      "Add first, then filter."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "order_id",
+            "units"
+          ],
+          "rows": [
+            [
+              1,
+              5
+            ],
+            [
+              6,
+              5
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "order_id",
+            "units"
+          ],
+          "rows": [
+            [
+              11,
+              4
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT order_id, SUM(quantity) AS units FROM order_items GROUP BY order_id HAVING SUM(quantity) > 3;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT order_id, SUM(quantity) AS units FROM order_items WHERE quantity > 3 GROUP BY order_id;",
+        "why": "Checks single rows"
+      },
+      {
+        "sql": "SELECT order_id, COUNT(*) AS units FROM order_items GROUP BY order_id HAVING COUNT(*) > 3;",
+        "why": "Counts rows, not units"
+      }
+    ]
+  },
+  {
+    "id": "st04-r07",
+    "kind": "review",
+    "stage": 4,
+    "skills": [
+      16,
+      20
+    ],
+    "recalls": [],
+    "title": "Hires per year",
+    "prompt": "Show each hire year as year and how many people were hired as hires, in year order.",
+    "dataset": "staff",
+    "hints": [
+      "Group by a date part."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "year",
+            "hires"
+          ],
+          "rows": [
+            [
+              "2018",
+              1
+            ],
+            [
+              "2019",
+              1
+            ],
+            [
+              "2020",
+              1
+            ],
+            [
+              "2021",
+              2
+            ],
+            [
+              "2022",
+              1
+            ],
+            [
+              "2023",
+              1
+            ],
+            [
+              "2024",
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "year",
+            "hires"
+          ],
+          "rows": [
+            [
+              "2019",
+              1
+            ],
+            [
+              "2020",
+              1
+            ],
+            [
+              "2022",
+              1
+            ],
+            [
+              "2023",
+              1
+            ],
+            [
+              "2024",
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT strftime('%Y', hire_date) AS year, COUNT(*) AS hires FROM employees GROUP BY year ORDER BY year;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT strftime('%Y', hire_date) AS year, COUNT(*) AS hires FROM employees GROUP BY hire_date ORDER BY year;",
+        "why": "Groups by exact date"
+      },
+      {
+        "sql": "SELECT hire_date AS year, COUNT(*) AS hires FROM employees GROUP BY hire_date ORDER BY year;",
+        "why": "Doesn't extract the year"
+      }
+    ]
+  },
+  {
+    "id": "st04-r08",
+    "kind": "review",
+    "stage": 4,
+    "skills": [
+      19,
+      21
+    ],
+    "recalls": [],
+    "title": "Maths or nothing",
+    "prompt": "Show each term and the average grade rounded to 2 decimals as average, for course 1 only.",
+    "dataset": "school",
+    "hints": [
+      "Filter rows before grouping."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "term",
+            "average"
+          ],
+          "rows": [
+            [
+              "2024-autumn",
+              71
+            ],
+            [
+              "2024-spring",
+              76
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring'); UPDATE enrolments SET course_id = 1 WHERE id IN (11, 14); INSERT INTO enrolments VALUES (15, 8, 1, 62, '2024-spring'), (16, 7, 1, 63, '2024-spring');",
+        "expected": {
+          "columns": [
+            "term",
+            "average"
+          ],
+          "rows": [
+            [
+              "2023-autumn",
+              60
+            ],
+            [
+              "2024-spring",
+              73.33
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT term, ROUND(AVG(grade), 2) AS average FROM enrolments WHERE course_id = 1 GROUP BY term;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT term, ROUND(AVG(grade), 2) AS average FROM enrolments GROUP BY term;",
+        "why": "Includes every course"
+      },
+      {
+        "sql": "SELECT term, AVG(grade) AS average FROM enrolments WHERE course_id = 1 GROUP BY term;",
+        "why": "Doesn't round"
+      }
+    ]
+  },
+  {
+    "id": "st04-r09",
+    "kind": "review",
+    "stage": 4,
+    "skills": [
+      9,
+      20
+    ],
+    "recalls": [],
+    "title": "Contacts by city",
+    "prompt": "Show each known city with its number of contacts as contacts. Leave out contacts with no city.",
+    "dataset": "contacts",
+    "hints": [
+      "Filter out missing cities first."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "city",
+            "contacts"
+          ],
+          "rows": [
+            [
+              "Austin",
+              1
+            ],
+            [
+              "Geneva",
+              1
+            ],
+            [
+              "London",
+              2
+            ],
+            [
+              "New York",
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3');",
+        "expected": {
+          "columns": [
+            "city",
+            "contacts"
+          ],
+          "rows": [
+            [
+              "Hampton",
+              1
+            ],
+            [
+              "Murray",
+              1
+            ],
+            [
+              "Tuskegee",
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT city, COUNT(*) AS contacts FROM contacts WHERE city IS NOT NULL GROUP BY city;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT city, COUNT(*) AS contacts FROM contacts GROUP BY city;",
+        "why": "Keeps the NULL group"
+      },
+      {
+        "sql": "SELECT city, COUNT(DISTINCT id) AS contacts FROM contacts;",
+        "why": "Doesn't group"
+      }
+    ]
+  },
+  {
+    "id": "st04-r10",
+    "kind": "review",
+    "stage": 4,
+    "skills": [
+      20,
+      23
+    ],
+    "recalls": [],
+    "title": "Longest day",
+    "prompt": "Show the session_date with the most total minutes, and the total as total. Break ties with the earliest date.",
+    "dataset": "app",
+    "hints": [
+      "Group, sort on two columns, and limit."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "session_date",
+            "total"
+          ],
+          "rows": [
+            [
+              "2024-01-03",
+              45
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "session_date",
+            "total"
+          ],
+          "rows": [
+            [
+              "2024-02-28",
+              50
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT session_date, SUM(minutes) AS total FROM sessions GROUP BY session_date ORDER BY total DESC, session_date LIMIT 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT session_date, MAX(minutes) AS total FROM sessions GROUP BY session_date ORDER BY total DESC, session_date LIMIT 1;",
+        "why": "Uses the longest session"
+      },
+      {
+        "sql": "SELECT session_date, SUM(minutes) AS total FROM sessions GROUP BY session_date ORDER BY total DESC, session_date DESC LIMIT 1;",
+        "why": "Breaks ties with the latest date"
+      }
+    ]
+  }
+]

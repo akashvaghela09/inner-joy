@@ -1,0 +1,15 @@
+{
+  "skill": 20,
+  "summary": "GROUP BY splits rows into groups, then calculates one summary row for each group.",
+  "points": [
+    "Each different value in the grouped column makes one group.",
+    "Group by several columns to get one row per combination.",
+    "Select only grouped columns and aggregates. Other columns have no single value.",
+    "NULL forms its own group."
+  ],
+  "example": {
+    "dataset": "staff",
+    "sql": "SELECT department_id, COUNT(*) AS staff, AVG(salary) AS average_salary\nFROM employees\nGROUP BY department_id;",
+    "explanation": "Each department becomes one row. Employees with no department form a NULL group."
+  }
+}

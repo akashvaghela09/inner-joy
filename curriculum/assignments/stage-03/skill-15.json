@@ -1,0 +1,553 @@
+[
+  {
+    "id": "s15-01",
+    "skill": 15,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Starts with",
+    "prompt": "Show the name of employees whose name starts with A or a. Replace the ___ with a pattern.",
+    "dataset": "staff",
+    "starterSql": "SELECT name\nFROM employees\nWHERE name LIKE ___;",
+    "hints": [
+      "% matches any characters after the letter."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Asha"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET name = 'Abe' WHERE id = 12;",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Abe"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM employees WHERE name LIKE 'A%';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM employees WHERE name LIKE '%A';",
+        "why": "Finds names ending in A"
+      },
+      {
+        "sql": "SELECT name FROM employees WHERE name = 'A%';",
+        "why": "= doesn't understand patterns"
+      }
+    ]
+  },
+  {
+    "id": "s15-02",
+    "skill": 15,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [],
+    "title": "Ends with",
+    "prompt": "Show the title of books whose title ends with the letters es.",
+    "dataset": "bookshop",
+    "hints": [
+      "Put % before the letters."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title"
+          ],
+          "rows": [
+            [
+              "Quiet Engines"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023); UPDATE books SET title = 'Tides' WHERE id = 11; UPDATE books SET title = 'Nestled' WHERE id = 12;",
+        "expected": {
+          "columns": [
+            "title"
+          ],
+          "rows": [
+            [
+              "Tides"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT title FROM books WHERE title LIKE '%es';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT title FROM books WHERE title LIKE 'es%';",
+        "why": "Finds titles starting with es"
+      },
+      {
+        "sql": "SELECT title FROM books WHERE title LIKE '%es%';",
+        "why": "Finds es anywhere"
+      }
+    ]
+  },
+  {
+    "id": "s15-03",
+    "skill": 15,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      14
+    ],
+    "title": "Contains",
+    "prompt": "Show the title of books with the word The anywhere in their title.",
+    "dataset": "bookshop",
+    "hints": [
+      "Put % on both sides."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title"
+          ],
+          "rows": [
+            [
+              "The Salt Road"
+            ],
+            [
+              "The Last Ferry"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023); UPDATE books SET title = 'Over The Hill' WHERE id = 11;",
+        "expected": {
+          "columns": [
+            "title"
+          ],
+          "rows": [
+            [
+              "Over The Hill"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT title FROM books WHERE title LIKE '%The%';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT title FROM books WHERE title LIKE 'The';",
+        "why": "Matches only the exact word"
+      },
+      {
+        "sql": "SELECT title FROM books WHERE title LIKE 'The%';",
+        "why": "Must then start with The"
+      }
+    ]
+  },
+  {
+    "id": "s15-04",
+    "skill": 15,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [],
+    "title": "Club emails",
+    "prompt": "Show the full_name of contacts whose email ends with @club.test.",
+    "dataset": "contacts",
+    "hints": [
+      "Match the ending with a leading %."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "full_name"
+          ],
+          "rows": [
+            [
+              "ada lovelace"
+            ],
+            [
+              "Grace HOPPER"
+            ],
+            [
+              "Katherine Johnson"
+            ],
+            [
+              "edsger dijkstra"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3');",
+        "expected": {
+          "columns": [
+            "full_name"
+          ],
+          "rows": [
+            [
+              "mary jackson"
+            ],
+            [
+              "BOB Kahn"
+            ],
+            [
+              "Ken Thompson"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT full_name FROM contacts WHERE email LIKE '%@club.test';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT full_name FROM contacts WHERE email LIKE '@club.test%';",
+        "why": "Must then start with @"
+      },
+      {
+        "sql": "SELECT full_name FROM contacts WHERE email LIKE '%@%';",
+        "why": "Accepts any domain"
+      }
+    ]
+  },
+  {
+    "id": "s15-05",
+    "skill": 15,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      7
+    ],
+    "title": "A whole code",
+    "prompt": "A contact's tags are separated by spaces. Show the full_name of contacts with a tag starting GOLD1, either first in the list or after a space. XGOLD1 doesn't count.",
+    "dataset": "contacts",
+    "hints": [
+      "Check 'GOLD1%' and '% GOLD1%'."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "full_name"
+          ],
+          "rows": [
+            [
+              "ada lovelace"
+            ],
+            [
+              "Tim Lee"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3');",
+        "expected": {
+          "columns": [
+            "full_name"
+          ],
+          "rows": [
+            [
+              "mary jackson"
+            ],
+            [
+              "BOB Kahn"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT full_name FROM contacts WHERE tags LIKE 'GOLD1%' OR tags LIKE '% GOLD1%';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT full_name FROM contacts WHERE tags LIKE '%GOLD1%';",
+        "why": "Also matches XGOLD1"
+      },
+      {
+        "sql": "SELECT full_name FROM contacts WHERE tags LIKE 'GOLD1%';",
+        "why": "Misses a tag after a space"
+      }
+    ]
+  },
+  {
+    "id": "s15-06",
+    "skill": 15,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the pattern",
+    "prompt": "This should show products with the word Note anywhere in their name, but it finds nothing. Fix it.",
+    "dataset": "shop",
+    "starterSql": "SELECT name\nFROM products\nWHERE name LIKE 'Note';",
+    "hints": [
+      "Without a %, LIKE acts like =."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Notebook"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); UPDATE products SET name = 'Sticky Notes' WHERE id = 9;",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Sticky Notes"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM products WHERE name LIKE '%Note%';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM products WHERE name LIKE 'Note';",
+        "why": "Needs the exact word"
+      },
+      {
+        "sql": "SELECT name FROM products WHERE name LIKE '%';",
+        "why": "Matches everything"
+      }
+    ]
+  },
+  {
+    "id": "s15-07",
+    "skill": 15,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [],
+    "title": "Exact phone format",
+    "prompt": "Show the full_name of contacts whose phone looks like 555-0000: 555, a dash, then exactly four characters.",
+    "dataset": "contacts",
+    "hints": [
+      "_ matches exactly one character."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "full_name"
+          ],
+          "rows": [
+            [
+              "ada lovelace"
+            ],
+            [
+              "Grace HOPPER"
+            ],
+            [
+              "edsger dijkstra"
+            ],
+            [
+              "Tim Lee"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3');",
+        "expected": {
+          "columns": [
+            "full_name"
+          ],
+          "rows": [
+            [
+              "mary jackson"
+            ],
+            [
+              "BOB Kahn"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT full_name FROM contacts WHERE phone LIKE '555-____';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT full_name FROM contacts WHERE phone LIKE '555%';",
+        "why": "Accepts other formats"
+      },
+      {
+        "sql": "SELECT full_name FROM contacts WHERE phone LIKE '555-___';",
+        "why": "Requires only three characters"
+      }
+    ]
+  },
+  {
+    "id": "s15-08",
+    "skill": 15,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      9
+    ],
+    "title": "Outside the club",
+    "prompt": "Show the full_name of contacts whose email isn't on @club.test, including those with no email.",
+    "dataset": "contacts",
+    "hints": [
+      "NOT LIKE skips NULL rows, so add them back."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "full_name"
+          ],
+          "rows": [
+            [
+              "alan turing"
+            ],
+            [
+              "Tim Lee"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3');",
+        "expected": {
+          "columns": [
+            "full_name"
+          ],
+          "rows": [
+            [
+              "Rosa Park"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT full_name FROM contacts WHERE email NOT LIKE '%@club.test' OR email IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT full_name FROM contacts WHERE email NOT LIKE '%@club.test';",
+        "why": "Drops missing emails"
+      },
+      {
+        "sql": "SELECT full_name FROM contacts WHERE email IS NULL;",
+        "why": "Keeps only missing emails"
+      }
+    ]
+  }
+]

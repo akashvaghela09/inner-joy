@@ -1,0 +1,15 @@
+{
+  "skill": 21,
+  "summary": "WHERE filters rows before grouping, and HAVING filters groups after they're calculated.",
+  "points": [
+    "Use WHERE for conditions on individual rows, such as status = 'shipped'.",
+    "Use HAVING for conditions on totals, such as COUNT(*) >= 2.",
+    "You can't use an aggregate in WHERE.",
+    "A query can use both."
+  ],
+  "example": {
+    "dataset": "shop",
+    "sql": "SELECT customer_id, COUNT(*) AS shipped_orders\nFROM orders\nWHERE status = 'shipped'\nGROUP BY customer_id\nHAVING COUNT(*) >= 2;",
+    "explanation": "WHERE removes unshipped orders first, then HAVING keeps customers with at least two left."
+  }
+}

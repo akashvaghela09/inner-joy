@@ -1,0 +1,525 @@
+[
+  {
+    "id": "s18-01",
+    "skill": 18,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Count all rows",
+    "prompt": "Show how many employees there are, as total. Replace the ___.",
+    "dataset": "staff",
+    "starterSql": "SELECT COUNT(___) AS total\nFROM employees;",
+    "hints": [
+      "COUNT(*) counts rows."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "total"
+          ],
+          "rows": [
+            [
+              8
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "total"
+          ],
+          "rows": [
+            [
+              5
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT COUNT(*) AS total FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT COUNT(bonus) AS total FROM employees;",
+        "why": "Skips missing bonuses"
+      },
+      {
+        "sql": "SELECT COUNT(*) FROM employees;",
+        "why": "Doesn't name the column"
+      }
+    ]
+  },
+  {
+    "id": "s18-02",
+    "skill": 18,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      9
+    ],
+    "title": "Count known values",
+    "prompt": "Show how many employees have a recorded email, as with_email.",
+    "dataset": "staff",
+    "hints": [
+      "COUNT(column) skips NULLs."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "with_email"
+          ],
+          "rows": [
+            [
+              6
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "with_email"
+          ],
+          "rows": [
+            [
+              4
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT COUNT(email) AS with_email FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT COUNT(*) AS with_email FROM employees;",
+        "why": "Counts everyone"
+      },
+      {
+        "sql": "SELECT COUNT(bonus) AS with_email FROM employees;",
+        "why": "Counts the wrong column"
+      }
+    ]
+  },
+  {
+    "id": "s18-03",
+    "skill": 18,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      10
+    ],
+    "title": "Count different values",
+    "prompt": "Show how many different cities customers live in, as cities.",
+    "dataset": "shop",
+    "hints": [
+      "Add DISTINCT inside COUNT."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "cities"
+          ],
+          "rows": [
+            [
+              3
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "cities"
+          ],
+          "rows": [
+            [
+              2
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT COUNT(DISTINCT city) AS cities FROM customers;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT COUNT(city) AS cities FROM customers;",
+        "why": "Counts repeats"
+      },
+      {
+        "sql": "SELECT COUNT(*) AS cities FROM customers;",
+        "why": "Counts every customer"
+      }
+    ]
+  },
+  {
+    "id": "s18-04",
+    "skill": 18,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      9
+    ],
+    "title": "Graded enrolments",
+    "prompt": "Show the number of enrolments as total, and the number with a grade as graded.",
+    "dataset": "school",
+    "hints": [
+      "Use two different COUNTs."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "total",
+            "graded"
+          ],
+          "rows": [
+            [
+              9,
+              8
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "total",
+            "graded"
+          ],
+          "rows": [
+            [
+              4,
+              3
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT COUNT(*) AS total, COUNT(grade) AS graded FROM enrolments;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT COUNT(*) AS total, COUNT(*) AS graded FROM enrolments;",
+        "why": "Counts every row twice"
+      },
+      {
+        "sql": "SELECT COUNT(grade) AS total, COUNT(grade) AS graded FROM enrolments;",
+        "why": "Total skips missing grades"
+      }
+    ]
+  },
+  {
+    "id": "s18-05",
+    "skill": 18,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      6
+    ],
+    "title": "Counting nothing",
+    "prompt": "Show how many orders have the status lost, as lost_orders. None do, and the answer should be 0, not an empty result.",
+    "dataset": "shop",
+    "hints": [
+      "COUNT returns 0 when no rows match."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "lost_orders"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); UPDATE orders SET status = 'lost' WHERE id = 12;",
+        "expected": {
+          "columns": [
+            "lost_orders"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT COUNT(*) AS lost_orders FROM orders WHERE status = 'lost';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id AS lost_orders FROM orders WHERE status = 'lost';",
+        "why": "Returns no rows at all"
+      },
+      {
+        "sql": "SELECT COUNT(*) AS lost_orders FROM orders;",
+        "why": "Doesn't filter"
+      }
+    ]
+  },
+  {
+    "id": "s18-06",
+    "skill": 18,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the distinct count",
+    "prompt": "This should show how many different users have sessions, as active_users, but it fails. Fix it.",
+    "dataset": "app",
+    "starterSql": "SELECT DISTINCT COUNT user_id AS active_users\nFROM sessions;",
+    "hints": [
+      "DISTINCT goes inside the brackets."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "active_users"
+          ],
+          "rows": [
+            [
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "active_users"
+          ],
+          "rows": [
+            [
+              2
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT COUNT(DISTINCT user_id) AS active_users FROM sessions;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT COUNT(user_id) AS active_users FROM sessions;",
+        "why": "Counts repeats"
+      },
+      {
+        "sql": "SELECT COUNT(DISTINCT id) AS active_users FROM sessions;",
+        "why": "Counts sessions"
+      }
+    ]
+  },
+  {
+    "id": "s18-07",
+    "skill": 18,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      9
+    ],
+    "title": "Missing rain",
+    "prompt": "Show how many readings have no rainfall recorded, as missing, by subtracting one count from another.",
+    "dataset": "weather",
+    "hints": [
+      "COUNT(*) minus COUNT(rainfall_mm)."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "missing"
+          ],
+          "rows": [
+            [
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL); UPDATE readings SET rainfall_mm = NULL WHERE id = 11;",
+        "expected": {
+          "columns": [
+            "missing"
+          ],
+          "rows": [
+            [
+              3
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT COUNT(*) - COUNT(rainfall_mm) AS missing FROM readings;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT COUNT(rainfall_mm) AS missing FROM readings;",
+        "why": "Counts known values"
+      },
+      {
+        "sql": "SELECT COUNT(*) AS missing FROM readings;",
+        "why": "Counts everything"
+      }
+    ]
+  },
+  {
+    "id": "s18-08",
+    "skill": 18,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      6,
+      10
+    ],
+    "title": "Customers who ordered in March",
+    "prompt": "Show how many different customers placed an order in March 2024, as march_customers.",
+    "dataset": "shop",
+    "hints": [
+      "Filter, then count different customers."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "march_customers"
+          ],
+          "rows": [
+            [
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); UPDATE orders SET order_date = '2024-03-31', customer_id = 8 WHERE id = 13; INSERT INTO orders VALUES (14, 8, '2024-03-05', 'shipped');",
+        "expected": {
+          "columns": [
+            "march_customers"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT COUNT(DISTINCT customer_id) AS march_customers FROM orders WHERE order_date BETWEEN '2024-03-01' AND '2024-03-31';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT COUNT(customer_id) AS march_customers FROM orders WHERE order_date BETWEEN '2024-03-01' AND '2024-03-31';",
+        "why": "Counts repeat customers twice"
+      },
+      {
+        "sql": "SELECT COUNT(DISTINCT customer_id) AS march_customers FROM orders;",
+        "why": "Doesn't filter"
+      }
+    ]
+  }
+]

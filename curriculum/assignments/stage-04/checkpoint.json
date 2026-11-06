@@ -1,0 +1,521 @@
+[
+  {
+    "id": "st04-c01",
+    "kind": "checkpoint",
+    "stage": 4,
+    "skills": [
+      19,
+      21,
+      22
+    ],
+    "sourceProblem": 19,
+    "recalls": [],
+    "title": "Course quality",
+    "prompt": "For each course_id, show quality, the average of grade divided by 100 rounded to 2 decimals, and low_pct, the percentage of its enrolments with a grade below 70, rounded to 2 decimals. Ignore enrolments with no grade.",
+    "dataset": "school",
+    "hints": [
+      "Filter NULL grades, then use a per-row ratio and a conditional count."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "course_id",
+            "quality",
+            "low_pct"
+          ],
+          "rows": [
+            [
+              1,
+              0.75,
+              25
+            ],
+            [
+              2,
+              0.74,
+              0
+            ],
+            [
+              3,
+              0.82,
+              33.33
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring'); INSERT INTO enrolments VALUES (15, 8, 5, 75, '2024-spring');",
+        "expected": {
+          "columns": [
+            "course_id",
+            "quality",
+            "low_pct"
+          ],
+          "rows": [
+            [
+              5,
+              0.65,
+              66.67
+            ],
+            [
+              6,
+              0.95,
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT course_id, ROUND(AVG(grade / 100.0), 2) AS quality, ROUND(SUM(CASE WHEN grade < 70 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS low_pct FROM enrolments WHERE grade IS NOT NULL GROUP BY course_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT course_id, ROUND(AVG(grade / 100), 2) AS quality, ROUND(SUM(CASE WHEN grade < 70 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS low_pct FROM enrolments WHERE grade IS NOT NULL GROUP BY course_id;",
+        "why": "Integer division gives 0"
+      },
+      {
+        "sql": "SELECT course_id, ROUND(AVG(grade / 100.0), 2) AS quality, ROUND(SUM(CASE WHEN grade < 70 THEN 1 ELSE 0 END) * 100 / COUNT(*), 2) AS low_pct FROM enrolments WHERE grade IS NOT NULL GROUP BY course_id;",
+        "why": "Integer division loses decimals"
+      }
+    ]
+  },
+  {
+    "id": "st04-c02",
+    "kind": "checkpoint",
+    "stage": 4,
+    "skills": [
+      16,
+      20,
+      22
+    ],
+    "sourceProblem": 20,
+    "recalls": [],
+    "title": "Monthly summary",
+    "prompt": "For each month like 2024-01 and each status, show month, status, the number of orders as orders, and the number placed by customer 1 as customer_one.",
+    "dataset": "shop",
+    "hints": [
+      "Group by two values, with a conditional count."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "month",
+            "status",
+            "orders",
+            "customer_one"
+          ],
+          "rows": [
+            [
+              "2024-01",
+              "shipped",
+              2,
+              1
+            ],
+            [
+              "2024-02",
+              "cancelled",
+              1,
+              1
+            ],
+            [
+              "2024-02",
+              "shipped",
+              1,
+              0
+            ],
+            [
+              "2024-03",
+              "pending",
+              1,
+              0
+            ],
+            [
+              "2024-03",
+              "shipped",
+              1,
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); UPDATE orders SET customer_id = 1 WHERE id = 11;",
+        "expected": {
+          "columns": [
+            "month",
+            "status",
+            "orders",
+            "customer_one"
+          ],
+          "rows": [
+            [
+              "2024-02",
+              "shipped",
+              1,
+              1
+            ],
+            [
+              "2024-03",
+              "cancelled",
+              1,
+              0
+            ],
+            [
+              "2024-03",
+              "pending",
+              1,
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT strftime('%Y-%m', order_date) AS month, status, COUNT(*) AS orders, SUM(CASE WHEN customer_id = 1 THEN 1 ELSE 0 END) AS customer_one FROM orders GROUP BY month, status;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT strftime('%Y-%m', order_date) AS month, status, COUNT(*) AS orders, COUNT(*) AS customer_one FROM orders GROUP BY month, status;",
+        "why": "Counts every customer"
+      },
+      {
+        "sql": "SELECT strftime('%Y-%m', order_date) AS month, status, COUNT(*) AS orders, SUM(CASE WHEN customer_id = 1 THEN 1 ELSE 0 END) AS customer_one FROM orders GROUP BY month;",
+        "why": "Doesn't split by status"
+      }
+    ]
+  },
+  {
+    "id": "st04-c03",
+    "kind": "checkpoint",
+    "stage": 4,
+    "skills": [
+      18,
+      20
+    ],
+    "sourceProblem": 23,
+    "recalls": [],
+    "title": "Different courses per student",
+    "prompt": "A student can repeat a course. Show each student_id and how many different courses they've taken, as courses.",
+    "dataset": "school",
+    "hints": [
+      "Count different course ids."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "student_id",
+            "courses"
+          ],
+          "rows": [
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              3
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "student_id",
+            "courses"
+          ],
+          "rows": [
+            [
+              6,
+              1
+            ],
+            [
+              7,
+              2
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT student_id, COUNT(DISTINCT course_id) AS courses FROM enrolments GROUP BY student_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT student_id, COUNT(course_id) AS courses FROM enrolments GROUP BY student_id;",
+        "why": "Counts repeats"
+      },
+      {
+        "sql": "SELECT student_id, COUNT(*) AS courses FROM enrolments GROUP BY student_id;",
+        "why": "Counts enrolments"
+      }
+    ]
+  },
+  {
+    "id": "st04-c04",
+    "kind": "checkpoint",
+    "stage": 4,
+    "skills": [
+      8,
+      18,
+      20
+    ],
+    "sourceProblem": 24,
+    "recalls": [],
+    "title": "Daily users",
+    "prompt": "For the 7 days ending 2024-01-05 inclusive, show each date as day and how many different users had a session as users.",
+    "dataset": "app",
+    "hints": [
+      "That window starts on 2023-12-30."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "day",
+            "users"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              1
+            ],
+            [
+              "2024-01-02",
+              1
+            ],
+            [
+              "2024-01-03",
+              2
+            ],
+            [
+              "2024-01-04",
+              1
+            ],
+            [
+              "2024-01-05",
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android'); UPDATE sessions SET session_date = '2024-01-05' WHERE id IN (11, 12); UPDATE sessions SET session_date = '2024-01-06' WHERE id = 13;",
+        "expected": {
+          "columns": [
+            "day",
+            "users"
+          ],
+          "rows": [
+            [
+              "2024-01-05",
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT session_date AS day, COUNT(DISTINCT user_id) AS users FROM sessions WHERE session_date BETWEEN '2023-12-30' AND '2024-01-05' GROUP BY session_date;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT session_date AS day, COUNT(*) AS users FROM sessions WHERE session_date BETWEEN '2023-12-30' AND '2024-01-05' GROUP BY session_date;",
+        "why": "Counts sessions, not users"
+      },
+      {
+        "sql": "SELECT session_date AS day, COUNT(DISTINCT user_id) AS users FROM sessions GROUP BY session_date;",
+        "why": "Doesn't limit the dates"
+      }
+    ]
+  },
+  {
+    "id": "st04-c05",
+    "kind": "checkpoint",
+    "stage": 4,
+    "skills": [
+      9,
+      21
+    ],
+    "sourceProblem": 26,
+    "recalls": [],
+    "title": "Popular referrers",
+    "prompt": "Show the referrer_id of users who have invited at least 2 people.",
+    "dataset": "app",
+    "hints": [
+      "Leave out users with no referrer, since NULL isn't a person."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "referrer_id"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android'); INSERT INTO users VALUES (10, 'vega', NULL, '2024-03-02'), (12, 'wren', NULL, '2024-03-03');",
+        "expected": {
+          "columns": [
+            "referrer_id"
+          ],
+          "rows": [
+            [
+              7
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT referrer_id FROM users WHERE referrer_id IS NOT NULL GROUP BY referrer_id HAVING COUNT(*) >= 2;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT referrer_id FROM users GROUP BY referrer_id HAVING COUNT(*) >= 2;",
+        "why": "NULL can appear as a group"
+      },
+      {
+        "sql": "SELECT referrer_id FROM users WHERE referrer_id IS NOT NULL GROUP BY referrer_id HAVING COUNT(*) > 2;",
+        "why": "Leaves out exactly 2"
+      }
+    ]
+  },
+  {
+    "id": "st04-c06",
+    "kind": "checkpoint",
+    "stage": 4,
+    "skills": [
+      9,
+      20,
+      11
+    ],
+    "sourceProblem": 27,
+    "recalls": [],
+    "title": "Invite counts",
+    "prompt": "Show each referrer_id that isn't NULL, and how many users they invited as invited, sorted by referrer_id.",
+    "dataset": "app",
+    "hints": [
+      "Filter, group, and sort."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "referrer_id",
+            "invited"
+          ],
+          "rows": [
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "referrer_id",
+            "invited"
+          ],
+          "rows": [
+            [
+              7,
+              2
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT referrer_id, COUNT(*) AS invited FROM users WHERE referrer_id IS NOT NULL GROUP BY referrer_id ORDER BY referrer_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT referrer_id, COUNT(*) AS invited FROM users GROUP BY referrer_id ORDER BY referrer_id;",
+        "why": "Keeps the NULL group"
+      },
+      {
+        "sql": "SELECT referrer_id, COUNT(*) AS invited FROM users WHERE referrer_id IS NOT NULL GROUP BY referrer_id ORDER BY invited;",
+        "why": "Sorts by the count"
+      }
+    ]
+  }
+]

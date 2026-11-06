@@ -1,0 +1,15 @@
+{
+  "skill": 22,
+  "summary": "Conditional aggregation counts or adds only some rows within each group, by putting CASE inside an aggregate.",
+  "points": [
+    "SUM(CASE WHEN condition THEN 1 ELSE 0 END) counts matching rows.",
+    "SUM(CASE WHEN condition THEN amount ELSE 0 END) adds matching amounts.",
+    "Dividing by COUNT(*) gives a percentage. Multiply by 100.0 to keep decimals.",
+    "Unlike WHERE, this keeps every group, even one with no matches."
+  ],
+  "example": {
+    "dataset": "shop",
+    "sql": "SELECT customer_id, COUNT(*) AS orders,\n  ROUND(SUM(CASE WHEN status = 'shipped' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 1) AS shipped_pct\nFROM orders\nGROUP BY customer_id;",
+    "explanation": "Each customer gets a total order count and a percentage shipped."
+  }
+}

@@ -1,0 +1,860 @@
+[
+  {
+    "id": "s17-01",
+    "skill": 17,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Two bands",
+    "prompt": "Show each employee's name and a band: High for salaries of at least 90000, otherwise Other. Name it band and replace the ___.",
+    "dataset": "staff",
+    "starterSql": "SELECT name,\n  CASE WHEN salary >= 90000 THEN 'High' ELSE ___ END AS band\nFROM employees;",
+    "hints": [
+      "ELSE covers every other row."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "band"
+          ],
+          "rows": [
+            [
+              "Asha",
+              "High"
+            ],
+            [
+              "Ben",
+              "High"
+            ],
+            [
+              "Chloe",
+              "High"
+            ],
+            [
+              "Dev",
+              "Other"
+            ],
+            [
+              "Elena",
+              "Other"
+            ],
+            [
+              "Farid",
+              "Other"
+            ],
+            [
+              "Grace",
+              "Other"
+            ],
+            [
+              "Hugo",
+              "Other"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET salary = 90000 WHERE id = 12;",
+        "expected": {
+          "columns": [
+            "name",
+            "band"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              "High"
+            ],
+            [
+              "Jon",
+              "High"
+            ],
+            [
+              "Kim",
+              "Other"
+            ],
+            [
+              "Leo",
+              "Other"
+            ],
+            [
+              "Mia",
+              "Other"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, CASE WHEN salary >= 90000 THEN 'High' ELSE 'Other' END AS band FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, CASE WHEN salary > 90000 THEN 'High' ELSE 'Other' END AS band FROM employees;",
+        "why": "Leaves out exactly 90000"
+      },
+      {
+        "sql": "SELECT name, CASE WHEN salary >= 90000 THEN 'High' END AS band FROM employees;",
+        "why": "Others become NULL"
+      }
+    ]
+  },
+  {
+    "id": "s17-02",
+    "skill": 17,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      9
+    ],
+    "title": "Zero for missing",
+    "prompt": "Show each employee's name and their bonus, with missing bonuses shown as 0, as bonus.",
+    "dataset": "staff",
+    "hints": [
+      "COALESCE returns the first non-NULL value."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "bonus"
+          ],
+          "rows": [
+            [
+              "Asha",
+              10000
+            ],
+            [
+              "Ben",
+              0
+            ],
+            [
+              "Chloe",
+              5000
+            ],
+            [
+              "Dev",
+              2000
+            ],
+            [
+              "Elena",
+              0
+            ],
+            [
+              "Farid",
+              0
+            ],
+            [
+              "Grace",
+              0
+            ],
+            [
+              "Hugo",
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "bonus"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              900
+            ],
+            [
+              "Jon",
+              0
+            ],
+            [
+              "Kim",
+              300
+            ],
+            [
+              "Leo",
+              0
+            ],
+            [
+              "Mia",
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, COALESCE(bonus, 0) AS bonus FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, bonus FROM employees;",
+        "why": "Leaves NULLs in place"
+      },
+      {
+        "sql": "SELECT name, COALESCE(bonus, 1) AS bonus FROM employees;",
+        "why": "Uses the wrong replacement"
+      }
+    ]
+  },
+  {
+    "id": "s17-03",
+    "skill": 17,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [],
+    "title": "Three price bands",
+    "prompt": "Show each product's name and a price_band: Budget under 5, Mid from 5 up to but not including 30, otherwise Premium.",
+    "dataset": "shop",
+    "hints": [
+      "Conditions are checked in order."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "price_band"
+          ],
+          "rows": [
+            [
+              "Notebook",
+              "Budget"
+            ],
+            [
+              "Pen",
+              "Budget"
+            ],
+            [
+              "Mug",
+              "Mid"
+            ],
+            [
+              "Kettle",
+              "Premium"
+            ],
+            [
+              "Lamp",
+              "Mid"
+            ],
+            [
+              "Rug",
+              "Premium"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); UPDATE products SET price = 5.0 WHERE id = 8; UPDATE products SET price = 30.0 WHERE id = 9;",
+        "expected": {
+          "columns": [
+            "name",
+            "price_band"
+          ],
+          "rows": [
+            [
+              "Stool",
+              "Premium"
+            ],
+            [
+              "Cup",
+              "Mid"
+            ],
+            [
+              "Ink",
+              "Premium"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, CASE WHEN price < 5 THEN 'Budget' WHEN price < 30 THEN 'Mid' ELSE 'Premium' END AS price_band FROM products;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, CASE WHEN price < 30 THEN 'Mid' WHEN price < 5 THEN 'Budget' ELSE 'Premium' END AS price_band FROM products;",
+        "why": "The first match wins, so Budget never appears"
+      },
+      {
+        "sql": "SELECT name, CASE WHEN price <= 5 THEN 'Budget' WHEN price <= 30 THEN 'Mid' ELSE 'Premium' END AS price_band FROM products;",
+        "why": "Includes the limits"
+      }
+    ]
+  },
+  {
+    "id": "s17-04",
+    "skill": 17,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      9
+    ],
+    "title": "Rain report",
+    "prompt": "Show each reading's id and a label named report: Unknown if rainfall is missing, Dry if it's 0, otherwise Wet.",
+    "dataset": "weather",
+    "hints": [
+      "Test for NULL first."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "report"
+          ],
+          "rows": [
+            [
+              1,
+              "Wet"
+            ],
+            [
+              2,
+              "Unknown"
+            ],
+            [
+              3,
+              "Dry"
+            ],
+            [
+              4,
+              "Wet"
+            ],
+            [
+              5,
+              "Dry"
+            ],
+            [
+              6,
+              "Unknown"
+            ],
+            [
+              7,
+              "Wet"
+            ],
+            [
+              8,
+              "Wet"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "report"
+          ],
+          "rows": [
+            [
+              11,
+              "Dry"
+            ],
+            [
+              12,
+              "Unknown"
+            ],
+            [
+              13,
+              "Wet"
+            ],
+            [
+              14,
+              "Wet"
+            ],
+            [
+              15,
+              "Wet"
+            ],
+            [
+              16,
+              "Unknown"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, CASE WHEN rainfall_mm IS NULL THEN 'Unknown' WHEN rainfall_mm = 0 THEN 'Dry' ELSE 'Wet' END AS report FROM readings;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, CASE WHEN rainfall_mm = 0 THEN 'Dry' ELSE 'Wet' END AS report FROM readings;",
+        "why": "Treats missing as Wet"
+      },
+      {
+        "sql": "SELECT id, CASE WHEN rainfall_mm = NULL THEN 'Unknown' WHEN rainfall_mm = 0 THEN 'Dry' ELSE 'Wet' END AS report FROM readings;",
+        "why": "= NULL never matches"
+      }
+    ]
+  },
+  {
+    "id": "s17-05",
+    "skill": 17,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      9
+    ],
+    "title": "No ELSE",
+    "prompt": "Show each employee's name and a flag named has_bonus containing Yes when their bonus is above 0. With no ELSE, other rows are NULL, and that's what's wanted.",
+    "dataset": "staff",
+    "hints": [
+      "Leave out ELSE."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "has_bonus"
+          ],
+          "rows": [
+            [
+              "Asha",
+              "Yes"
+            ],
+            [
+              "Ben",
+              null
+            ],
+            [
+              "Chloe",
+              "Yes"
+            ],
+            [
+              "Dev",
+              "Yes"
+            ],
+            [
+              "Elena",
+              null
+            ],
+            [
+              "Farid",
+              null
+            ],
+            [
+              "Grace",
+              null
+            ],
+            [
+              "Hugo",
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "has_bonus"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              "Yes"
+            ],
+            [
+              "Jon",
+              null
+            ],
+            [
+              "Kim",
+              "Yes"
+            ],
+            [
+              "Leo",
+              null
+            ],
+            [
+              "Mia",
+              null
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, CASE WHEN bonus > 0 THEN 'Yes' END AS has_bonus FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, CASE WHEN bonus > 0 THEN 'Yes' ELSE 'No' END AS has_bonus FROM employees;",
+        "why": "Replaces NULL with No"
+      },
+      {
+        "sql": "SELECT name, CASE WHEN bonus >= 0 THEN 'Yes' END AS has_bonus FROM employees;",
+        "why": "A bonus of 0 isn't above 0"
+      }
+    ]
+  },
+  {
+    "id": "s17-06",
+    "skill": 17,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the CASE",
+    "prompt": "This should label each employee as Senior if hired before 2020, otherwise Junior, in a column named level, but it fails. Fix it.",
+    "dataset": "staff",
+    "starterSql": "SELECT name,\n  CASE WHEN hire_date < '2020-01-01' THEN 'Senior' ELSE 'Junior' AS level\nFROM employees;",
+    "hints": [
+      "Every CASE needs a closing END."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "level"
+          ],
+          "rows": [
+            [
+              "Asha",
+              "Senior"
+            ],
+            [
+              "Ben",
+              "Senior"
+            ],
+            [
+              "Chloe",
+              "Junior"
+            ],
+            [
+              "Dev",
+              "Junior"
+            ],
+            [
+              "Elena",
+              "Junior"
+            ],
+            [
+              "Farid",
+              "Junior"
+            ],
+            [
+              "Grace",
+              "Junior"
+            ],
+            [
+              "Hugo",
+              "Junior"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "level"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              "Senior"
+            ],
+            [
+              "Jon",
+              "Junior"
+            ],
+            [
+              "Kim",
+              "Junior"
+            ],
+            [
+              "Leo",
+              "Junior"
+            ],
+            [
+              "Mia",
+              "Junior"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, CASE WHEN hire_date < '2020-01-01' THEN 'Senior' ELSE 'Junior' END AS level FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, CASE WHEN hire_date > '2020-01-01' THEN 'Senior' ELSE 'Junior' END AS level FROM employees;",
+        "why": "Reverses the dates"
+      },
+      {
+        "sql": "SELECT name, CASE WHEN hire_date < '2020-01-01' THEN 'Senior' END AS level FROM employees;",
+        "why": "Leaves out Junior"
+      }
+    ]
+  },
+  {
+    "id": "s17-07",
+    "skill": 17,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [],
+    "title": "Best way to reach",
+    "prompt": "Show each contact's id and their best contact detail as reach: their email if present, else their phone, else the text none.",
+    "dataset": "contacts",
+    "hints": [
+      "COALESCE accepts several values."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "reach"
+          ],
+          "rows": [
+            [
+              1,
+              "ada@club.test"
+            ],
+            [
+              2,
+              "grace.h@club.test"
+            ],
+            [
+              3,
+              "alan@other.test"
+            ],
+            [
+              4,
+              "kj_99@club.test"
+            ],
+            [
+              5,
+              "1edsger@club.test"
+            ],
+            [
+              6,
+              "555-0106"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3');",
+        "expected": {
+          "columns": [
+            "id",
+            "reach"
+          ],
+          "rows": [
+            [
+              11,
+              "mary-j@club.test"
+            ],
+            [
+              12,
+              "bob@CLUB.test"
+            ],
+            [
+              13,
+              "rosa@club-test"
+            ],
+            [
+              14,
+              "ken.t@club.test"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, COALESCE(email, phone, 'none') AS reach FROM contacts;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, COALESCE(phone, email, 'none') AS reach FROM contacts;",
+        "why": "Prefers the phone"
+      },
+      {
+        "sql": "SELECT id, COALESCE(email, 'none') AS reach FROM contacts;",
+        "why": "Skips the phone"
+      }
+    ]
+  },
+  {
+    "id": "s17-08",
+    "skill": 17,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      7
+    ],
+    "title": "Priority order",
+    "prompt": "Show each order's id and status, with pending orders first, then shipped, then cancelled. Within a status, sort by id.",
+    "dataset": "shop",
+    "hints": [
+      "A CASE can go inside ORDER BY."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "status"
+          ],
+          "rows": [
+            [
+              5,
+              "pending"
+            ],
+            [
+              1,
+              "shipped"
+            ],
+            [
+              2,
+              "shipped"
+            ],
+            [
+              4,
+              "shipped"
+            ],
+            [
+              6,
+              "shipped"
+            ],
+            [
+              3,
+              "cancelled"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "status"
+          ],
+          "rows": [
+            [
+              12,
+              "pending"
+            ],
+            [
+              11,
+              "shipped"
+            ],
+            [
+              13,
+              "cancelled"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, status FROM orders ORDER BY CASE WHEN status = 'pending' THEN 1 WHEN status = 'shipped' THEN 2 ELSE 3 END, id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, status FROM orders ORDER BY status, id;",
+        "why": "Alphabetical order puts cancelled first"
+      },
+      {
+        "sql": "SELECT id, status FROM orders ORDER BY CASE WHEN status = 'shipped' THEN 1 WHEN status = 'pending' THEN 2 ELSE 3 END, id;",
+        "why": "Puts shipped first"
+      }
+    ]
+  }
+]

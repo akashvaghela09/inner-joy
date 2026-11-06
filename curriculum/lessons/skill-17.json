@@ -1,0 +1,15 @@
+{
+  "skill": 17,
+  "summary": "CASE adds if-then logic to a query, and COALESCE replaces missing values.",
+  "points": [
+    "CASE WHEN condition THEN value ... ELSE value END checks conditions in order and stops at the first match.",
+    "Without ELSE, a row that matches nothing gets NULL.",
+    "COALESCE(a, b, c) returns the first value that isn't NULL.",
+    "COALESCE(bonus, 0) is a common way to treat a missing number as zero."
+  ],
+  "example": {
+    "dataset": "staff",
+    "sql": "SELECT name,\n  CASE WHEN salary >= 90000 THEN 'High' WHEN salary >= 55000 THEN 'Mid' ELSE 'Low' END AS band,\n  COALESCE(bonus, 0) AS bonus\nFROM employees;",
+    "explanation": "CASE puts each salary in a band, and COALESCE shows missing bonuses as 0."
+  }
+}

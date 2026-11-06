@@ -1,0 +1,745 @@
+[
+  {
+    "id": "s14-01",
+    "skill": 14,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Shout the city",
+    "prompt": "Show each customer's name and their city in capital letters, as city_upper. Replace the ___.",
+    "dataset": "shop",
+    "starterSql": "SELECT name, ___(city) AS city_upper\nFROM customers;",
+    "hints": [
+      "UPPER makes text uppercase."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "city_upper"
+          ],
+          "rows": [
+            [
+              "Priya",
+              "PUNE"
+            ],
+            [
+              "Marco",
+              "ROME"
+            ],
+            [
+              "Hana",
+              "TOKYO"
+            ],
+            [
+              "Luis",
+              "ROME"
+            ],
+            [
+              "Noor",
+              "PUNE"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "city_upper"
+          ],
+          "rows": [
+            [
+              "Ravi",
+              "OSLO"
+            ],
+            [
+              "Sara",
+              "LIMA"
+            ],
+            [
+              "Tom",
+              "OSLO"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, UPPER(city) AS city_upper FROM customers;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, LOWER(city) AS city_upper FROM customers;",
+        "why": "Makes it lowercase"
+      },
+      {
+        "sql": "SELECT name, city AS city_upper FROM customers;",
+        "why": "Doesn't change capitals"
+      }
+    ]
+  },
+  {
+    "id": "s14-02",
+    "skill": 14,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      5
+    ],
+    "title": "Title length",
+    "prompt": "Show each book's title and how many characters it has, as title_length.",
+    "dataset": "bookshop",
+    "hints": [
+      "LENGTH counts characters."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title",
+            "title_length"
+          ],
+          "rows": [
+            [
+              "The Salt Road",
+              13
+            ],
+            [
+              "Quiet Engines",
+              13
+            ],
+            [
+              "Paper Lanterns",
+              14
+            ],
+            [
+              "River of Glass",
+              14
+            ],
+            [
+              "Small Planets",
+              13
+            ],
+            [
+              "The Last Ferry",
+              14
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": {
+          "columns": [
+            "title",
+            "title_length"
+          ],
+          "rows": [
+            [
+              "Copper Moon",
+              11
+            ],
+            [
+              "North Light",
+              11
+            ],
+            [
+              "Sky Atlas",
+              9
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT title, LENGTH(title) AS title_length FROM books;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT title, LENGTH(author) AS title_length FROM books;",
+        "why": "Measures the author"
+      },
+      {
+        "sql": "SELECT title, pages AS title_length FROM books;",
+        "why": "Shows the page count"
+      }
+    ]
+  },
+  {
+    "id": "s14-03",
+    "skill": 14,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [],
+    "title": "First letters",
+    "prompt": "Show each employee's name and the first letter of their name, as initial.",
+    "dataset": "staff",
+    "hints": [
+      "SUBSTR(name, 1, 1) starts at position 1 and takes one character."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "initial"
+          ],
+          "rows": [
+            [
+              "Asha",
+              "A"
+            ],
+            [
+              "Ben",
+              "B"
+            ],
+            [
+              "Chloe",
+              "C"
+            ],
+            [
+              "Dev",
+              "D"
+            ],
+            [
+              "Elena",
+              "E"
+            ],
+            [
+              "Farid",
+              "F"
+            ],
+            [
+              "Grace",
+              "G"
+            ],
+            [
+              "Hugo",
+              "H"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "initial"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              "I"
+            ],
+            [
+              "Jon",
+              "J"
+            ],
+            [
+              "Kim",
+              "K"
+            ],
+            [
+              "Leo",
+              "L"
+            ],
+            [
+              "Mia",
+              "M"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, SUBSTR(name, 1, 1) AS initial FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, SUBSTR(name, 0, 1) AS initial FROM employees;",
+        "why": "Positions start at 1"
+      },
+      {
+        "sql": "SELECT name, SUBSTR(name, 1, 2) AS initial FROM employees;",
+        "why": "Takes two letters"
+      }
+    ]
+  },
+  {
+    "id": "s14-04",
+    "skill": 14,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      5
+    ],
+    "title": "Tidy case",
+    "prompt": "Show each contact's id and their full_name in lowercase, as clean_name.",
+    "dataset": "contacts",
+    "hints": [
+      "Use LOWER."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "clean_name"
+          ],
+          "rows": [
+            [
+              1,
+              "ada lovelace"
+            ],
+            [
+              2,
+              "grace hopper"
+            ],
+            [
+              3,
+              "alan turing"
+            ],
+            [
+              4,
+              "katherine johnson"
+            ],
+            [
+              5,
+              "edsger dijkstra"
+            ],
+            [
+              6,
+              "tim lee"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3');",
+        "expected": {
+          "columns": [
+            "id",
+            "clean_name"
+          ],
+          "rows": [
+            [
+              11,
+              "mary jackson"
+            ],
+            [
+              12,
+              "bob kahn"
+            ],
+            [
+              13,
+              "rosa park"
+            ],
+            [
+              14,
+              "ken thompson"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, LOWER(full_name) AS clean_name FROM contacts;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, UPPER(full_name) AS clean_name FROM contacts;",
+        "why": "Makes it uppercase"
+      },
+      {
+        "sql": "SELECT id, full_name AS clean_name FROM contacts;",
+        "why": "Doesn't change anything"
+      }
+    ]
+  },
+  {
+    "id": "s14-05",
+    "skill": 14,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [],
+    "title": "Joining with NULL",
+    "prompt": "Show each contact's full_name followed by a space and their email, as label. Contacts with no email will show NULL, which is expected here.",
+    "dataset": "contacts",
+    "hints": [
+      "Join with ||, and put a space in quotes."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "label"
+          ],
+          "rows": [
+            [
+              "ada lovelace ada@club.test"
+            ],
+            [
+              "Grace HOPPER grace.h@club.test"
+            ],
+            [
+              "alan turing alan@other.test"
+            ],
+            [
+              "Katherine Johnson kj_99@club.test"
+            ],
+            [
+              "edsger dijkstra 1edsger@club.test"
+            ],
+            [
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3');",
+        "expected": {
+          "columns": [
+            "label"
+          ],
+          "rows": [
+            [
+              "mary jackson mary-j@club.test"
+            ],
+            [
+              "BOB Kahn bob@CLUB.test"
+            ],
+            [
+              "Rosa Park rosa@club-test"
+            ],
+            [
+              "Ken Thompson ken.t@club.test"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT full_name || ' ' || email AS label FROM contacts;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT full_name || email AS label FROM contacts;",
+        "why": "Leaves out the space"
+      },
+      {
+        "sql": "SELECT full_name AS label FROM contacts;",
+        "why": "Leaves out the email"
+      }
+    ]
+  },
+  {
+    "id": "s14-06",
+    "skill": 14,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the join",
+    "prompt": "This should show each customer as 'name - city' in a column named label, but it returns 0. Fix it.",
+    "dataset": "shop",
+    "starterSql": "SELECT name + ' - ' + city AS label\nFROM customers;",
+    "hints": [
+      "+ tries to add numbers. Text joins with ||."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "label"
+          ],
+          "rows": [
+            [
+              "Priya - Pune"
+            ],
+            [
+              "Marco - Rome"
+            ],
+            [
+              "Hana - Tokyo"
+            ],
+            [
+              "Luis - Rome"
+            ],
+            [
+              "Noor - Pune"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "label"
+          ],
+          "rows": [
+            [
+              "Ravi - Oslo"
+            ],
+            [
+              "Sara - Lima"
+            ],
+            [
+              "Tom - Oslo"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name || ' - ' || city AS label FROM customers;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name || city AS label FROM customers;",
+        "why": "Leaves out the separator"
+      },
+      {
+        "sql": "SELECT name AS label FROM customers;",
+        "why": "Leaves out the city"
+      }
+    ]
+  },
+  {
+    "id": "s14-07",
+    "skill": 14,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      5
+    ],
+    "title": "Fix the capitals",
+    "prompt": "Names are messy. Show each contact's id and their full_name with only the first character capitalised and the rest lowercase, as fixed_name.",
+    "dataset": "contacts",
+    "hints": [
+      "Combine UPPER on the first letter with LOWER on the rest."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "fixed_name"
+          ],
+          "rows": [
+            [
+              1,
+              "Ada lovelace"
+            ],
+            [
+              2,
+              "Grace hopper"
+            ],
+            [
+              3,
+              "Alan turing"
+            ],
+            [
+              4,
+              "Katherine johnson"
+            ],
+            [
+              5,
+              "Edsger dijkstra"
+            ],
+            [
+              6,
+              "Tim lee"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3');",
+        "expected": {
+          "columns": [
+            "id",
+            "fixed_name"
+          ],
+          "rows": [
+            [
+              11,
+              "Mary jackson"
+            ],
+            [
+              12,
+              "Bob kahn"
+            ],
+            [
+              13,
+              "Rosa park"
+            ],
+            [
+              14,
+              "Ken thompson"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, UPPER(SUBSTR(full_name, 1, 1)) || LOWER(SUBSTR(full_name, 2)) AS fixed_name FROM contacts;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, UPPER(full_name) AS fixed_name FROM contacts;",
+        "why": "Capitalises every letter"
+      },
+      {
+        "sql": "SELECT id, UPPER(SUBSTR(full_name, 1, 1)) || SUBSTR(full_name, 2) AS fixed_name FROM contacts;",
+        "why": "Leaves later capitals in place"
+      }
+    ]
+  },
+  {
+    "id": "s14-08",
+    "skill": 14,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      6,
+      11
+    ],
+    "title": "Customer codes",
+    "prompt": "Make a code from the first three letters of each customer's name, in capitals, as code. Show only customers from Rome, sorted by name.",
+    "dataset": "shop",
+    "hints": [
+      "Nest SUBSTR inside UPPER, and sort by name."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "code"
+          ],
+          "rows": [
+            [
+              "LUI"
+            ],
+            [
+              "MAR"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "UPDATE customers SET city = 'Rome' WHERE id = 5; UPDATE customers SET city = 'Lima' WHERE id = 2;",
+        "expected": {
+          "columns": [
+            "code"
+          ],
+          "rows": [
+            [
+              "LUI"
+            ],
+            [
+              "NOO"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT UPPER(SUBSTR(name, 1, 3)) AS code FROM customers WHERE city = 'Rome' ORDER BY name;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT UPPER(SUBSTR(name, 1, 3)) AS code FROM customers ORDER BY name;",
+        "why": "Doesn't filter by city"
+      },
+      {
+        "sql": "SELECT SUBSTR(name, 1, 3) AS code FROM customers WHERE city = 'Rome' ORDER BY name;",
+        "why": "Doesn't capitalise"
+      }
+    ]
+  }
+]

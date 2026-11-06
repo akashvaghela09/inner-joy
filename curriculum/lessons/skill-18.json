@@ -1,0 +1,15 @@
+{
+  "skill": 18,
+  "summary": "COUNT tells you how many, but there are three versions and they answer different questions.",
+  "points": [
+    "COUNT(*) counts rows, including rows with NULLs.",
+    "COUNT(column) counts rows where that column isn't NULL.",
+    "COUNT(DISTINCT column) counts different non-NULL values.",
+    "Without GROUP BY, the whole table becomes one summary row."
+  ],
+  "example": {
+    "dataset": "staff",
+    "sql": "SELECT COUNT(*) AS all_rows, COUNT(bonus) AS with_bonus, COUNT(DISTINCT department_id) AS departments\nFROM employees;",
+    "explanation": "The three counts differ because some bonuses are missing and departments repeat."
+  }
+}

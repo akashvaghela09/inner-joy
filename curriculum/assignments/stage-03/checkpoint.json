@@ -1,0 +1,537 @@
+[
+  {
+    "id": "st03-c01",
+    "kind": "checkpoint",
+    "stage": 3,
+    "skills": [
+      14
+    ],
+    "sourceProblem": 5,
+    "recalls": [],
+    "title": "Long usernames",
+    "prompt": "A username is too long if it has more than 5 characters. Show the id of users with a username that's too long.",
+    "dataset": "app",
+    "hints": [
+      "Strictly more than 5."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": []
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": []
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id FROM users WHERE LENGTH(username) > 5;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id FROM users WHERE LENGTH(username) >= 5;",
+        "why": "Includes exactly 5"
+      },
+      {
+        "sql": "SELECT id FROM users WHERE username > 5;",
+        "why": "Compares the text, not its length"
+      }
+    ]
+  },
+  {
+    "id": "st03-c02",
+    "kind": "checkpoint",
+    "stage": 3,
+    "skills": [
+      12,
+      7,
+      11
+    ],
+    "sourceProblem": 15,
+    "recalls": [],
+    "title": "Odd rows, not Maths",
+    "prompt": "Show the title of courses with an odd id whose subject isn't Maths, sorted by title from Z to A.",
+    "dataset": "school",
+    "hints": [
+      "Use % and <>, then sort descending."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title"
+          ],
+          "rows": [
+            [
+              "Biology"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring'); INSERT INTO courses VALUES (9, 'Art', 'Arts'), (11, 'Zoology', 'Science');",
+        "expected": {
+          "columns": [
+            "title"
+          ],
+          "rows": [
+            [
+              "Zoology"
+            ],
+            [
+              "Chemistry"
+            ],
+            [
+              "Art"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT title FROM courses WHERE id % 2 = 1 AND subject <> 'Maths' ORDER BY title DESC;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT title FROM courses WHERE id % 2 = 0 AND subject <> 'Maths' ORDER BY title DESC;",
+        "why": "Finds even ids"
+      },
+      {
+        "sql": "SELECT title FROM courses WHERE id % 2 = 1 AND subject <> 'Maths' ORDER BY title;",
+        "why": "Sorts A to Z"
+      }
+    ]
+  },
+  {
+    "id": "st03-c03",
+    "kind": "checkpoint",
+    "stage": 3,
+    "skills": [
+      9,
+      17
+    ],
+    "sourceProblem": 32,
+    "recalls": [],
+    "title": "Award eligibility",
+    "prompt": "An employee is eligible when they earn over 50000, have a recorded bonus, and were hired before 2022. Show each name and eligible as Yes or No.",
+    "dataset": "staff",
+    "hints": [
+      "All three parts must be true."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "eligible"
+          ],
+          "rows": [
+            [
+              "Asha",
+              "Yes"
+            ],
+            [
+              "Ben",
+              "No"
+            ],
+            [
+              "Chloe",
+              "Yes"
+            ],
+            [
+              "Dev",
+              "Yes"
+            ],
+            [
+              "Elena",
+              "No"
+            ],
+            [
+              "Farid",
+              "No"
+            ],
+            [
+              "Grace",
+              "No"
+            ],
+            [
+              "Hugo",
+              "No"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "eligible"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              "Yes"
+            ],
+            [
+              "Jon",
+              "No"
+            ],
+            [
+              "Kim",
+              "No"
+            ],
+            [
+              "Leo",
+              "No"
+            ],
+            [
+              "Mia",
+              "No"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, CASE WHEN salary > 50000 AND bonus IS NOT NULL AND hire_date < '2022-01-01' THEN 'Yes' ELSE 'No' END AS eligible FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, CASE WHEN salary > 50000 OR bonus IS NOT NULL OR hire_date < '2022-01-01' THEN 'Yes' ELSE 'No' END AS eligible FROM employees;",
+        "why": "OR needs just one"
+      },
+      {
+        "sql": "SELECT name, CASE WHEN salary > 50000 AND hire_date < '2022-01-01' THEN 'Yes' ELSE 'No' END AS eligible FROM employees;",
+        "why": "Ignores the bonus"
+      }
+    ]
+  },
+  {
+    "id": "st03-c04",
+    "kind": "checkpoint",
+    "stage": 3,
+    "skills": [
+      12,
+      17,
+      11
+    ],
+    "sourceProblem": 38,
+    "recalls": [],
+    "title": "Study partners",
+    "prompt": "Students pair up by id: an odd id works with the next id, and an even id with the previous one. Show each student's id and partner_id, sorted by id.",
+    "dataset": "school",
+    "hints": [
+      "Use % inside CASE."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "partner_id"
+          ],
+          "rows": [
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              5,
+              6
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "id",
+            "partner_id"
+          ],
+          "rows": [
+            [
+              6,
+              5
+            ],
+            [
+              7,
+              8
+            ],
+            [
+              8,
+              7
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, CASE WHEN id % 2 = 1 THEN id + 1 ELSE id - 1 END AS partner_id FROM students ORDER BY id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, CASE WHEN id % 2 = 0 THEN id + 1 ELSE id - 1 END AS partner_id FROM students ORDER BY id;",
+        "why": "Reverses odd and even"
+      },
+      {
+        "sql": "SELECT id, id + 1 AS partner_id FROM students ORDER BY id;",
+        "why": "Doesn't handle even ids"
+      }
+    ]
+  },
+  {
+    "id": "st03-c05",
+    "kind": "checkpoint",
+    "stage": 3,
+    "skills": [
+      14,
+      11
+    ],
+    "sourceProblem": 44,
+    "recalls": [],
+    "title": "Tidy city names",
+    "prompt": "Show each customer's id and their name with the first letter in capitals and the rest lowercase, as tidy_name, sorted by id.",
+    "dataset": "shop",
+    "hints": [
+      "Combine UPPER, LOWER, and SUBSTR."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "tidy_name"
+          ],
+          "rows": [
+            [
+              1,
+              "Priya"
+            ],
+            [
+              2,
+              "Marco"
+            ],
+            [
+              3,
+              "Hana"
+            ],
+            [
+              4,
+              "Luis"
+            ],
+            [
+              5,
+              "Noor"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "UPDATE customers SET name = 'mATEO' WHERE id = 2;",
+        "expected": {
+          "columns": [
+            "id",
+            "tidy_name"
+          ],
+          "rows": [
+            [
+              1,
+              "Priya"
+            ],
+            [
+              2,
+              "Mateo"
+            ],
+            [
+              3,
+              "Hana"
+            ],
+            [
+              4,
+              "Luis"
+            ],
+            [
+              5,
+              "Noor"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, UPPER(SUBSTR(name, 1, 1)) || LOWER(SUBSTR(name, 2)) AS tidy_name FROM customers ORDER BY id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, UPPER(name) AS tidy_name FROM customers ORDER BY id;",
+        "why": "Capitalises every letter"
+      },
+      {
+        "sql": "SELECT id, name AS tidy_name FROM customers ORDER BY id;",
+        "why": "Doesn't tidy messy names"
+      }
+    ]
+  },
+  {
+    "id": "st03-c06",
+    "kind": "checkpoint",
+    "stage": 3,
+    "skills": [
+      15,
+      7
+    ],
+    "sourceProblem": 45,
+    "recalls": [],
+    "title": "Gold members",
+    "prompt": "A gold tag is any tag starting with GOLD. Show the id, full_name, and tags of contacts with a gold tag, either first or after a space.",
+    "dataset": "contacts",
+    "hints": [
+      "Check the start and after a space."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "full_name",
+            "tags"
+          ],
+          "rows": [
+            [
+              1,
+              "ada lovelace",
+              "VIP GOLD1"
+            ],
+            [
+              2,
+              "Grace HOPPER",
+              "GOLD2 NEW"
+            ],
+            [
+              6,
+              "Tim Lee",
+              "GOLD1"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3');",
+        "expected": {
+          "columns": [
+            "id",
+            "full_name",
+            "tags"
+          ],
+          "rows": [
+            [
+              11,
+              "mary jackson",
+              "SILVER GOLD1"
+            ],
+            [
+              12,
+              "BOB Kahn",
+              "gold1"
+            ],
+            [
+              14,
+              "Ken Thompson",
+              "GOLD3"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, full_name, tags FROM contacts WHERE tags LIKE 'GOLD%' OR tags LIKE '% GOLD%';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, full_name, tags FROM contacts WHERE tags LIKE '%GOLD%';",
+        "why": "Also matches XGOLD1"
+      },
+      {
+        "sql": "SELECT id, full_name, tags FROM contacts WHERE tags LIKE 'GOLD%';",
+        "why": "Misses tags after a space"
+      }
+    ]
+  }
+]

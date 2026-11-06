@@ -1,0 +1,15 @@
+{
+  "skill": 19,
+  "summary": "SUM, AVG, MIN, and MAX summarise many values into one.",
+  "points": [
+    "They all ignore NULLs. AVG divides by the number of non-NULL values, not by all rows.",
+    "With no matching rows, SUM, AVG, MIN, and MAX return NULL, and COUNT returns 0.",
+    "AVG always returns a decimal, so wrap it in ROUND when needed.",
+    "MIN and MAX also work on text and dates."
+  ],
+  "example": {
+    "dataset": "staff",
+    "sql": "SELECT SUM(bonus) AS total, AVG(bonus) AS average, MIN(hire_date) AS first_hire, MAX(salary) AS top_salary\nFROM employees;",
+    "explanation": "AVG(bonus) averages only the employees who have a recorded bonus."
+  }
+}

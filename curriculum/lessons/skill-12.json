@@ -1,0 +1,15 @@
+{
+  "skill": 12,
+  "summary": "SQL can calculate with +, -, *, /, and %. Calculations work on each row, using that row's values.",
+  "points": [
+    "Use brackets to control the order: (price - cost) * 2.",
+    "% gives the remainder, so id % 2 = 0 finds even numbers.",
+    "Dividing two integers drops the decimals: 5 / 2 is 2. Write 5 / 2.0 to get 2.5.",
+    "Any calculation involving NULL gives NULL."
+  ],
+  "example": {
+    "dataset": "shop",
+    "sql": "SELECT name, price - cost AS profit, (price - cost) * 100.0 / price AS margin_pct\nFROM products;",
+    "explanation": "The 100.0 keeps the result a decimal, and brackets make the subtraction happen first."
+  }
+}

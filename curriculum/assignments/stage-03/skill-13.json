@@ -1,0 +1,855 @@
+[
+  {
+    "id": "s13-01",
+    "skill": 13,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Two decimals",
+    "prompt": "Show each product's name and its price times 1.1, rounded to 2 decimal places, as new_price. Replace the ___.",
+    "dataset": "shop",
+    "starterSql": "SELECT name, ROUND(price * 1.1, ___) AS new_price\nFROM products;",
+    "hints": [
+      "ROUND's second value is the number of decimals."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "new_price"
+          ],
+          "rows": [
+            [
+              "Notebook",
+              4.4
+            ],
+            [
+              "Pen",
+              1.65
+            ],
+            [
+              "Mug",
+              9.9
+            ],
+            [
+              "Kettle",
+              38.5
+            ],
+            [
+              "Lamp",
+              27.5
+            ],
+            [
+              "Rug",
+              66
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "new_price"
+          ],
+          "rows": [
+            [
+              "Stool",
+              44
+            ],
+            [
+              "Cup",
+              9.9
+            ],
+            [
+              "Ink",
+              13.75
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, ROUND(price * 1.1, 2) AS new_price FROM products;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, ROUND(price * 1.1) AS new_price FROM products;",
+        "why": "Rounds to a whole number"
+      },
+      {
+        "sql": "SELECT name, price * 1.1 AS new_price FROM products;",
+        "why": "Doesn't round"
+      }
+    ]
+  },
+  {
+    "id": "s13-02",
+    "skill": 13,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      12
+    ],
+    "title": "Monthly salary",
+    "prompt": "Show each employee's name and their salary divided by 12, rounded to 2 decimals, as monthly.",
+    "dataset": "staff",
+    "hints": [
+      "Divide by 12.0 to keep decimals."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "monthly"
+          ],
+          "rows": [
+            [
+              "Asha",
+              10000
+            ],
+            [
+              "Ben",
+              7916.67
+            ],
+            [
+              "Chloe",
+              7916.67
+            ],
+            [
+              "Dev",
+              5833.33
+            ],
+            [
+              "Elena",
+              5166.67
+            ],
+            [
+              "Farid",
+              4833.33
+            ],
+            [
+              "Grace",
+              4000
+            ],
+            [
+              "Hugo",
+              3416.67
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "monthly"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              7500
+            ],
+            [
+              "Jon",
+              5833.33
+            ],
+            [
+              "Kim",
+              5833.33
+            ],
+            [
+              "Leo",
+              2500
+            ],
+            [
+              "Mia",
+              4583.33
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, ROUND(salary / 12.0, 2) AS monthly FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, ROUND(salary / 12, 2) AS monthly FROM employees;",
+        "why": "Integer division loses the decimals"
+      },
+      {
+        "sql": "SELECT name, salary / 12.0 AS monthly FROM employees;",
+        "why": "Doesn't round"
+      }
+    ]
+  },
+  {
+    "id": "s13-03",
+    "skill": 13,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      2
+    ],
+    "title": "Using CAST",
+    "prompt": "Show each session's id and its hours, as hours. Use CAST to make minutes a REAL before dividing by 60, then round to 1 decimal.",
+    "dataset": "app",
+    "hints": [
+      "ROUND(CAST(minutes AS REAL) / 60, 1)."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "hours"
+          ],
+          "rows": [
+            [
+              1,
+              0.2
+            ],
+            [
+              2,
+              0.4
+            ],
+            [
+              3,
+              0.1
+            ],
+            [
+              4,
+              0.7
+            ],
+            [
+              5,
+              0.3
+            ],
+            [
+              6,
+              0.3
+            ],
+            [
+              7,
+              0.3
+            ],
+            [
+              8,
+              0.5
+            ],
+            [
+              9,
+              0.2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "id",
+            "hours"
+          ],
+          "rows": [
+            [
+              11,
+              0.8
+            ],
+            [
+              12,
+              0.8
+            ],
+            [
+              13,
+              0.1
+            ],
+            [
+              14,
+              0.6
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, ROUND(CAST(minutes AS REAL) / 60, 1) AS hours FROM sessions;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, ROUND(minutes / 60, 1) AS hours FROM sessions;",
+        "why": "Integer division happens first"
+      },
+      {
+        "sql": "SELECT id, ROUND(CAST(minutes AS REAL) / 60, 2) AS hours FROM sessions;",
+        "why": "Keeps two decimals"
+      }
+    ]
+  },
+  {
+    "id": "s13-04",
+    "skill": 13,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      12
+    ],
+    "title": "Fahrenheit",
+    "prompt": "Show each reading's id and temperature in Fahrenheit, as temp_f. Use temp_c * 1.8 + 32, rounded to 1 decimal.",
+    "dataset": "weather",
+    "hints": [
+      "Multiplication runs before addition."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "temp_f"
+          ],
+          "rows": [
+            [
+              1,
+              35.6
+            ],
+            [
+              2,
+              39.2
+            ],
+            [
+              3,
+              37.4
+            ],
+            [
+              4,
+              44.6
+            ],
+            [
+              5,
+              75.2
+            ],
+            [
+              6,
+              78.8
+            ],
+            [
+              7,
+              78.8
+            ],
+            [
+              8,
+              77
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "temp_f"
+          ],
+          "rows": [
+            [
+              11,
+              100.4
+            ],
+            [
+              12,
+              104
+            ],
+            [
+              13,
+              105.8
+            ],
+            [
+              14,
+              59
+            ],
+            [
+              15,
+              57.2
+            ],
+            [
+              16,
+              64.4
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, ROUND(temp_c * 1.8 + 32, 1) AS temp_f FROM readings;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, ROUND(temp_c + 32 * 1.8, 1) AS temp_f FROM readings;",
+        "why": "Multiplies the wrong number"
+      },
+      {
+        "sql": "SELECT id, temp_c AS temp_f FROM readings;",
+        "why": "Doesn't convert"
+      }
+    ]
+  },
+  {
+    "id": "s13-05",
+    "skill": 13,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      2
+    ],
+    "title": "Cut, don't round",
+    "prompt": "Show each book's title and its price with the decimals simply removed, as whole_price. So 18.5 becomes 18.",
+    "dataset": "bookshop",
+    "hints": [
+      "CAST to INTEGER drops decimals."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title",
+            "whole_price"
+          ],
+          "rows": [
+            [
+              "The Salt Road",
+              18
+            ],
+            [
+              "Quiet Engines",
+              24
+            ],
+            [
+              "Paper Lanterns",
+              12
+            ],
+            [
+              "River of Glass",
+              15
+            ],
+            [
+              "Small Planets",
+              30
+            ],
+            [
+              "The Last Ferry",
+              9
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": {
+          "columns": [
+            "title",
+            "whole_price"
+          ],
+          "rows": [
+            [
+              "Copper Moon",
+              20
+            ],
+            [
+              "North Light",
+              7
+            ],
+            [
+              "Sky Atlas",
+              25
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT title, CAST(price AS INTEGER) AS whole_price FROM books;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT title, ROUND(price) AS whole_price FROM books;",
+        "why": "Rounding turns 18.5 into 19"
+      },
+      {
+        "sql": "SELECT title, price AS whole_price FROM books;",
+        "why": "Keeps the decimals"
+      }
+    ]
+  },
+  {
+    "id": "s13-06",
+    "skill": 13,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the division",
+    "prompt": "This should show each book's title and how many weeks it takes at 7 pages per week, rounded to 1 decimal, as weeks. Every value ends in .0. Fix it.",
+    "dataset": "bookshop",
+    "starterSql": "SELECT title, ROUND(pages / 7, 1) AS weeks\nFROM books;",
+    "hints": [
+      "The integer division happens before ROUND."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title",
+            "weeks"
+          ],
+          "rows": [
+            [
+              "The Salt Road",
+              45.7
+            ],
+            [
+              "Quiet Engines",
+              58.9
+            ],
+            [
+              "Paper Lanterns",
+              35.7
+            ],
+            [
+              "River of Glass",
+              42.6
+            ],
+            [
+              "Small Planets",
+              77.1
+            ],
+            [
+              "The Last Ferry",
+              30
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": {
+          "columns": [
+            "title",
+            "weeks"
+          ],
+          "rows": [
+            [
+              "Copper Moon",
+              14.3
+            ],
+            [
+              "North Light",
+              25.7
+            ],
+            [
+              "Sky Atlas",
+              42.9
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT title, ROUND(pages / 7.0, 1) AS weeks FROM books;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT title, ROUND(pages * 7.0, 1) AS weeks FROM books;",
+        "why": "Multiplies instead"
+      },
+      {
+        "sql": "SELECT title, pages / 7.0 AS weeks FROM books;",
+        "why": "Doesn't round"
+      }
+    ]
+  },
+  {
+    "id": "s13-07",
+    "skill": 13,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      12
+    ],
+    "title": "Share of a budget",
+    "prompt": "Show each employee's name and their salary as a percentage of 120000, rounded to 1 decimal, as pct.",
+    "dataset": "staff",
+    "hints": [
+      "Multiply by 100.0 before dividing."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "pct"
+          ],
+          "rows": [
+            [
+              "Asha",
+              100
+            ],
+            [
+              "Ben",
+              79.2
+            ],
+            [
+              "Chloe",
+              79.2
+            ],
+            [
+              "Dev",
+              58.3
+            ],
+            [
+              "Elena",
+              51.7
+            ],
+            [
+              "Farid",
+              48.3
+            ],
+            [
+              "Grace",
+              40
+            ],
+            [
+              "Hugo",
+              34.2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "pct"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              75
+            ],
+            [
+              "Jon",
+              58.3
+            ],
+            [
+              "Kim",
+              58.3
+            ],
+            [
+              "Leo",
+              25
+            ],
+            [
+              "Mia",
+              45.8
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, ROUND(salary * 100.0 / 120000, 1) AS pct FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, ROUND(salary * 100 / 120000, 1) AS pct FROM employees;",
+        "why": "Integer division removes the decimals"
+      },
+      {
+        "sql": "SELECT name, ROUND(salary / 120000.0, 1) AS pct FROM employees;",
+        "why": "Doesn't convert to a percentage"
+      }
+    ]
+  },
+  {
+    "id": "s13-08",
+    "skill": 13,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      2
+    ],
+    "title": "Year as text",
+    "prompt": "Show each book's title, its year converted to text as year_text, and the type of that converted value as year_type.",
+    "dataset": "bookshop",
+    "hints": [
+      "Use CAST inside typeof too."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title",
+            "year_text",
+            "year_type"
+          ],
+          "rows": [
+            [
+              "The Salt Road",
+              "2019",
+              "text"
+            ],
+            [
+              "Quiet Engines",
+              "2021",
+              "text"
+            ],
+            [
+              "Paper Lanterns",
+              "2016",
+              "text"
+            ],
+            [
+              "River of Glass",
+              "2022",
+              "text"
+            ],
+            [
+              "Small Planets",
+              "2018",
+              "text"
+            ],
+            [
+              "The Last Ferry",
+              "2014",
+              "text"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": {
+          "columns": [
+            "title",
+            "year_text",
+            "year_type"
+          ],
+          "rows": [
+            [
+              "Copper Moon",
+              "2020",
+              "text"
+            ],
+            [
+              "North Light",
+              "2015",
+              "text"
+            ],
+            [
+              "Sky Atlas",
+              "2023",
+              "text"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT title, CAST(year AS TEXT) AS year_text, typeof(CAST(year AS TEXT)) AS year_type FROM books;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT title, year AS year_text, typeof(year) AS year_type FROM books;",
+        "why": "Stays an integer"
+      },
+      {
+        "sql": "SELECT title, CAST(year AS TEXT) AS year_text FROM books;",
+        "why": "Leaves out the type"
+      }
+    ]
+  }
+]

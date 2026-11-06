@@ -1,0 +1,811 @@
+[
+  {
+    "id": "s16-01",
+    "skill": 16,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Hire year",
+    "prompt": "Show each employee's name and the year they were hired, as hire_year. Replace the ___.",
+    "dataset": "staff",
+    "starterSql": "SELECT name, strftime('___', hire_date) AS hire_year\nFROM employees;",
+    "hints": [
+      "%Y is the four-digit year."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "hire_year"
+          ],
+          "rows": [
+            [
+              "Asha",
+              "2018"
+            ],
+            [
+              "Ben",
+              "2019"
+            ],
+            [
+              "Chloe",
+              "2021"
+            ],
+            [
+              "Dev",
+              "2020"
+            ],
+            [
+              "Elena",
+              "2022"
+            ],
+            [
+              "Farid",
+              "2023"
+            ],
+            [
+              "Grace",
+              "2021"
+            ],
+            [
+              "Hugo",
+              "2024"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "hire_year"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              "2019"
+            ],
+            [
+              "Jon",
+              "2020"
+            ],
+            [
+              "Kim",
+              "2023"
+            ],
+            [
+              "Leo",
+              "2024"
+            ],
+            [
+              "Mia",
+              "2022"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, strftime('%Y', hire_date) AS hire_year FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, strftime('%m', hire_date) AS hire_year FROM employees;",
+        "why": "%m gets the month"
+      },
+      {
+        "sql": "SELECT name, hire_date AS hire_year FROM employees;",
+        "why": "Shows the full date"
+      }
+    ]
+  },
+  {
+    "id": "s16-02",
+    "skill": 16,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      2
+    ],
+    "title": "Order month",
+    "prompt": "Show each order's id and its year and month like 2024-01, as order_month.",
+    "dataset": "shop",
+    "hints": [
+      "Use the format %Y-%m."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "order_month"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-01"
+            ],
+            [
+              2,
+              "2024-01"
+            ],
+            [
+              3,
+              "2024-02"
+            ],
+            [
+              4,
+              "2024-02"
+            ],
+            [
+              5,
+              "2024-03"
+            ],
+            [
+              6,
+              "2024-03"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "order_month"
+          ],
+          "rows": [
+            [
+              11,
+              "2024-02"
+            ],
+            [
+              12,
+              "2024-03"
+            ],
+            [
+              13,
+              "2024-03"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, strftime('%Y-%m', order_date) AS order_month FROM orders;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, strftime('%Y', order_date) AS order_month FROM orders;",
+        "why": "Year only"
+      },
+      {
+        "sql": "SELECT id, strftime('%m', order_date) AS order_month FROM orders;",
+        "why": "Month only"
+      }
+    ]
+  },
+  {
+    "id": "s16-03",
+    "skill": 16,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      12
+    ],
+    "title": "Days since signup",
+    "prompt": "Show each user's username and how many days after 2024-01-01 they signed up, as days_after. The result should be a whole number.",
+    "dataset": "app",
+    "hints": [
+      "Subtract julianday values, and CAST to INTEGER."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "username",
+            "days_after"
+          ],
+          "rows": [
+            [
+              "nova",
+              0
+            ],
+            [
+              "orbit",
+              2
+            ],
+            [
+              "pixel",
+              2
+            ],
+            [
+              "quark",
+              9
+            ],
+            [
+              "raven",
+              11
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "username",
+            "days_after"
+          ],
+          "rows": [
+            [
+              "sable",
+              57
+            ],
+            [
+              "tulip",
+              58
+            ],
+            [
+              "umber",
+              60
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT username, CAST(julianday(signup_date) - julianday('2024-01-01') AS INTEGER) AS days_after FROM users;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT username, CAST(julianday('2024-01-01') - julianday(signup_date) AS INTEGER) AS days_after FROM users;",
+        "why": "Subtracts the wrong way round"
+      },
+      {
+        "sql": "SELECT username, signup_date AS days_after FROM users;",
+        "why": "Shows the date"
+      }
+    ]
+  },
+  {
+    "id": "s16-04",
+    "skill": 16,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [],
+    "title": "Next day",
+    "prompt": "Show each reading's reading_date and the day after it, as next_day.",
+    "dataset": "weather",
+    "hints": [
+      "date(value, '+1 day')."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "reading_date",
+            "next_day"
+          ],
+          "rows": [
+            [
+              "2024-03-01",
+              "2024-03-02"
+            ],
+            [
+              "2024-03-02",
+              "2024-03-03"
+            ],
+            [
+              "2024-03-03",
+              "2024-03-04"
+            ],
+            [
+              "2024-03-05",
+              "2024-03-06"
+            ],
+            [
+              "2024-03-01",
+              "2024-03-02"
+            ],
+            [
+              "2024-03-02",
+              "2024-03-03"
+            ],
+            [
+              "2024-03-03",
+              "2024-03-04"
+            ],
+            [
+              "2024-03-04",
+              "2024-03-05"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "reading_date",
+            "next_day"
+          ],
+          "rows": [
+            [
+              "2024-07-30",
+              "2024-07-31"
+            ],
+            [
+              "2024-07-31",
+              "2024-08-01"
+            ],
+            [
+              "2024-08-01",
+              "2024-08-02"
+            ],
+            [
+              "2024-07-31",
+              "2024-08-01"
+            ],
+            [
+              "2024-08-01",
+              "2024-08-02"
+            ],
+            [
+              "2024-08-03",
+              "2024-08-04"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT reading_date, date(reading_date, '+1 day') AS next_day FROM readings;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT reading_date, date(reading_date, '-1 day') AS next_day FROM readings;",
+        "why": "Goes backwards"
+      },
+      {
+        "sql": "SELECT reading_date, reading_date + 1 AS next_day FROM readings;",
+        "why": "Text dates can't be added to"
+      }
+    ]
+  },
+  {
+    "id": "s16-05",
+    "skill": 16,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      2
+    ],
+    "title": "Across a month end",
+    "prompt": "Show each reading's reading_date and the day before it, as previous_day. The hidden test crosses a month boundary.",
+    "dataset": "weather",
+    "hints": [
+      "Let date() handle the calendar."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "reading_date",
+            "previous_day"
+          ],
+          "rows": [
+            [
+              "2024-03-01",
+              "2024-02-29"
+            ],
+            [
+              "2024-03-02",
+              "2024-03-01"
+            ],
+            [
+              "2024-03-03",
+              "2024-03-02"
+            ],
+            [
+              "2024-03-05",
+              "2024-03-04"
+            ],
+            [
+              "2024-03-01",
+              "2024-02-29"
+            ],
+            [
+              "2024-03-02",
+              "2024-03-01"
+            ],
+            [
+              "2024-03-03",
+              "2024-03-02"
+            ],
+            [
+              "2024-03-04",
+              "2024-03-03"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "reading_date",
+            "previous_day"
+          ],
+          "rows": [
+            [
+              "2024-07-30",
+              "2024-07-29"
+            ],
+            [
+              "2024-07-31",
+              "2024-07-30"
+            ],
+            [
+              "2024-08-01",
+              "2024-07-31"
+            ],
+            [
+              "2024-07-31",
+              "2024-07-30"
+            ],
+            [
+              "2024-08-01",
+              "2024-07-31"
+            ],
+            [
+              "2024-08-03",
+              "2024-08-02"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT reading_date, date(reading_date, '-1 day') AS previous_day FROM readings;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT reading_date, reading_date - 1 AS previous_day FROM readings;",
+        "why": "Doesn't calculate dates"
+      },
+      {
+        "sql": "SELECT reading_date, date(reading_date, '-1 month') AS previous_day FROM readings;",
+        "why": "Goes back a month"
+      }
+    ]
+  },
+  {
+    "id": "s16-06",
+    "skill": 16,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the function",
+    "prompt": "This should show each employee's name and hire year as hire_year, but SQLite has no YEAR function. Fix it.",
+    "dataset": "staff",
+    "starterSql": "SELECT name, YEAR(hire_date) AS hire_year\nFROM employees;",
+    "hints": [
+      "Use strftime."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "hire_year"
+          ],
+          "rows": [
+            [
+              "Asha",
+              "2018"
+            ],
+            [
+              "Ben",
+              "2019"
+            ],
+            [
+              "Chloe",
+              "2021"
+            ],
+            [
+              "Dev",
+              "2020"
+            ],
+            [
+              "Elena",
+              "2022"
+            ],
+            [
+              "Farid",
+              "2023"
+            ],
+            [
+              "Grace",
+              "2021"
+            ],
+            [
+              "Hugo",
+              "2024"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "hire_year"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              "2019"
+            ],
+            [
+              "Jon",
+              "2020"
+            ],
+            [
+              "Kim",
+              "2023"
+            ],
+            [
+              "Leo",
+              "2024"
+            ],
+            [
+              "Mia",
+              "2022"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, strftime('%Y', hire_date) AS hire_year FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, hire_date AS hire_year FROM employees;",
+        "why": "Shows the full date"
+      },
+      {
+        "sql": "SELECT name, strftime('%y', hire_date) AS hire_year FROM employees;",
+        "why": "%y is the two-digit year"
+      }
+    ]
+  },
+  {
+    "id": "s16-07",
+    "skill": 16,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      2
+    ],
+    "title": "February orders",
+    "prompt": "Show the id and order_date of orders placed in February of any year. strftime returns text, so compare with '02'.",
+    "dataset": "shop",
+    "hints": [
+      "strftime('%m', order_date) = '02'."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "order_date"
+          ],
+          "rows": [
+            [
+              3,
+              "2024-02-03"
+            ],
+            [
+              4,
+              "2024-02-20"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "order_date"
+          ],
+          "rows": [
+            [
+              11,
+              "2024-02-28"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, order_date FROM orders WHERE strftime('%m', order_date) = '02';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, order_date FROM orders WHERE strftime('%m', order_date) = 2;",
+        "why": "Text '02' doesn't equal the number 2"
+      },
+      {
+        "sql": "SELECT id, order_date FROM orders WHERE order_date = '2024-02';",
+        "why": "Compares with a whole date"
+      }
+    ]
+  },
+  {
+    "id": "s16-08",
+    "skill": 16,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      8,
+      12
+    ],
+    "title": "Tenure at year end",
+    "prompt": "Show each employee's name and full years employed by 2024-12-31, as tenure_years. Divide the days by 365.25, then CAST to INTEGER. Only include hires before 2022.",
+    "dataset": "staff",
+    "hints": [
+      "Use julianday, and filter hire_date."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "tenure_years"
+          ],
+          "rows": [
+            [
+              "Asha",
+              6
+            ],
+            [
+              "Ben",
+              5
+            ],
+            [
+              "Chloe",
+              3
+            ],
+            [
+              "Dev",
+              4
+            ],
+            [
+              "Grace",
+              3
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "tenure_years"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              5
+            ],
+            [
+              "Jon",
+              4
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, CAST((julianday('2024-12-31') - julianday(hire_date)) / 365.25 AS INTEGER) AS tenure_years FROM employees WHERE hire_date < '2022-01-01';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, CAST((julianday('2024-12-31') - julianday(hire_date)) / 365.25 AS INTEGER) AS tenure_years FROM employees;",
+        "why": "Doesn't filter"
+      },
+      {
+        "sql": "SELECT name, CAST(julianday('2024-12-31') - julianday(hire_date) AS INTEGER) AS tenure_years FROM employees WHERE hire_date < '2022-01-01';",
+        "why": "Shows days, not years"
+      }
+    ]
+  }
+]

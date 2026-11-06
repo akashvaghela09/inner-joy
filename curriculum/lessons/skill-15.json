@@ -1,0 +1,15 @@
+{
+  "skill": 15,
+  "summary": "LIKE matches text against a pattern, for when you don't know the exact value.",
+  "points": [
+    "% matches any number of characters, including none. _ matches exactly one.",
+    "'A%' means starts with A, '%a' means ends with a, and '%a%' means contains a.",
+    "In SQLite, LIKE ignores capital letters for standard English characters.",
+    "To match a whole code in a space-separated list, check both the start and after a space: 'X%' or '% X%'."
+  ],
+  "example": {
+    "dataset": "contacts",
+    "sql": "SELECT full_name, tags\nFROM contacts\nWHERE tags LIKE 'GOLD1%' OR tags LIKE '% GOLD1%';",
+    "explanation": "This finds the GOLD1 code at the start of the tags or after a space, but not XGOLD1, which only contains it."
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "skill": 23,
+  "summary": "SQL runs in a different order from how you write it. Knowing this order explains many confusing errors.",
+  "points": [
+    "The order is FROM, WHERE, GROUP BY, HAVING, SELECT, DISTINCT, ORDER BY, then LIMIT.",
+    "WHERE runs before SELECT, so standard SQL can't use a SELECT alias in WHERE. Repeat the calculation.",
+    "ORDER BY runs late, so it can use aliases.",
+    "SQLite is more relaxed than most databases about aliases, but write queries that work everywhere."
+  ],
+  "example": {
+    "dataset": "bookshop",
+    "sql": "SELECT title, price * 1.2 AS with_tax\nFROM books\nWHERE price * 1.2 > 20\nORDER BY with_tax DESC;",
+    "explanation": "WHERE repeats the calculation because it runs before SELECT, while ORDER BY can use the alias."
+  }
+}

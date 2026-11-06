@@ -1,0 +1,794 @@
+[
+  {
+    "id": "s12-01",
+    "skill": 12,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Profit per product",
+    "prompt": "Show each product's name and its price minus its cost, as profit. Replace the ___.",
+    "dataset": "shop",
+    "starterSql": "SELECT name, price ___ cost AS profit\nFROM products;",
+    "hints": [
+      "Subtraction uses a minus sign."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true,
+      "decimals": 2
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "profit"
+          ],
+          "rows": [
+            [
+              "Notebook",
+              2.5
+            ],
+            [
+              "Pen",
+              1
+            ],
+            [
+              "Mug",
+              5
+            ],
+            [
+              "Kettle",
+              15
+            ],
+            [
+              "Lamp",
+              13
+            ],
+            [
+              "Rug",
+              30
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "profit"
+          ],
+          "rows": [
+            [
+              "Stool",
+              15
+            ],
+            [
+              "Cup",
+              7
+            ],
+            [
+              "Ink",
+              6.5
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, price - cost AS profit FROM products;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, price + cost AS profit FROM products;",
+        "why": "Adds instead of subtracting"
+      },
+      {
+        "sql": "SELECT name, cost - price AS profit FROM products;",
+        "why": "Subtracts the wrong way round"
+      }
+    ]
+  },
+  {
+    "id": "s12-02",
+    "skill": 12,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      5
+    ],
+    "title": "Double the order",
+    "prompt": "Show each order item's order_id and twice its quantity, as doubled.",
+    "dataset": "shop",
+    "hints": [
+      "Multiply with *."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "order_id",
+            "doubled"
+          ],
+          "rows": [
+            [
+              1,
+              6
+            ],
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              6,
+              2
+            ],
+            [
+              6,
+              8
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "order_id",
+            "doubled"
+          ],
+          "rows": [
+            [
+              11,
+              2
+            ],
+            [
+              11,
+              6
+            ],
+            [
+              12,
+              4
+            ],
+            [
+              13,
+              2
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT order_id, quantity * 2 AS doubled FROM order_items;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT order_id, quantity + 2 AS doubled FROM order_items;",
+        "why": "Adds 2 instead"
+      },
+      {
+        "sql": "SELECT order_id, quantity AS doubled FROM order_items;",
+        "why": "Doesn't multiply"
+      }
+    ]
+  },
+  {
+    "id": "s12-03",
+    "skill": 12,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [],
+    "title": "Brackets first",
+    "prompt": "Show each product's name and the profit from selling two of it, as profit_on_two.",
+    "dataset": "shop",
+    "hints": [
+      "Subtract first, then multiply."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true,
+      "decimals": 2
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "profit_on_two"
+          ],
+          "rows": [
+            [
+              "Notebook",
+              5
+            ],
+            [
+              "Pen",
+              2
+            ],
+            [
+              "Mug",
+              10
+            ],
+            [
+              "Kettle",
+              30
+            ],
+            [
+              "Lamp",
+              26
+            ],
+            [
+              "Rug",
+              60
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "profit_on_two"
+          ],
+          "rows": [
+            [
+              "Stool",
+              30
+            ],
+            [
+              "Cup",
+              14
+            ],
+            [
+              "Ink",
+              13
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, (price - cost) * 2 AS profit_on_two FROM products;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, price - cost * 2 AS profit_on_two FROM products;",
+        "why": "Multiplication runs first without brackets"
+      },
+      {
+        "sql": "SELECT name, price - cost AS profit_on_two FROM products;",
+        "why": "Profit on one item"
+      }
+    ]
+  },
+  {
+    "id": "s12-04",
+    "skill": 12,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      6
+    ],
+    "title": "Even numbers",
+    "prompt": "Show the id and name of employees with an even id.",
+    "dataset": "staff",
+    "hints": [
+      "id % 2 is 0 for even numbers."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              2,
+              "Ben"
+            ],
+            [
+              4,
+              "Dev"
+            ],
+            [
+              6,
+              "Farid"
+            ],
+            [
+              8,
+              "Hugo"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              12,
+              "Jon"
+            ],
+            [
+              14,
+              "Leo"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, name FROM employees WHERE id % 2 = 0;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, name FROM employees WHERE id % 2 = 1;",
+        "why": "Finds odd ids"
+      },
+      {
+        "sql": "SELECT id, name FROM employees WHERE id / 2 = 0;",
+        "why": "Division isn't the remainder"
+      }
+    ]
+  },
+  {
+    "id": "s12-05",
+    "skill": 12,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      9
+    ],
+    "title": "Adding a missing value",
+    "prompt": "Show each employee's name and salary plus bonus, as total. Employees with no bonus will show NULL, which is correct for this one.",
+    "dataset": "staff",
+    "hints": [
+      "Just add the two columns."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "total"
+          ],
+          "rows": [
+            [
+              "Asha",
+              130000
+            ],
+            [
+              "Ben",
+              null
+            ],
+            [
+              "Chloe",
+              100000
+            ],
+            [
+              "Dev",
+              72000
+            ],
+            [
+              "Elena",
+              null
+            ],
+            [
+              "Farid",
+              58000
+            ],
+            [
+              "Grace",
+              null
+            ],
+            [
+              "Hugo",
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "total"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              90900
+            ],
+            [
+              "Jon",
+              null
+            ],
+            [
+              "Kim",
+              70300
+            ],
+            [
+              "Leo",
+              null
+            ],
+            [
+              "Mia",
+              55000
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, salary + bonus AS total FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, salary AS total FROM employees;",
+        "why": "Doesn't add the bonus"
+      },
+      {
+        "sql": "SELECT name, salary + bonus AS total FROM employees WHERE bonus IS NOT NULL;",
+        "why": "Removes people with no bonus"
+      }
+    ]
+  },
+  {
+    "id": "s12-06",
+    "skill": 12,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Lost decimals",
+    "prompt": "This should show each session's id and its length in hours, but it shows 0 for most sessions. Fix it.",
+    "dataset": "app",
+    "starterSql": "SELECT id, minutes / 60 AS hours\nFROM sessions;",
+    "hints": [
+      "Dividing two integers drops the decimals."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true,
+      "decimals": 2
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "hours"
+          ],
+          "rows": [
+            [
+              1,
+              0.16666666666666666
+            ],
+            [
+              2,
+              0.4166666666666667
+            ],
+            [
+              3,
+              0.08333333333333333
+            ],
+            [
+              4,
+              0.6666666666666666
+            ],
+            [
+              5,
+              0.25
+            ],
+            [
+              6,
+              0.3333333333333333
+            ],
+            [
+              7,
+              0.3333333333333333
+            ],
+            [
+              8,
+              0.5
+            ],
+            [
+              9,
+              0.2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "id",
+            "hours"
+          ],
+          "rows": [
+            [
+              11,
+              0.8333333333333334
+            ],
+            [
+              12,
+              0.8333333333333334
+            ],
+            [
+              13,
+              0.11666666666666667
+            ],
+            [
+              14,
+              0.55
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, minutes / 60.0 AS hours FROM sessions;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, minutes * 60.0 AS hours FROM sessions;",
+        "why": "Multiplies instead"
+      },
+      {
+        "sql": "SELECT id, minutes AS hours FROM sessions;",
+        "why": "Shows minutes"
+      }
+    ]
+  },
+  {
+    "id": "s12-07",
+    "skill": 12,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [],
+    "title": "Profit margin",
+    "prompt": "Show each product's name and its margin as a percentage of price, as margin_pct. Margin is (price - cost) divided by price, times 100.",
+    "dataset": "shop",
+    "hints": [
+      "Use 100.0, with brackets around the subtraction."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true,
+      "decimals": 2
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "margin_pct"
+          ],
+          "rows": [
+            [
+              "Notebook",
+              62.5
+            ],
+            [
+              "Pen",
+              66.66666666666667
+            ],
+            [
+              "Mug",
+              55.55555555555556
+            ],
+            [
+              "Kettle",
+              42.857142857142854
+            ],
+            [
+              "Lamp",
+              52
+            ],
+            [
+              "Rug",
+              50
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "margin_pct"
+          ],
+          "rows": [
+            [
+              "Stool",
+              37.5
+            ],
+            [
+              "Cup",
+              77.77777777777777
+            ],
+            [
+              "Ink",
+              52
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, (price - cost) * 100.0 / price AS margin_pct FROM products;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, (price - cost) / price AS margin_pct FROM products;",
+        "why": "Doesn't convert to a percentage"
+      },
+      {
+        "sql": "SELECT name, (price - cost) * 100.0 / cost AS margin_pct FROM products;",
+        "why": "Divides by cost, not price"
+      }
+    ]
+  },
+  {
+    "id": "s12-08",
+    "skill": 12,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      5,
+      6
+    ],
+    "title": "Worth discounting",
+    "prompt": "With 10% off, a product costs price times 0.9. Show the name and sale_price of products whose sale price is above 20.",
+    "dataset": "shop",
+    "hints": [
+      "Repeat the calculation in WHERE."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true,
+      "decimals": 2
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "sale_price"
+          ],
+          "rows": [
+            [
+              "Kettle",
+              31.5
+            ],
+            [
+              "Lamp",
+              22.5
+            ],
+            [
+              "Rug",
+              54
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); UPDATE products SET price = 22.0 WHERE id = 9;",
+        "expected": {
+          "columns": [
+            "name",
+            "sale_price"
+          ],
+          "rows": [
+            [
+              "Stool",
+              36
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, price * 0.9 AS sale_price FROM products WHERE price * 0.9 > 20;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, price * 0.9 AS sale_price FROM products WHERE price > 20;",
+        "why": "Filters on the original price"
+      },
+      {
+        "sql": "SELECT name, price AS sale_price FROM products WHERE price * 0.9 > 20;",
+        "why": "Doesn't discount the shown price"
+      }
+    ]
+  }
+]

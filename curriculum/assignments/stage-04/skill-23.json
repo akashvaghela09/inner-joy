@@ -1,0 +1,624 @@
+[
+  {
+    "id": "s23-01",
+    "skill": 23,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Alias order",
+    "prompt": "Show each title and price * 1.2 as with_tax, keeping only rows where that calculation is above 20. Repeat the calculation in WHERE. Replace the ___.",
+    "dataset": "bookshop",
+    "starterSql": "SELECT title, price * 1.2 AS with_tax\nFROM books\nWHERE ___ > 20;",
+    "hints": [
+      "WHERE runs before SELECT."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true,
+      "decimals": 2
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title",
+            "with_tax"
+          ],
+          "rows": [
+            [
+              "The Salt Road",
+              22.2
+            ],
+            [
+              "Quiet Engines",
+              28.799999999999997
+            ],
+            [
+              "Small Planets",
+              36
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023); UPDATE books SET price = 18.0 WHERE id = 10;",
+        "expected": {
+          "columns": [
+            "title",
+            "with_tax"
+          ],
+          "rows": [
+            [
+              "Copper Moon",
+              21.599999999999998
+            ],
+            [
+              "Sky Atlas",
+              30
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT title, price * 1.2 AS with_tax FROM books WHERE price * 1.2 > 20;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT title, price * 1.2 AS with_tax FROM books WHERE price > 20;",
+        "why": "Filters on the original price"
+      },
+      {
+        "sql": "SELECT title, price * 1.2 AS with_tax FROM books;",
+        "why": "Doesn't filter"
+      }
+    ]
+  },
+  {
+    "id": "s23-02",
+    "skill": 23,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      11
+    ],
+    "title": "Sorting by an alias",
+    "prompt": "Show each title and pages * 2 as minutes, longest first. ORDER BY runs late, so use the alias there.",
+    "dataset": "bookshop",
+    "hints": [
+      "ORDER BY minutes DESC."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title",
+            "minutes"
+          ],
+          "rows": [
+            [
+              "Small Planets",
+              1080
+            ],
+            [
+              "Quiet Engines",
+              824
+            ],
+            [
+              "The Salt Road",
+              640
+            ],
+            [
+              "River of Glass",
+              596
+            ],
+            [
+              "Paper Lanterns",
+              500
+            ],
+            [
+              "The Last Ferry",
+              420
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": {
+          "columns": [
+            "title",
+            "minutes"
+          ],
+          "rows": [
+            [
+              "Sky Atlas",
+              600
+            ],
+            [
+              "North Light",
+              360
+            ],
+            [
+              "Copper Moon",
+              200
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT title, pages * 2 AS minutes FROM books ORDER BY minutes DESC;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT title, pages * 2 AS minutes FROM books ORDER BY minutes;",
+        "why": "Sorts shortest first"
+      },
+      {
+        "sql": "SELECT title, pages * 2 AS minutes FROM books ORDER BY title DESC;",
+        "why": "Sorts by title"
+      }
+    ]
+  },
+  {
+    "id": "s23-03",
+    "skill": 23,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      21
+    ],
+    "title": "Rows, then groups",
+    "prompt": "Count each customer's shipped orders as shipped, keeping customers with at least 1. Use WHERE for shipped and HAVING for the count.",
+    "dataset": "shop",
+    "hints": [
+      "WHERE happens before grouping."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "customer_id",
+            "shipped"
+          ],
+          "rows": [
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "customer_id",
+            "shipped"
+          ],
+          "rows": [
+            [
+              7,
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT customer_id, COUNT(*) AS shipped FROM orders WHERE status = 'shipped' GROUP BY customer_id HAVING COUNT(*) >= 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT customer_id, COUNT(*) AS shipped FROM orders GROUP BY customer_id HAVING COUNT(*) >= 1;",
+        "why": "Counts every status"
+      },
+      {
+        "sql": "SELECT customer_id, COUNT(*) AS shipped FROM orders WHERE status <> 'shipped' GROUP BY customer_id;",
+        "why": "Counts the wrong orders"
+      }
+    ]
+  },
+  {
+    "id": "s23-04",
+    "skill": 23,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      11
+    ],
+    "title": "Top group",
+    "prompt": "Show the department_id with the highest total salary, and that total as total. Leave out employees with no department.",
+    "dataset": "staff",
+    "hints": [
+      "Filter, group, sort, then limit."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "department_id",
+            "total"
+          ],
+          "rows": [
+            [
+              1,
+              310000
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "department_id",
+            "total"
+          ],
+          "rows": [
+            [
+              5,
+              160000
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT department_id, SUM(salary) AS total FROM employees WHERE department_id IS NOT NULL GROUP BY department_id ORDER BY total DESC LIMIT 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT department_id, SUM(salary) AS total FROM employees GROUP BY department_id ORDER BY total LIMIT 1;",
+        "why": "Finds the lowest"
+      },
+      {
+        "sql": "SELECT department_id, MAX(salary) AS total FROM employees WHERE department_id IS NOT NULL GROUP BY department_id ORDER BY total DESC LIMIT 1;",
+        "why": "Uses the highest single salary"
+      }
+    ]
+  },
+  {
+    "id": "s23-05",
+    "skill": 23,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      11
+    ],
+    "title": "DISTINCT before LIMIT",
+    "prompt": "Show the top 2 different product categories in reverse alphabetical order.",
+    "dataset": "shop",
+    "hints": [
+      "DISTINCT happens before ORDER BY and LIMIT."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "category"
+          ],
+          "rows": [
+            [
+              "Stationery"
+            ],
+            [
+              "Kitchen"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO products VALUES (10, 'Zip', 'Zoo', 1.0, 1.0);",
+        "expected": {
+          "columns": [
+            "category"
+          ],
+          "rows": [
+            [
+              "Zoo"
+            ],
+            [
+              "Stationery"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT DISTINCT category FROM products ORDER BY category DESC LIMIT 2;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT category FROM products ORDER BY category DESC LIMIT 2;",
+        "why": "Duplicates use up the limit"
+      },
+      {
+        "sql": "SELECT DISTINCT category FROM products ORDER BY category LIMIT 2;",
+        "why": "Sorts A to Z"
+      }
+    ]
+  },
+  {
+    "id": "s23-06",
+    "skill": 23,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [
+      4
+    ],
+    "title": "Fix the order of clauses",
+    "prompt": "This should show the average grade per course as average for courses averaging over 70, highest first, but the clauses are out of order. Fix it.",
+    "dataset": "school",
+    "starterSql": "SELECT course_id, AVG(grade) AS average\nFROM enrolments\nORDER BY average DESC\nHAVING AVG(grade) > 70\nGROUP BY course_id;",
+    "hints": [
+      "The written order is SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "course_id",
+            "average"
+          ],
+          "rows": [
+            [
+              3,
+              82
+            ],
+            [
+              1,
+              74.75
+            ],
+            [
+              2,
+              74
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring'); UPDATE enrolments SET grade = 50 WHERE id = 14;",
+        "expected": {
+          "columns": [
+            "course_id",
+            "average"
+          ],
+          "rows": []
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT course_id, AVG(grade) AS average FROM enrolments GROUP BY course_id HAVING AVG(grade) > 70 ORDER BY average DESC;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT course_id, AVG(grade) AS average FROM enrolments GROUP BY course_id ORDER BY average DESC;",
+        "why": "Removes the filter"
+      },
+      {
+        "sql": "SELECT course_id, AVG(grade) AS average FROM enrolments GROUP BY course_id HAVING AVG(grade) > 70 ORDER BY average;",
+        "why": "Sorts lowest first"
+      }
+    ]
+  },
+  {
+    "id": "s23-07",
+    "skill": 23,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      11
+    ],
+    "title": "Aggregate in ORDER BY",
+    "prompt": "Show each city and its number of customers as customers. Sort by the count from highest to lowest, then by city.",
+    "dataset": "shop",
+    "hints": [
+      "Sort by count, then break ties."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "city",
+            "customers"
+          ],
+          "rows": [
+            [
+              "Pune",
+              2
+            ],
+            [
+              "Rome",
+              2
+            ],
+            [
+              "Tokyo",
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "city",
+            "customers"
+          ],
+          "rows": [
+            [
+              "Oslo",
+              2
+            ],
+            [
+              "Lima",
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT city, COUNT(*) AS customers FROM customers GROUP BY city ORDER BY customers DESC, city;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT city, COUNT(*) AS customers FROM customers GROUP BY city ORDER BY city;",
+        "why": "Sorts by city only"
+      },
+      {
+        "sql": "SELECT city, COUNT(*) AS customers FROM customers GROUP BY city ORDER BY customers, city;",
+        "why": "Sorts lowest first"
+      }
+    ]
+  },
+  {
+    "id": "s23-08",
+    "skill": 23,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      21
+    ],
+    "title": "All the steps",
+    "prompt": "Considering sessions of at least 10 minutes, show each user_id with a total above 30 minutes as total. Sort from highest to lowest, and return the top 2.",
+    "dataset": "app",
+    "hints": [
+      "Use all of WHERE, GROUP BY, HAVING, ORDER BY, and LIMIT."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "user_id",
+            "total"
+          ],
+          "rows": [
+            [
+              2,
+              55
+            ],
+            [
+              4,
+              42
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android'); DELETE FROM sessions WHERE user_id = 7; INSERT INTO sessions VALUES (15, 9, '2024-03-02', 8, 'web'), (16, 9, '2024-03-03', 25, 'web');",
+        "expected": {
+          "columns": [
+            "user_id",
+            "total"
+          ],
+          "rows": [
+            [
+              8,
+              33
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT user_id, SUM(minutes) AS total FROM sessions WHERE minutes >= 10 GROUP BY user_id HAVING SUM(minutes) > 30 ORDER BY total DESC LIMIT 2;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT user_id, SUM(minutes) AS total FROM sessions GROUP BY user_id HAVING SUM(minutes) > 30 ORDER BY total DESC LIMIT 2;",
+        "why": "Doesn't filter short sessions"
+      },
+      {
+        "sql": "SELECT user_id, SUM(minutes) AS total FROM sessions WHERE minutes >= 10 GROUP BY user_id ORDER BY total DESC LIMIT 2;",
+        "why": "Doesn't filter totals"
+      }
+    ]
+  }
+]

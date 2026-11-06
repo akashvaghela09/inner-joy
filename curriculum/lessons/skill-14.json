@@ -1,0 +1,15 @@
+{
+  "skill": 14,
+  "summary": "String functions clean up and reshape text.",
+  "points": [
+    "UPPER and LOWER change capital letters, and LENGTH counts characters.",
+    "SUBSTR(text, start, length) takes part of a string, counting from 1. Leave out the length to take the rest.",
+    "|| joins text together. Don't use + for this: it treats text as numbers.",
+    "Joining anything to NULL gives NULL."
+  ],
+  "example": {
+    "dataset": "contacts",
+    "sql": "SELECT full_name,\n  UPPER(SUBSTR(full_name, 1, 1)) || LOWER(SUBSTR(full_name, 2)) AS tidied\nFROM contacts;",
+    "explanation": "This makes the first letter a capital and every other letter lowercase."
+  }
+}
