@@ -42,6 +42,8 @@ For example, arithmetic (skill 12) returns in `ROUND` (13), dates (16), `GROUP B
 
 ## Stages
 
+Learners see stages as **chapters** in the app. The curriculum data keeps the name stage.
+
 | Stage | Topic | Skills | Per skill | Skill assignments | Review | Checkpoints | Total |
 |---:|---|---:|---:|---:|---:|---:|---:|
 | 1 | Database basics | 4 | 5 | 20 | 5 | 3 | 28 |

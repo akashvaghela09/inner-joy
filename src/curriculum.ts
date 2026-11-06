@@ -56,7 +56,7 @@ export const stages: Stage[] = skillMap.stages.map((stage) => {
   }));
   const groups = [
     ...skills,
-    specialGroup(stage, "review", "Stage review", stage.reviewCount),
+    specialGroup(stage, "review", "Chapter review", stage.reviewCount),
     specialGroup(stage, "checkpoint", "Checkpoints", stage.checkpoints.sourceProblems.length + stage.checkpoints.originalCount),
   ];
   return {
@@ -123,7 +123,7 @@ const STEP_LABELS: Record<string, string> = {
 };
 
 export function typeLabel(assignment: Assignment): string {
-  if (assignment.kind === "review") return "Stage review";
+  if (assignment.kind === "review") return "Chapter review";
   if (assignment.kind === "checkpoint") return "Checkpoint";
   return STEP_LABELS[assignment.stepType!] ?? "";
 }

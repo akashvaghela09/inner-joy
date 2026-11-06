@@ -3,7 +3,7 @@ import { canSaveProgress, useProgress } from "../storage";
 import ui from "../ui.module.css";
 import { Mark } from "./Icons";
 
-export type Section = "curriculum" | "playground";
+export type Section = "chapters" | "playground";
 
 export function Header({ section }: { section: Section }) {
   const { completed } = useProgress();
@@ -29,7 +29,7 @@ export function Header({ section }: { section: Section }) {
           Inner Joy
         </a>
         <nav className={ui.headerNav} aria-label="Main">
-          {link("curriculum", "#/", "Curriculum")}
+          {link("chapters", "#/", "Chapters")}
           {link("playground", "#/playground", "Playground")}
         </nav>
         <span className={ui.headerCount} aria-label={`${done} of ${total} required assignments complete`}>

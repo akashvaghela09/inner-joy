@@ -121,7 +121,7 @@ export function AssignmentView({ assignment }: { assignment: Assignment }) {
     <>
       <div className={wb.topBar}>
         <nav className={wb.crumbs} aria-label="Breadcrumb">
-          <a href={`#/stage/${stage.id}`}>Stage {stage.id}</a>
+          <a href={`#/chapter/${stage.id}`}>Chapter {stage.id}</a>
           <span className={wb.crumbSeparator} aria-hidden="true">
             /
           </span>

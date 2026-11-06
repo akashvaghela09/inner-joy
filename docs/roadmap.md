@@ -47,7 +47,7 @@ A small set of assignments running in a real interface, used to judge the struct
 - [x] Build the sidebar, assignment screen, data panel, hints, and test results
 - [x] Save progress and drafts in the browser
 - [x] Add light and dark themes and a phone layout
-- [x] Redesign the interface after a UX review: landing page, split workbench, tabs, and progress model
+- [x] Redesign the interface after a UX review: chapter home page, chapter screens, split workbench, tabs, and progress model
 - [ ] Review the slice and agree on changes
 
 **Done when:** the assignment structure and interface are approved.

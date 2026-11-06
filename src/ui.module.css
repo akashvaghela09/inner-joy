@@ -312,6 +312,12 @@
   outline: none;
 }
 
+/* Focus shows on the header line above, not as a ring around the editor. */
+.editor:focus,
+.editor:focus-visible {
+  outline: none;
+}
+
 /* Text */
 
 .errorBox {
