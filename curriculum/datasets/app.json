@@ -1,0 +1,7 @@
+{
+  "id": "app",
+  "title": "App Activity",
+  "story": "A mobile app stores its users and one row per session. A user's referrer_id points to the user who invited them.",
+  "schemaSql": "CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT NOT NULL, referrer_id INTEGER, signup_date TEXT NOT NULL); CREATE TABLE sessions (id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, session_date TEXT NOT NULL, minutes INTEGER NOT NULL, device TEXT NOT NULL);",
+  "seedSql": "INSERT INTO users VALUES (1, 'nova', NULL, '2024-01-01'), (2, 'orbit', 1, '2024-01-03'), (3, 'pixel', 1, '2024-01-03'), (4, 'quark', 2, '2024-01-10'), (5, 'raven', NULL, '2024-01-12'); INSERT INTO sessions VALUES (1, 1, '2024-01-01', 10, 'ios'), (2, 1, '2024-01-02', 25, 'ios'), (3, 1, '2024-01-03', 5, 'web'), (4, 2, '2024-01-03', 40, 'android'), (5, 2, '2024-01-05', 15, 'android'), (6, 3, '2024-01-04', 20, 'web'), (7, 3, '2024-01-05', 20, 'web'), (8, 4, '2024-01-10', 30, 'ios'), (9, 4, '2024-01-10', 12, 'web');"
+}

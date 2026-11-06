@@ -1,0 +1,400 @@
+[
+  {
+    "id": "st01-r01",
+    "kind": "review",
+    "stage": 1,
+    "skills": [
+      1
+    ],
+    "recalls": [],
+    "title": "Course list",
+    "prompt": "Show every column and row of the courses table.",
+    "dataset": "school",
+    "hints": [
+      "Use the star."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "title",
+            "subject"
+          ],
+          "rows": [
+            [
+              1,
+              "Algebra",
+              "Maths"
+            ],
+            [
+              2,
+              "Geometry",
+              "Maths"
+            ],
+            [
+              3,
+              "Biology",
+              "Science"
+            ],
+            [
+              4,
+              "Poetry",
+              "English"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "id",
+            "title",
+            "subject"
+          ],
+          "rows": [
+            [
+              5,
+              "Chemistry",
+              "Science"
+            ],
+            [
+              6,
+              "Drama",
+              "Arts"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT * FROM courses;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT title FROM courses;",
+        "why": "Shows one column"
+      },
+      {
+        "sql": "SELECT * FROM students;",
+        "why": "Reads the wrong table"
+      }
+    ]
+  },
+  {
+    "id": "st01-r02",
+    "kind": "review",
+    "stage": 1,
+    "skills": [
+      1
+    ],
+    "recalls": [],
+    "title": "How many readings?",
+    "prompt": "Show how many rows the readings table has, in a column named total_readings.",
+    "dataset": "weather",
+    "hints": [
+      "Count the rows and name the column."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "total_readings"
+          ],
+          "rows": [
+            [
+              8
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "total_readings"
+          ],
+          "rows": [
+            [
+              6
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT COUNT(*) AS total_readings FROM readings;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT COUNT(*) FROM readings;",
+        "why": "Doesn't name the column"
+      },
+      {
+        "sql": "SELECT * FROM readings;",
+        "why": "Lists rows instead of counting"
+      }
+    ]
+  },
+  {
+    "id": "st01-r03",
+    "kind": "review",
+    "stage": 1,
+    "skills": [
+      1,
+      2
+    ],
+    "recalls": [],
+    "title": "Types of cost",
+    "prompt": "Show each product's name, and the type of its cost as cost_type.",
+    "dataset": "shop",
+    "hints": [
+      "One function reveals a value's type."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "cost_type"
+          ],
+          "rows": [
+            [
+              "Notebook",
+              "real"
+            ],
+            [
+              "Pen",
+              "real"
+            ],
+            [
+              "Mug",
+              "real"
+            ],
+            [
+              "Kettle",
+              "real"
+            ],
+            [
+              "Lamp",
+              "real"
+            ],
+            [
+              "Rug",
+              "real"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "cost_type"
+          ],
+          "rows": [
+            [
+              "Stool",
+              "real"
+            ],
+            [
+              "Cup",
+              "real"
+            ],
+            [
+              "Ink",
+              "real"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, typeof(cost) AS cost_type FROM products;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, cost AS cost_type FROM products;",
+        "why": "Shows the cost, not its type"
+      },
+      {
+        "sql": "SELECT name, typeof(name) AS cost_type FROM products;",
+        "why": "Checks the wrong column"
+      }
+    ]
+  },
+  {
+    "id": "st01-r04",
+    "kind": "review",
+    "stage": 1,
+    "skills": [
+      3
+    ],
+    "recalls": [],
+    "title": "Follow the key",
+    "prompt": "Order 4 belongs to customer 3. Show the name and city of the customer with that id.",
+    "dataset": "shop",
+    "hints": [
+      "Look the id up in customers."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "city"
+          ],
+          "rows": [
+            [
+              "Hana",
+              "Tokyo"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "UPDATE customers SET name = 'Haru' WHERE id = 3;",
+        "expected": {
+          "columns": [
+            "name",
+            "city"
+          ],
+          "rows": [
+            [
+              "Haru",
+              "Tokyo"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, city FROM customers WHERE id = 3;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, city FROM customers WHERE id = 4;",
+        "why": "Uses the order's id"
+      },
+      {
+        "sql": "SELECT name, city FROM customers;",
+        "why": "Shows everyone"
+      }
+    ]
+  },
+  {
+    "id": "st01-r05",
+    "kind": "review",
+    "stage": 1,
+    "skills": [
+      4
+    ],
+    "recalls": [],
+    "title": "Repair the query",
+    "prompt": "This should show the titles of all courses, but it fails. Fix it.",
+    "dataset": "school",
+    "starterSql": "SELECT titel FROM courses;",
+    "hints": [
+      "Read the error message carefully."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title"
+          ],
+          "rows": [
+            [
+              "Algebra"
+            ],
+            [
+              "Geometry"
+            ],
+            [
+              "Biology"
+            ],
+            [
+              "Poetry"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "title"
+          ],
+          "rows": [
+            [
+              "Chemistry"
+            ],
+            [
+              "Drama"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT title FROM courses;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT * FROM courses;",
+        "why": "Shows too many columns"
+      },
+      {
+        "sql": "SELECT subject FROM courses;",
+        "why": "Shows the wrong column"
+      }
+    ]
+  }
+]

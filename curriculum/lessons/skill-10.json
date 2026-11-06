@@ -1,0 +1,15 @@
+{
+  "skill": 10,
+  "summary": "DISTINCT removes duplicate rows from a result.",
+  "points": [
+    "SELECT DISTINCT city returns each city once.",
+    "With several columns, it removes rows where all the listed columns repeat.",
+    "NULL counts as one value, so it can appear once.",
+    "Use it when duplicates are a real problem, rather than to hide a mistake elsewhere."
+  ],
+  "example": {
+    "dataset": "shop",
+    "sql": "SELECT DISTINCT city\nFROM customers;",
+    "explanation": "Five customers live in three cities, so the result has three rows."
+  }
+}

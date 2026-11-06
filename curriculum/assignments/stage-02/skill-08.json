@@ -1,0 +1,612 @@
+[
+  {
+    "id": "s08-01",
+    "skill": 8,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Pick from a list",
+    "prompt": "Show the title and genre of books in History or Mystery. Replace the ___ with the list.",
+    "dataset": "bookshop",
+    "starterSql": "SELECT title, genre\nFROM books\nWHERE genre IN (___);",
+    "hints": [
+      "List text values in single quotes, separated by commas."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title",
+            "genre"
+          ],
+          "rows": [
+            [
+              "The Salt Road",
+              "History"
+            ],
+            [
+              "The Last Ferry",
+              "Mystery"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": {
+          "columns": [
+            "title",
+            "genre"
+          ],
+          "rows": []
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT title, genre FROM books WHERE genre IN ('History', 'Mystery');"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT title, genre FROM books WHERE genre IN ('History');",
+        "why": "Leaves out Mystery"
+      },
+      {
+        "sql": "SELECT title, genre FROM books WHERE genre NOT IN ('History', 'Mystery');",
+        "why": "Keeps every other genre"
+      }
+    ]
+  },
+  {
+    "id": "s08-02",
+    "skill": 8,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [],
+    "title": "A price range",
+    "prompt": "Show the title and price of books costing from 12 to 18.5, including both of those prices.",
+    "dataset": "bookshop",
+    "hints": [
+      "BETWEEN includes both ends."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title",
+            "price"
+          ],
+          "rows": [
+            [
+              "The Salt Road",
+              18.5
+            ],
+            [
+              "Paper Lanterns",
+              12
+            ],
+            [
+              "River of Glass",
+              15.5
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": {
+          "columns": [
+            "title",
+            "price"
+          ],
+          "rows": []
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT title, price FROM books WHERE price BETWEEN 12 AND 18.5;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT title, price FROM books WHERE price > 12 AND price < 18.5;",
+        "why": "Leaves out the exact limits"
+      },
+      {
+        "sql": "SELECT title, price FROM books WHERE price BETWEEN 18.5 AND 12;",
+        "why": "The lower value must come first"
+      }
+    ]
+  },
+  {
+    "id": "s08-03",
+    "skill": 8,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [],
+    "title": "Not in the list",
+    "prompt": "Show the name of employees whose id isn't 1, 2, or 3.",
+    "dataset": "staff",
+    "hints": [
+      "Use NOT IN."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Dev"
+            ],
+            [
+              "Elena"
+            ],
+            [
+              "Farid"
+            ],
+            [
+              "Grace"
+            ],
+            [
+              "Hugo"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "UPDATE employees SET id = 21 WHERE id = 1;",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Dev"
+            ],
+            [
+              "Elena"
+            ],
+            [
+              "Farid"
+            ],
+            [
+              "Grace"
+            ],
+            [
+              "Hugo"
+            ],
+            [
+              "Asha"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM employees WHERE id NOT IN (1, 2, 3);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM employees WHERE id IN (1, 2, 3);",
+        "why": "Keeps those three instead"
+      },
+      {
+        "sql": "SELECT name FROM employees WHERE id NOT IN (1, 2);",
+        "why": "Leaves out id 3 from the list"
+      }
+    ]
+  },
+  {
+    "id": "s08-04",
+    "skill": 8,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      2
+    ],
+    "title": "A week of dates",
+    "prompt": "Show the city and reading_date of readings from 2024-03-02 to 2024-03-03, inclusive.",
+    "dataset": "weather",
+    "hints": [
+      "BETWEEN works on dates written as YYYY-MM-DD."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "city",
+            "reading_date"
+          ],
+          "rows": [
+            [
+              "Oslo",
+              "2024-03-02"
+            ],
+            [
+              "Oslo",
+              "2024-03-03"
+            ],
+            [
+              "Lima",
+              "2024-03-02"
+            ],
+            [
+              "Lima",
+              "2024-03-03"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "UPDATE readings SET reading_date = '2024-03-03' WHERE id = 1; UPDATE readings SET reading_date = '2024-03-09' WHERE id = 2;",
+        "expected": {
+          "columns": [
+            "city",
+            "reading_date"
+          ],
+          "rows": [
+            [
+              "Oslo",
+              "2024-03-03"
+            ],
+            [
+              "Oslo",
+              "2024-03-03"
+            ],
+            [
+              "Lima",
+              "2024-03-02"
+            ],
+            [
+              "Lima",
+              "2024-03-03"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT city, reading_date FROM readings WHERE reading_date BETWEEN '2024-03-02' AND '2024-03-03';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT city, reading_date FROM readings WHERE reading_date > '2024-03-02' AND reading_date < '2024-03-03';",
+        "why": "Leaves out both end dates"
+      },
+      {
+        "sql": "SELECT city, reading_date FROM readings WHERE reading_date = '2024-03-02';",
+        "why": "Uses only one date"
+      }
+    ]
+  },
+  {
+    "id": "s08-05",
+    "skill": 8,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      7
+    ],
+    "title": "Outside the range",
+    "prompt": "Show the name and price of products that aren't priced from 4 to 25. Products priced exactly 4 or 25 should be left out.",
+    "dataset": "shop",
+    "hints": [
+      "NOT BETWEEN excludes both ends."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "price"
+          ],
+          "rows": [
+            [
+              "Pen",
+              1.5
+            ],
+            [
+              "Kettle",
+              35
+            ],
+            [
+              "Rug",
+              60
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "price"
+          ],
+          "rows": [
+            [
+              "Stool",
+              40
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, price FROM products WHERE price NOT BETWEEN 4 AND 25;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, price FROM products WHERE price BETWEEN 4 AND 25;",
+        "why": "Keeps the middle instead"
+      },
+      {
+        "sql": "SELECT name, price FROM products WHERE price <= 4 OR price >= 25;",
+        "why": "Keeps the exact limits"
+      }
+    ]
+  },
+  {
+    "id": "s08-06",
+    "skill": 8,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the list",
+    "prompt": "This should show customers from Pune or Tokyo, but it fails. Fix it.",
+    "dataset": "shop",
+    "starterSql": "SELECT name\nFROM customers\nWHERE city IN 'Pune' 'Tokyo';",
+    "hints": [
+      "A list needs brackets and a comma between values."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Priya"
+            ],
+            [
+              "Hana"
+            ],
+            [
+              "Noor"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": []
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM customers WHERE city IN ('Pune', 'Tokyo');"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM customers WHERE city IN ('Pune');",
+        "why": "Leaves out Tokyo"
+      },
+      {
+        "sql": "SELECT name FROM customers WHERE city = 'Pune';",
+        "why": "Leaves out Tokyo"
+      }
+    ]
+  },
+  {
+    "id": "s08-07",
+    "skill": 8,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      7
+    ],
+    "title": "Hired in a year, paid in a range",
+    "prompt": "Show the name of employees hired during 2021 who earn from 48000 to 95000, inclusive.",
+    "dataset": "staff",
+    "hints": [
+      "Use two BETWEENs joined with AND."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Chloe"
+            ],
+            [
+              "Grace"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET hire_date = '2021-12-31', salary = 48000 WHERE id = 14;",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Leo"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM employees WHERE hire_date BETWEEN '2021-01-01' AND '2021-12-31' AND salary BETWEEN 48000 AND 95000;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM employees WHERE hire_date BETWEEN '2021-01-01' AND '2021-12-31';",
+        "why": "Ignores salary"
+      },
+      {
+        "sql": "SELECT name FROM employees WHERE hire_date BETWEEN '2021-01-01' AND '2021-12-31' OR salary BETWEEN 48000 AND 95000;",
+        "why": "OR accepts one condition"
+      }
+    ]
+  },
+  {
+    "id": "s08-08",
+    "skill": 8,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [],
+    "title": "A shortlist",
+    "prompt": "Show the student_id and grade of enrolments in course 1 or 3 with a grade from 80 to 100.",
+    "dataset": "school",
+    "hints": [
+      "Combine IN and BETWEEN."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "student_id",
+            "grade"
+          ],
+          "rows": [
+            [
+              1,
+              82
+            ],
+            [
+              1,
+              91
+            ],
+            [
+              4,
+              91
+            ],
+            [
+              4,
+              88
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring'); UPDATE enrolments SET grade = 80, course_id = 1 WHERE id = 11;",
+        "expected": {
+          "columns": [
+            "student_id",
+            "grade"
+          ],
+          "rows": [
+            [
+              6,
+              80
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT student_id, grade FROM enrolments WHERE course_id IN (1, 3) AND grade BETWEEN 80 AND 100;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT student_id, grade FROM enrolments WHERE course_id IN (1, 3);",
+        "why": "Ignores the grade"
+      },
+      {
+        "sql": "SELECT student_id, grade FROM enrolments WHERE course_id IN (1, 3) AND grade > 80;",
+        "why": "Leaves out a grade of exactly 80"
+      }
+    ]
+  }
+]

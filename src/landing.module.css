@@ -224,6 +224,50 @@
   font-size: 13px;
 }
 
+.lessonSummary {
+  margin: 12px 0;
+  font-size: 16px;
+}
+
+.lessonPoints {
+  padding-left: 20px;
+  list-style: disc;
+}
+
+.lessonPoints li {
+  padding: 4px 0;
+}
+
+.lessonHeading {
+  margin-top: 32px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.lessonExplain {
+  margin: 12px 0;
+}
+
+.lessonCode {
+  margin: 0;
+  padding: 12px 16px;
+  overflow-x: auto;
+  background: var(--canvas-subtle);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  white-space: pre-wrap;
+}
+
+.lessonResult {
+  margin: 12px 0;
+}
+
+.lessonAction {
+  margin-top: 24px;
+}
+
 .emptyNote {
   padding: 8px;
   color: var(--text-muted);

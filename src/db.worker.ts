@@ -1,6 +1,6 @@
 import initSqlJs, { type Database, type SqlJsStatic } from "sql.js";
 import wasmUrl from "sql.js/dist/sql-wasm.wasm?url";
-import { createCaseDb, runCase, runStatements, type Assignment, type Dataset } from "../curriculum/tools/grade";
+import { createCaseDb, registerRegexp, runCase, runStatements, type Assignment, type Dataset } from "../curriculum/tools/grade";
 import type {
   CaseReport,
   CheckOutcome,
@@ -16,6 +16,7 @@ const sqlPromise = initSqlJs({ locateFile: () => wasmUrl });
 
 const playgroundPromise = sqlPromise.then((SQL) => {
   const db = new SQL.Database();
+  registerRegexp(db);
   db.run(SEED_SQL);
   return db;
 });
@@ -89,6 +90,14 @@ async function handle(request: WorkerRequest): Promise<WorkerOutcome> {
       return checkAssignment(SQL, request.dataset, request.assignment, request.sql);
     case "describe":
       return describe(SQL, request.dataset);
+    case "example": {
+      const db = createCaseDb(SQL, request.dataset);
+      try {
+        return run(db, request.sql);
+      } finally {
+        db.close();
+      }
+    }
   }
 }
 

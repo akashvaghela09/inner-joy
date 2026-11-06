@@ -1,0 +1,293 @@
+[
+  {
+    "id": "st01-c01",
+    "kind": "checkpoint",
+    "stage": 1,
+    "skills": [
+      1,
+      2
+    ],
+    "recalls": [],
+    "title": "Meet the data",
+    "prompt": "Show every column and row of the users table, then notice which users have no referrer.",
+    "dataset": "app",
+    "hints": [
+      "This is a simple full-table query."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "username",
+            "referrer_id",
+            "signup_date"
+          ],
+          "rows": [
+            [
+              1,
+              "nova",
+              null,
+              "2024-01-01"
+            ],
+            [
+              2,
+              "orbit",
+              1,
+              "2024-01-03"
+            ],
+            [
+              3,
+              "pixel",
+              1,
+              "2024-01-03"
+            ],
+            [
+              4,
+              "quark",
+              2,
+              "2024-01-10"
+            ],
+            [
+              5,
+              "raven",
+              null,
+              "2024-01-12"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "id",
+            "username",
+            "referrer_id",
+            "signup_date"
+          ],
+          "rows": [
+            [
+              7,
+              "sable",
+              null,
+              "2024-02-27"
+            ],
+            [
+              8,
+              "tulip",
+              7,
+              "2024-02-28"
+            ],
+            [
+              9,
+              "umber",
+              7,
+              "2024-03-01"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT * FROM users;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT username FROM users;",
+        "why": "Shows one column"
+      },
+      {
+        "sql": "SELECT * FROM sessions;",
+        "why": "Reads the wrong table"
+      }
+    ]
+  },
+  {
+    "id": "st01-c02",
+    "kind": "checkpoint",
+    "stage": 1,
+    "skills": [
+      3
+    ],
+    "recalls": [],
+    "title": "Who invited them?",
+    "prompt": "User 4 was invited by referrer_id 2. Show the username of the user with id 2.",
+    "dataset": "app",
+    "hints": [
+      "referrer_id points to another user's id."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "username"
+          ],
+          "rows": [
+            [
+              "orbit"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "UPDATE users SET username = 'orca' WHERE id = 2;",
+        "expected": {
+          "columns": [
+            "username"
+          ],
+          "rows": [
+            [
+              "orca"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT username FROM users WHERE id = 2;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT username FROM users WHERE id = 4;",
+        "why": "Looks up the invited user"
+      },
+      {
+        "sql": "SELECT username FROM users WHERE referrer_id = 2;",
+        "why": "Finds who user 2 invited"
+      }
+    ]
+  },
+  {
+    "id": "st01-c03",
+    "kind": "checkpoint",
+    "stage": 1,
+    "skills": [
+      2,
+      4
+    ],
+    "recalls": [],
+    "title": "Find and fix",
+    "prompt": "This should show each session's device and the type of its minutes as minutes_type, but it has two mistakes. Fix them.",
+    "dataset": "app",
+    "starterSql": "SELECT device typeof(minute) AS minutes_type\nFROM sessions;",
+    "hints": [
+      "Fix the error first, then check that every column appears."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "device",
+            "minutes_type"
+          ],
+          "rows": [
+            [
+              "ios",
+              "integer"
+            ],
+            [
+              "ios",
+              "integer"
+            ],
+            [
+              "web",
+              "integer"
+            ],
+            [
+              "android",
+              "integer"
+            ],
+            [
+              "android",
+              "integer"
+            ],
+            [
+              "web",
+              "integer"
+            ],
+            [
+              "web",
+              "integer"
+            ],
+            [
+              "ios",
+              "integer"
+            ],
+            [
+              "web",
+              "integer"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "device",
+            "minutes_type"
+          ],
+          "rows": [
+            [
+              "web",
+              "integer"
+            ],
+            [
+              "web",
+              "integer"
+            ],
+            [
+              "ios",
+              "integer"
+            ],
+            [
+              "android",
+              "integer"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT device, typeof(minutes) AS minutes_type FROM sessions;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT device FROM sessions;",
+        "why": "Leaves out the type"
+      },
+      {
+        "sql": "SELECT device, minutes AS minutes_type FROM sessions;",
+        "why": "Shows the minutes, not their type"
+      }
+    ]
+  }
+]

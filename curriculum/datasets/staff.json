@@ -1,0 +1,7 @@
+{
+  "id": "staff",
+  "title": "Staff Directory",
+  "story": "A small company keeps its departments and employees in two connected tables. An employee's manager_id points to another employee.",
+  "schemaSql": "CREATE TABLE departments (id INTEGER PRIMARY KEY, name TEXT NOT NULL); CREATE TABLE employees (id INTEGER PRIMARY KEY, name TEXT NOT NULL, department_id INTEGER, manager_id INTEGER, salary INTEGER NOT NULL, hire_date TEXT NOT NULL, bonus INTEGER, email TEXT);",
+  "seedSql": "INSERT INTO departments VALUES (1, 'Engineering'), (2, 'Sales'), (3, 'Support'), (4, 'Legal'); INSERT INTO employees VALUES (1, 'Asha', 1, NULL, 120000, '2018-03-15', 10000, 'asha@acme.test'), (2, 'Ben', 1, 1, 95000, '2019-07-01', NULL, 'ben@acme.test'), (3, 'Chloe', 1, 1, 95000, '2021-01-20', 5000, NULL), (4, 'Dev', 2, 1, 70000, '2020-11-09', 2000, 'dev@acme.test'), (5, 'Elena', 2, 4, 62000, '2022-05-30', NULL, 'elena@acme.test'), (6, 'Farid', 2, 4, 58000, '2023-02-14', 0, 'farid@acme.test'), (7, 'Grace', 3, 1, 48000, '2021-09-01', NULL, NULL), (8, 'Hugo', NULL, 99, 41000, '2024-01-10', NULL, 'hugo@acme.test');"
+}

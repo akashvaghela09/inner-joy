@@ -1,0 +1,689 @@
+[
+  {
+    "id": "s11-01",
+    "skill": 11,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Cheapest first",
+    "prompt": "Show the title and price of every book, from cheapest to most expensive. Replace the ___.",
+    "dataset": "bookshop",
+    "starterSql": "SELECT title, price\nFROM books\nORDER BY ___;",
+    "hints": [
+      "Sort by the price column."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title",
+            "price"
+          ],
+          "rows": [
+            [
+              "The Last Ferry",
+              9
+            ],
+            [
+              "Paper Lanterns",
+              12
+            ],
+            [
+              "River of Glass",
+              15.5
+            ],
+            [
+              "The Salt Road",
+              18.5
+            ],
+            [
+              "Quiet Engines",
+              24
+            ],
+            [
+              "Small Planets",
+              30
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": {
+          "columns": [
+            "title",
+            "price"
+          ],
+          "rows": [
+            [
+              "North Light",
+              7.5
+            ],
+            [
+              "Copper Moon",
+              20
+            ],
+            [
+              "Sky Atlas",
+              25
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT title, price FROM books ORDER BY price;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT title, price FROM books ORDER BY price DESC;",
+        "why": "Sorts the wrong way"
+      },
+      {
+        "sql": "SELECT title, price FROM books ORDER BY title;",
+        "why": "Sorts by title"
+      }
+    ]
+  },
+  {
+    "id": "s11-02",
+    "skill": 11,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [],
+    "title": "Highest paid first",
+    "prompt": "Show each employee's name and salary, highest salary first. Break ties alphabetically by name.",
+    "dataset": "staff",
+    "hints": [
+      "Use salary DESC, then name."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "salary"
+          ],
+          "rows": [
+            [
+              "Asha",
+              120000
+            ],
+            [
+              "Ben",
+              95000
+            ],
+            [
+              "Chloe",
+              95000
+            ],
+            [
+              "Dev",
+              70000
+            ],
+            [
+              "Elena",
+              62000
+            ],
+            [
+              "Farid",
+              58000
+            ],
+            [
+              "Grace",
+              48000
+            ],
+            [
+              "Hugo",
+              41000
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "salary"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              90000
+            ],
+            [
+              "Jon",
+              70000
+            ],
+            [
+              "Kim",
+              70000
+            ],
+            [
+              "Mia",
+              55000
+            ],
+            [
+              "Leo",
+              30000
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, salary FROM employees ORDER BY salary DESC, name;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, salary FROM employees ORDER BY salary, name;",
+        "why": "Sorts lowest first"
+      },
+      {
+        "sql": "SELECT name, salary FROM employees ORDER BY name, salary DESC;",
+        "why": "Sorts by name first"
+      }
+    ]
+  },
+  {
+    "id": "s11-03",
+    "skill": 11,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [],
+    "title": "Top three",
+    "prompt": "Show the title and pages of the three longest books, longest first.",
+    "dataset": "bookshop",
+    "hints": [
+      "Sort, then LIMIT."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title",
+            "pages"
+          ],
+          "rows": [
+            [
+              "Small Planets",
+              540
+            ],
+            [
+              "Quiet Engines",
+              412
+            ],
+            [
+              "The Salt Road",
+              320
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": {
+          "columns": [
+            "title",
+            "pages"
+          ],
+          "rows": [
+            [
+              "Sky Atlas",
+              300
+            ],
+            [
+              "North Light",
+              180
+            ],
+            [
+              "Copper Moon",
+              100
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT title, pages FROM books ORDER BY pages DESC LIMIT 3;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT title, pages FROM books LIMIT 3;",
+        "why": "Doesn't sort first"
+      },
+      {
+        "sql": "SELECT title, pages FROM books ORDER BY pages LIMIT 3;",
+        "why": "Finds the shortest"
+      }
+    ]
+  },
+  {
+    "id": "s11-04",
+    "skill": 11,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [],
+    "title": "Latest reading",
+    "prompt": "Show the city, reading_date, and temp_c of the single most recent reading. If several share that date, take the one with the highest id.",
+    "dataset": "weather",
+    "hints": [
+      "Sort by date descending, then id descending."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "city",
+            "reading_date",
+            "temp_c"
+          ],
+          "rows": [
+            [
+              "Oslo",
+              "2024-03-05",
+              7
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "city",
+            "reading_date",
+            "temp_c"
+          ],
+          "rows": [
+            [
+              "Quito",
+              "2024-08-03",
+              18
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT city, reading_date, temp_c FROM readings ORDER BY reading_date DESC, id DESC LIMIT 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT city, reading_date, temp_c FROM readings ORDER BY reading_date LIMIT 1;",
+        "why": "Finds the oldest"
+      },
+      {
+        "sql": "SELECT city, reading_date, temp_c FROM readings ORDER BY reading_date DESC LIMIT 2;",
+        "why": "Returns two rows"
+      }
+    ]
+  },
+  {
+    "id": "s11-05",
+    "skill": 11,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      10
+    ],
+    "title": "Second highest",
+    "prompt": "Show the second-highest different salary, in a column named salary.",
+    "dataset": "staff",
+    "hints": [
+      "Remove duplicates, sort, then use OFFSET."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "salary"
+          ],
+          "rows": [
+            [
+              95000
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET salary = 90000 WHERE id = 12;",
+        "expected": {
+          "columns": [
+            "salary"
+          ],
+          "rows": [
+            [
+              70000
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT DISTINCT salary FROM employees ORDER BY salary DESC LIMIT 1 OFFSET 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT salary FROM employees ORDER BY salary DESC LIMIT 1 OFFSET 1;",
+        "why": "A tie can repeat the highest salary"
+      },
+      {
+        "sql": "SELECT DISTINCT salary FROM employees ORDER BY salary DESC LIMIT 1;",
+        "why": "Returns the highest"
+      }
+    ]
+  },
+  {
+    "id": "s11-06",
+    "skill": 11,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the clause order",
+    "prompt": "This should show the two most expensive products with their price, but it fails. Fix it.",
+    "dataset": "shop",
+    "starterSql": "SELECT name, price\nFROM products\nLIMIT 2\nORDER BY price DESC;",
+    "hints": [
+      "ORDER BY comes before LIMIT."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "price"
+          ],
+          "rows": [
+            [
+              "Rug",
+              60
+            ],
+            [
+              "Kettle",
+              35
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "price"
+          ],
+          "rows": [
+            [
+              "Stool",
+              40
+            ],
+            [
+              "Ink",
+              12.5
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, price FROM products ORDER BY price DESC LIMIT 2;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, price FROM products LIMIT 2;",
+        "why": "Doesn't sort"
+      },
+      {
+        "sql": "SELECT name, price FROM products ORDER BY price LIMIT 2;",
+        "why": "Finds the cheapest"
+      }
+    ]
+  },
+  {
+    "id": "s11-07",
+    "skill": 11,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      6
+    ],
+    "title": "Grouped listing",
+    "prompt": "Show the category, name, and price of every product. Sort by category A to Z, then by price from highest to lowest within each category.",
+    "dataset": "shop",
+    "hints": [
+      "Each sort column can have its own direction."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "category",
+            "name",
+            "price"
+          ],
+          "rows": [
+            [
+              "Home",
+              "Rug",
+              60
+            ],
+            [
+              "Home",
+              "Lamp",
+              25
+            ],
+            [
+              "Kitchen",
+              "Kettle",
+              35
+            ],
+            [
+              "Kitchen",
+              "Mug",
+              9
+            ],
+            [
+              "Stationery",
+              "Notebook",
+              4
+            ],
+            [
+              "Stationery",
+              "Pen",
+              1.5
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "category",
+            "name",
+            "price"
+          ],
+          "rows": [
+            [
+              "Home",
+              "Stool",
+              40
+            ],
+            [
+              "Kitchen",
+              "Cup",
+              9
+            ],
+            [
+              "Stationery",
+              "Ink",
+              12.5
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT category, name, price FROM products ORDER BY category, price DESC;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT category, name, price FROM products ORDER BY category DESC, price DESC;",
+        "why": "Sorts categories backwards"
+      },
+      {
+        "sql": "SELECT category, name, price FROM products ORDER BY price DESC, category;",
+        "why": "Sorts by price first"
+      }
+    ]
+  },
+  {
+    "id": "s11-08",
+    "skill": 11,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      6
+    ],
+    "title": "Recent hires in a department",
+    "prompt": "Show the name and hire_date of the two most recently hired employees in department 2.",
+    "dataset": "staff",
+    "hints": [
+      "Filter first, then sort and limit."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "hire_date"
+          ],
+          "rows": [
+            [
+              "Farid",
+              "2023-02-14"
+            ],
+            [
+              "Elena",
+              "2022-05-30"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET department_id = 2 WHERE id IN (11, 13, 15);",
+        "expected": {
+          "columns": [
+            "name",
+            "hire_date"
+          ],
+          "rows": [
+            [
+              "Kim",
+              "2023-03-03"
+            ],
+            [
+              "Mia",
+              "2022-12-31"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, hire_date FROM employees WHERE department_id = 2 ORDER BY hire_date DESC LIMIT 2;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, hire_date FROM employees ORDER BY hire_date DESC LIMIT 2;",
+        "why": "Ignores the department"
+      },
+      {
+        "sql": "SELECT name, hire_date FROM employees WHERE department_id = 2 ORDER BY hire_date LIMIT 2;",
+        "why": "Finds the earliest hires"
+      }
+    ]
+  }
+]

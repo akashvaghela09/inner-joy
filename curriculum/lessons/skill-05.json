@@ -1,0 +1,15 @@
+{
+  "skill": 5,
+  "summary": "SELECT chooses which columns a query returns. You can also rename columns and calculate new ones.",
+  "points": [
+    "List columns with commas, in the order you want them. SELECT * returns all of them.",
+    "AS gives a column a new name in the result. Names with spaces need double quotes.",
+    "A column can be a calculation, such as price * 1.2, or fixed text, such as 'paperback'.",
+    "Text values use single quotes. Column names don't."
+  ],
+  "example": {
+    "dataset": "bookshop",
+    "sql": "SELECT title AS book, price * 1.2 AS price_with_tax\nFROM books;",
+    "explanation": "This renames title to book and adds a calculated column. The table itself doesn't change."
+  }
+}

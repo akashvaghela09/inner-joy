@@ -1,0 +1,7 @@
+{
+  "id": "contacts",
+  "title": "Contact List",
+  "story": "A membership club keeps a messy list of contacts, including names, emails, phone numbers, and space-separated tags.",
+  "schemaSql": "CREATE TABLE contacts (id INTEGER PRIMARY KEY, full_name TEXT NOT NULL, email TEXT, phone TEXT, city TEXT, tags TEXT NOT NULL);",
+  "seedSql": "INSERT INTO contacts VALUES (1, 'ada lovelace', 'ada@club.test', '555-0101', 'London', 'VIP GOLD1'), (2, 'Grace HOPPER', 'grace.h@club.test', '555-0102', 'New York', 'GOLD2 NEW'), (3, 'alan turing', 'alan@other.test', NULL, 'London', 'XGOLD1'), (4, 'Katherine Johnson', 'kj_99@club.test', '5550104', NULL, 'NEW'), (5, 'edsger dijkstra', '1edsger@club.test', '555-0105', 'Austin', ''), (6, 'Tim Lee', NULL, '555-0106', 'Geneva', 'GOLD1');"
+}

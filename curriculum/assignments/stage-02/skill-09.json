@@ -1,0 +1,693 @@
+[
+  {
+    "id": "s09-01",
+    "skill": 9,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Find the missing",
+    "prompt": "Show the name of employees with no bonus recorded. Replace the ___.",
+    "dataset": "staff",
+    "starterSql": "SELECT name\nFROM employees\nWHERE bonus IS ___;",
+    "hints": [
+      "Use IS NULL, never = NULL."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Ben"
+            ],
+            [
+              "Elena"
+            ],
+            [
+              "Grace"
+            ],
+            [
+              "Hugo"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Jon"
+            ],
+            [
+              "Leo"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM employees WHERE bonus IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM employees WHERE bonus = NULL;",
+        "why": "= NULL never matches"
+      },
+      {
+        "sql": "SELECT name FROM employees WHERE bonus = 0;",
+        "why": "Zero is a known value, not a missing one"
+      }
+    ]
+  },
+  {
+    "id": "s09-02",
+    "skill": 9,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [],
+    "title": "Known emails",
+    "prompt": "Show the name and email of customers who have an email on record.",
+    "dataset": "shop",
+    "hints": [
+      "Use IS NOT NULL."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "email"
+          ],
+          "rows": [
+            [
+              "Priya",
+              "priya@mail.test"
+            ],
+            [
+              "Hana",
+              "hana@mail.test"
+            ],
+            [
+              "Luis",
+              "luis@mail.test"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "email"
+          ],
+          "rows": [
+            [
+              "Ravi",
+              "ravi@mail.test"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, email FROM customers WHERE email IS NOT NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, email FROM customers WHERE email IS NULL;",
+        "why": "Keeps the missing ones"
+      },
+      {
+        "sql": "SELECT name, email FROM customers WHERE email <> NULL;",
+        "why": "Comparing with NULL never matches"
+      }
+    ]
+  },
+  {
+    "id": "s09-03",
+    "skill": 9,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      6
+    ],
+    "title": "Not two, or nothing",
+    "prompt": "Show the name of employees who aren't in department 2, including those with no department.",
+    "dataset": "staff",
+    "hints": [
+      "department_id <> 2 skips NULLs, so add them back with OR."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Asha"
+            ],
+            [
+              "Ben"
+            ],
+            [
+              "Chloe"
+            ],
+            [
+              "Grace"
+            ],
+            [
+              "Hugo"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Ivy"
+            ],
+            [
+              "Jon"
+            ],
+            [
+              "Kim"
+            ],
+            [
+              "Leo"
+            ],
+            [
+              "Mia"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM employees WHERE department_id <> 2 OR department_id IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM employees WHERE department_id <> 2;",
+        "why": "Skips employees with no department"
+      },
+      {
+        "sql": "SELECT name FROM employees WHERE department_id IS NULL;",
+        "why": "Keeps only employees with no department"
+      }
+    ]
+  },
+  {
+    "id": "s09-04",
+    "skill": 9,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      2
+    ],
+    "title": "Gauge failures",
+    "prompt": "Show the city and reading_date of readings where rainfall wasn't recorded.",
+    "dataset": "weather",
+    "hints": [
+      "A recorded 0.0 isn't missing."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "city",
+            "reading_date"
+          ],
+          "rows": [
+            [
+              "Oslo",
+              "2024-03-02"
+            ],
+            [
+              "Lima",
+              "2024-03-02"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "city",
+            "reading_date"
+          ],
+          "rows": [
+            [
+              "Cairo",
+              "2024-07-31"
+            ],
+            [
+              "Quito",
+              "2024-08-03"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT city, reading_date FROM readings WHERE rainfall_mm IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT city, reading_date FROM readings WHERE rainfall_mm = 0;",
+        "why": "Finds zero rainfall instead"
+      },
+      {
+        "sql": "SELECT city, reading_date FROM readings WHERE rainfall_mm IS NOT NULL;",
+        "why": "Keeps the recorded ones"
+      }
+    ]
+  },
+  {
+    "id": "s09-05",
+    "skill": 9,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      6
+    ],
+    "title": "Zero isn't missing",
+    "prompt": "Show the name and bonus of employees with a bonus of 0 or no bonus at all. They're different cases, and both should appear.",
+    "dataset": "staff",
+    "hints": [
+      "Check for 0 and for NULL separately."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "bonus"
+          ],
+          "rows": [
+            [
+              "Ben",
+              null
+            ],
+            [
+              "Elena",
+              null
+            ],
+            [
+              "Farid",
+              0
+            ],
+            [
+              "Grace",
+              null
+            ],
+            [
+              "Hugo",
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "bonus"
+          ],
+          "rows": [
+            [
+              "Jon",
+              null
+            ],
+            [
+              "Leo",
+              null
+            ],
+            [
+              "Mia",
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, bonus FROM employees WHERE bonus = 0 OR bonus IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, bonus FROM employees WHERE bonus = 0;",
+        "why": "Leaves out missing bonuses"
+      },
+      {
+        "sql": "SELECT name, bonus FROM employees WHERE bonus IS NULL;",
+        "why": "Leaves out zero bonuses"
+      }
+    ]
+  },
+  {
+    "id": "s09-06",
+    "skill": 9,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the check",
+    "prompt": "This should show products in order items with no discount, but it returns nothing. Show the order_id and product_id. Fix it.",
+    "dataset": "shop",
+    "starterSql": "SELECT order_id, product_id\nFROM order_items\nWHERE discount = NULL;",
+    "hints": [
+      "NULL can't be compared with =."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "order_id",
+            "product_id"
+          ],
+          "rows": [
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              4,
+              1
+            ],
+            [
+              6,
+              4
+            ],
+            [
+              6,
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "order_id",
+            "product_id"
+          ],
+          "rows": [
+            [
+              11,
+              8
+            ],
+            [
+              12,
+              9
+            ],
+            [
+              13,
+              8
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT order_id, product_id FROM order_items WHERE discount IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT order_id, product_id FROM order_items WHERE discount = 0;",
+        "why": "Zero isn't the same as missing"
+      },
+      {
+        "sql": "SELECT order_id, product_id FROM order_items;",
+        "why": "Removes the filter"
+      }
+    ]
+  },
+  {
+    "id": "s09-07",
+    "skill": 9,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      8
+    ],
+    "title": "Small or unknown bonus",
+    "prompt": "HR is reviewing bonuses. Show the name and bonus of employees whose bonus is under 3000 or isn't recorded.",
+    "dataset": "staff",
+    "hints": [
+      "A plain bonus < 3000 would skip NULL rows."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "bonus"
+          ],
+          "rows": [
+            [
+              "Ben",
+              null
+            ],
+            [
+              "Dev",
+              2000
+            ],
+            [
+              "Elena",
+              null
+            ],
+            [
+              "Farid",
+              0
+            ],
+            [
+              "Grace",
+              null
+            ],
+            [
+              "Hugo",
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "bonus"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              900
+            ],
+            [
+              "Jon",
+              null
+            ],
+            [
+              "Kim",
+              300
+            ],
+            [
+              "Leo",
+              null
+            ],
+            [
+              "Mia",
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, bonus FROM employees WHERE bonus < 3000 OR bonus IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, bonus FROM employees WHERE bonus < 3000;",
+        "why": "Silently drops missing bonuses"
+      },
+      {
+        "sql": "SELECT name, bonus FROM employees WHERE bonus <= 3000 OR bonus IS NOT NULL;",
+        "why": "Keeps almost everyone"
+      }
+    ]
+  },
+  {
+    "id": "s09-08",
+    "skill": 9,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      6
+    ],
+    "title": "Complete records only",
+    "prompt": "Show the full_name of contacts that have both an email and a phone recorded.",
+    "dataset": "contacts",
+    "hints": [
+      "Join two IS NOT NULL checks with AND."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "full_name"
+          ],
+          "rows": [
+            [
+              "ada lovelace"
+            ],
+            [
+              "Grace HOPPER"
+            ],
+            [
+              "Katherine Johnson"
+            ],
+            [
+              "edsger dijkstra"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3');",
+        "expected": {
+          "columns": [
+            "full_name"
+          ],
+          "rows": [
+            [
+              "mary jackson"
+            ],
+            [
+              "BOB Kahn"
+            ],
+            [
+              "Ken Thompson"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT full_name FROM contacts WHERE email IS NOT NULL AND phone IS NOT NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT full_name FROM contacts WHERE email IS NOT NULL OR phone IS NOT NULL;",
+        "why": "OR accepts just one"
+      },
+      {
+        "sql": "SELECT full_name FROM contacts WHERE email IS NOT NULL;",
+        "why": "Ignores phone"
+      }
+    ]
+  }
+]

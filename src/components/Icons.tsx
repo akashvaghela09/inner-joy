@@ -68,6 +68,12 @@ export const EyeOffIcon = () => (
   </Icon>
 );
 
+export const BookIcon = () => (
+  <Icon>
+    <path d="M8 4.2C6.8 3.2 5 2.8 2 3v9.5c3-.2 4.8.2 6 1.2 1.2-1 3-1.4 6-1.2V3c-3-.2-4.8.2-6 1.2Zm0 0v9.5" {...stroke} />
+  </Icon>
+);
+
 export const ExternalLinkIcon = () => (
   <Icon size={14}>
     <path d="M6.5 3H3v10h10V9.5M9 3h4v4M13 3 7.5 8.5" {...stroke} />

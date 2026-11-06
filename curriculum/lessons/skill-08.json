@@ -1,0 +1,15 @@
+{
+  "skill": 8,
+  "summary": "IN and BETWEEN are shorter ways to write common filters.",
+  "points": [
+    "genre IN ('Fiction', 'Science') means the value equals any item in the list.",
+    "price BETWEEN 10 AND 20 includes both 10 and 20.",
+    "NOT IN and NOT BETWEEN reverse them.",
+    "BETWEEN also works on text dates, because they sort correctly in YYYY-MM-DD form."
+  ],
+  "example": {
+    "dataset": "staff",
+    "sql": "SELECT name, hire_date\nFROM employees\nWHERE hire_date BETWEEN '2021-01-01' AND '2021-12-31';",
+    "explanation": "This finds everyone hired during 2021, including anyone hired on the first or last day."
+  }
+}

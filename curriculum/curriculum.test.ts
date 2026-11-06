@@ -2,7 +2,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import initSqlJs, { type SqlJsStatic } from "sql.js";
 import externalPractice from "./external-practice.json";
 import skillMap from "./skill-map.json";
-import { passesAllCases, runCase, type Assignment, type Dataset, type Value } from "./tools/grade";
+import { createCaseDb, passesAllCases, runCase, runStatements, type Assignment, type Dataset, type Value } from "./tools/grade";
 
 const datasetModules = import.meta.glob<{ default: Dataset }>("./datasets/*.json", { eager: true });
 const assignmentModules = import.meta.glob<{ default: Assignment[] }>("./assignments/**/*.json", { eager: true });
@@ -15,7 +15,7 @@ const skills = stages.flatMap((stage) => stage.skills);
 const skillById = new Map(skills.map((skill) => [skill.id, skill]));
 const stageOfSkill = new Map(stages.flatMap((stage) => stage.skills.map((skill) => [skill.id, stage] as const)));
 
-const LADDER = ["guided", "direct", "variation", "newContext", "edgeCase", "fixBug", "requirementChange", "apply"];
+const LADDER = ["guided", "direct", "variation", "newContext", "edgeCase", "fixBug", "requirementChange", "apply", "scenario", "challenge"];
 const MUST_START_BROKEN = ["guided", "fixBug"];
 
 let SQL: SqlJsStatic;
@@ -75,6 +75,24 @@ describe("skill map", () => {
     const recalled = new Set(skills.flatMap((skill) => skill.recalls));
     const forgotten = skills.filter((skill) => stageOfSkill.get(skill.id)!.id < 10 && !recalled.has(skill.id)).map((skill) => skill.id);
     expect(forgotten).toEqual([]);
+  });
+});
+
+type Lesson = { skill: number; summary: string; points: string[]; example: { dataset: string; sql: string; explanation: string } };
+const lessonModules = import.meta.glob<{ default: Lesson }>("./lessons/*.json", { eager: true });
+const lessons = Object.values(lessonModules).map((module) => module.default);
+
+describe("lessons", () => {
+  it.each(lessons.map((lesson) => [lesson.skill, lesson] as const))("skill %i has content and a working example", (_skill, lesson) => {
+    expect(skillById.has(lesson.skill)).toBe(true);
+    expect(lesson.summary).not.toBe("");
+    expect(lesson.points.length).toBeGreaterThanOrEqual(2);
+    const db = createCaseDb(SQL, datasets.get(lesson.example.dataset)!);
+    try {
+      runStatements(db, lesson.example.sql);
+    } finally {
+      db.close();
+    }
   });
 });
 

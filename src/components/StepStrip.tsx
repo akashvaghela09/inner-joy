@@ -2,6 +2,7 @@ import type { Assignment } from "../../curriculum/tools/grade";
 import { typeLabel, type Group } from "../curriculum";
 import { useProgress } from "../storage";
 import wb from "../workbench.module.css";
+import { paths } from "../routes";
 
 export function StepStrip({ group, current }: { group: Group; current: Assignment }) {
   const { completed, attempts } = useProgress();
@@ -37,7 +38,7 @@ export function StepStrip({ group, current }: { group: Group; current: Assignmen
             {divider}
             <a
               className={`${wb.stepCell} ${done ? wb.stepDone : attempted ? wb.stepAttempted : ""} ${isCurrent ? wb.stepCurrent : ""}`}
-              href={`#/a/${assignment.id}`}
+              href={paths.assignment(assignment.id)}
               aria-current={isCurrent ? "step" : undefined}
               aria-label={label}
               title={label}

@@ -1,0 +1,15 @@
+{
+  "skill": 2,
+  "summary": "Every value has a type, and the type decides what you can do with it. You can add numbers, but not names.",
+  "points": [
+    "INTEGER holds whole numbers, and REAL holds decimals.",
+    "TEXT holds words. SQLite also stores dates as text, such as '2024-03-15'.",
+    "NULL means a value is missing. It isn't zero or empty text.",
+    "typeof(column) shows the type of each value."
+  ],
+  "example": {
+    "dataset": "staff",
+    "sql": "SELECT name, salary, typeof(salary) AS salary_type, bonus, typeof(bonus) AS bonus_type\nFROM employees;",
+    "explanation": "salary is always an integer. bonus is an integer when present and null when missing."
+  }
+}

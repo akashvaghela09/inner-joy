@@ -1,0 +1,15 @@
+{
+  "skill": 4,
+  "summary": "Errors are normal and useful. An error message usually tells you exactly what SQLite couldn't understand.",
+  "points": [
+    "\"near ...: syntax error\" means a word or symbol is misplaced or misspelled. Look just before the word it names.",
+    "\"no such table\" and \"no such column\" mean a name is misspelled or doesn't exist.",
+    "Text values need single quotes. Without them, SQLite reads the word as a column name.",
+    "Some mistakes give no error, only a wrong result, so always check the output. Build queries one small step at a time."
+  ],
+  "example": {
+    "dataset": "bookshop",
+    "sql": "SELECT title price\nFROM books;",
+    "explanation": "This runs without an error but is wrong. With no comma, price becomes a new name for title, so only one column appears."
+  }
+}

@@ -3,32 +3,309 @@
     "id": "st02-c01",
     "kind": "checkpoint",
     "stage": 2,
-    "skills": [5, 6, 7],
+    "skills": [
+      5,
+      6,
+      7
+    ],
     "sourceProblem": 1,
     "recalls": [],
     "title": "Budget fiction shelf",
     "prompt": "The shop is setting up a budget fiction shelf. Show the id of every book that is in the Fiction genre and also costs less than 14.",
     "dataset": "bookshop",
-    "hints": ["AND requires both conditions to be true."],
-    "check": { "mode": "result", "ordered": false, "columnNames": true },
+    "hints": [
+      "AND requires both conditions to be true."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
     "cases": [
       {
         "name": "Bookshop catalogue",
         "hidden": false,
-        "expected": { "columns": ["id"], "rows": [[3]] }
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              3
+            ]
+          ]
+        }
       },
       {
         "name": "A different catalogue",
         "hidden": true,
         "setupSql": "DELETE FROM books; INSERT INTO books VALUES (20, 'Ember Bay', 'Ann Cho', 'Fiction', 11.0, 150, 2017), (21, 'Long Tide', 'Sol Ruiz', 'Poetry', 12.0, 90, 2019), (22, 'Old Maps', 'Ken Ito', 'Fiction', 16.0, 205, 2020), (24, 'Grey Wren', 'Ann Cho', 'Fiction', 14.0, 111, 2022);",
-        "expected": { "columns": ["id"], "rows": [[20]] }
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              20
+            ]
+          ]
+        }
       }
     ],
-    "solutions": ["SELECT id FROM books WHERE genre = 'Fiction' AND price < 14;"],
+    "solutions": [
+      "SELECT id FROM books WHERE genre = 'Fiction' AND price < 14;"
+    ],
     "wrongSolutions": [
-      { "sql": "SELECT id FROM books WHERE genre = 'Fiction' OR price < 14;", "why": "OR accepts a book meeting just one condition" },
-      { "sql": "SELECT id FROM books WHERE genre = 'Fiction' AND price <= 14;", "why": "Includes a book costing exactly 14" },
-      { "sql": "SELECT title FROM books WHERE genre = 'Fiction' AND price < 14;", "why": "Returns the title instead of the id" }
+      {
+        "sql": "SELECT id FROM books WHERE genre = 'Fiction' OR price < 14;",
+        "why": "OR accepts a book meeting just one condition"
+      },
+      {
+        "sql": "SELECT id FROM books WHERE genre = 'Fiction' AND price <= 14;",
+        "why": "Includes a book costing exactly 14"
+      },
+      {
+        "sql": "SELECT title FROM books WHERE genre = 'Fiction' AND price < 14;",
+        "why": "Returns the title instead of the id"
+      }
+    ]
+  },
+  {
+    "id": "st02-c02",
+    "kind": "checkpoint",
+    "stage": 2,
+    "skills": [
+      6,
+      7,
+      9
+    ],
+    "sourceProblem": 2,
+    "recalls": [],
+    "title": "Not invited by nova",
+    "prompt": "Nova is user 1. Show the username of every user who wasn't invited by nova, including users nobody invited.",
+    "dataset": "app",
+    "hints": [
+      "referrer_id <> 1 alone skips NULLs."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "username"
+          ],
+          "rows": [
+            [
+              "nova"
+            ],
+            [
+              "quark"
+            ],
+            [
+              "raven"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "username"
+          ],
+          "rows": [
+            [
+              "sable"
+            ],
+            [
+              "tulip"
+            ],
+            [
+              "umber"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT username FROM users WHERE referrer_id <> 1 OR referrer_id IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT username FROM users WHERE referrer_id <> 1;",
+        "why": "Drops users with no referrer"
+      },
+      {
+        "sql": "SELECT username FROM users WHERE referrer_id IS NULL;",
+        "why": "Keeps only users with no referrer"
+      }
+    ]
+  },
+  {
+    "id": "st02-c03",
+    "kind": "checkpoint",
+    "stage": 2,
+    "skills": [
+      5,
+      6,
+      7
+    ],
+    "sourceProblem": 3,
+    "recalls": [],
+    "title": "Extreme readings",
+    "prompt": "A reading is extreme if it's at least 25 degrees or has at least 4 mm of rain. Show the city, reading_date, and temp_c of extreme readings.",
+    "dataset": "weather",
+    "hints": [
+      "Both thresholds are inclusive."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "city",
+            "reading_date",
+            "temp_c"
+          ],
+          "rows": [
+            [
+              "Lima",
+              "2024-03-02",
+              26
+            ],
+            [
+              "Lima",
+              "2024-03-03",
+              26
+            ],
+            [
+              "Lima",
+              "2024-03-04",
+              25
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "city",
+            "reading_date",
+            "temp_c"
+          ],
+          "rows": [
+            [
+              "Cairo",
+              "2024-07-30",
+              38
+            ],
+            [
+              "Cairo",
+              "2024-07-31",
+              40
+            ],
+            [
+              "Cairo",
+              "2024-08-01",
+              41
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT city, reading_date, temp_c FROM readings WHERE temp_c >= 25 OR rainfall_mm >= 4;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT city, reading_date, temp_c FROM readings WHERE temp_c >= 25 AND rainfall_mm >= 4;",
+        "why": "AND requires both"
+      },
+      {
+        "sql": "SELECT city, reading_date, temp_c FROM readings WHERE temp_c > 25 OR rainfall_mm > 4;",
+        "why": "Leaves out exact thresholds"
+      }
+    ]
+  },
+  {
+    "id": "st02-c04",
+    "kind": "checkpoint",
+    "stage": 2,
+    "skills": [
+      5,
+      6,
+      10,
+      11
+    ],
+    "sourceProblem": 4,
+    "recalls": [],
+    "title": "Courses taken twice",
+    "prompt": "A retake is an enrolment with a grade below 60. Show each different student_id with a retake-level grade, sorted by student_id, in a column named id.",
+    "dataset": "school",
+    "hints": [
+      "Filter, remove duplicates, rename, and sort."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": []
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT DISTINCT student_id AS id FROM enrolments WHERE grade < 60 ORDER BY id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT student_id AS id FROM enrolments WHERE grade <= 60 ORDER BY id;",
+        "why": "A grade of exactly 60 isn't below 60"
+      },
+      {
+        "sql": "SELECT DISTINCT student_id FROM enrolments WHERE grade < 60 ORDER BY student_id;",
+        "why": "Doesn't rename the column"
+      }
     ]
   }
 ]

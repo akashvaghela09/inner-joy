@@ -2,6 +2,7 @@ import { overallProgress } from "../progress";
 import { canSaveProgress, useProgress } from "../storage";
 import ui from "../ui.module.css";
 import { Mark } from "./Icons";
+import { paths } from "../routes";
 
 export type Section = "chapters" | "playground";
 
@@ -22,15 +23,15 @@ export function Header({ section }: { section: Section }) {
   return (
     <>
       <header className={ui.header}>
-        <a className={ui.brand} href="#/">
+        <a className={ui.brand} href={paths.home}>
           <span className={ui.mark}>
             <Mark />
           </span>
           Inner Joy
         </a>
         <nav className={ui.headerNav} aria-label="Main">
-          {link("chapters", "#/", "Chapters")}
-          {link("playground", "#/playground", "Playground")}
+          {link("chapters", paths.home, "Chapters")}
+          {link("playground", paths.playground, "Playground")}
         </nav>
         <span className={ui.headerCount} aria-label={`${done} of ${total} required assignments complete`}>
           {done}/{total}

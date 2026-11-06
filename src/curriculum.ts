@@ -1,11 +1,26 @@
 import externalPractice from "../curriculum/external-practice.json";
 import skillMap from "../curriculum/skill-map.json";
 import type { Assignment, Dataset } from "../curriculum/tools/grade";
+import { paths } from "./routes";
 
 const datasetModules = import.meta.glob<{ default: Dataset }>("../curriculum/datasets/*.json", { eager: true });
 const assignmentModules = import.meta.glob<{ default: Assignment[] }>("../curriculum/assignments/**/*.json", {
   eager: true,
 });
+
+export type Lesson = {
+  skill: number;
+  summary: string;
+  points: string[];
+  example: { dataset: string; sql: string; explanation: string };
+};
+
+const lessonModules = import.meta.glob<{ default: Lesson }>("../curriculum/lessons/*.json", { eager: true });
+const lessons = new Map(Object.values(lessonModules).map(({ default: lesson }) => [lesson.skill, lesson]));
+
+export function findLesson(skill: number): Lesson | undefined {
+  return lessons.get(skill);
+}
 
 const datasets = new Map(Object.values(datasetModules).map(({ default: dataset }) => [dataset.id, dataset]));
 const allAssignments = Object.values(assignmentModules).flatMap(({ default: list }) => list);
@@ -100,6 +115,20 @@ export function nextAssignment(assignment: Assignment): Assignment | undefined {
   return orderedAssignments[indexOf(assignment) + 1];
 }
 
+export function datasetById(id: string): Dataset {
+  const dataset = datasets.get(id);
+  if (!dataset) throw new Error(`Unknown dataset: ${id}`);
+  return dataset;
+}
+
+export function stageOfSkill(skill: number): Stage {
+  return stages.find((stage) => stage.groups.some((group) => group.id === `skill-${skill}`))!;
+}
+
+export function firstAssignmentOfSkill(skill: number): Assignment | undefined {
+  return orderedAssignments.find((assignment) => assignment.skill === skill);
+}
+
 export function datasetFor(assignment: Assignment): Dataset {
   const dataset = datasets.get(assignment.dataset);
   if (!dataset) throw new Error(`Unknown dataset: ${assignment.dataset}`);
@@ -157,4 +186,10 @@ export function nextSteps(assignment: Assignment): NextStep {
   }
   const next = after[0];
   return next ? { primary: { assignment: next, label: label(next) } } : {};
+}
+
+/** Where to send a learner reaching an assignment: a skill begins with its lesson. */
+export function startPath(assignment: Assignment): string {
+  const opensSkill = !assignment.kind && firstAssignmentOfSkill(assignment.skill!)?.id === assignment.id;
+  return opensSkill && findLesson(assignment.skill!) ? paths.lesson(assignment.skill!) : paths.assignment(assignment.id);
 }

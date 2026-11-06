@@ -1,0 +1,559 @@
+[
+  {
+    "id": "s04-01",
+    "skill": 4,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "A misspelled word",
+    "prompt": "This should show every department, but it fails. Read the error and fix the query.",
+    "dataset": "staff",
+    "starterSql": "SELEC * FROM departments;",
+    "hints": [
+      "Check the spelling of the first word."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              1,
+              "Engineering"
+            ],
+            [
+              2,
+              "Sales"
+            ],
+            [
+              3,
+              "Support"
+            ],
+            [
+              4,
+              "Legal"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              5,
+              "Design"
+            ],
+            [
+              6,
+              "Finance"
+            ],
+            [
+              7,
+              "Ops"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT * FROM departments;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT * FROM employees;",
+        "why": "Changes the table instead of fixing the typo"
+      },
+      {
+        "sql": "SELECT name FROM departments;",
+        "why": "Removes a column"
+      }
+    ]
+  },
+  {
+    "id": "s04-02",
+    "skill": 4,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [],
+    "title": "A table that doesn't exist",
+    "prompt": "This should show every employee, but it fails. Read the error and fix the query.",
+    "dataset": "staff",
+    "starterSql": "SELECT * FROM employee;",
+    "hints": [
+      "The table's name is plural."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "department_id",
+            "manager_id",
+            "salary",
+            "hire_date",
+            "bonus",
+            "email"
+          ],
+          "rows": [
+            [
+              1,
+              "Asha",
+              1,
+              null,
+              120000,
+              "2018-03-15",
+              10000,
+              "asha@acme.test"
+            ],
+            [
+              2,
+              "Ben",
+              1,
+              1,
+              95000,
+              "2019-07-01",
+              null,
+              "ben@acme.test"
+            ],
+            [
+              3,
+              "Chloe",
+              1,
+              1,
+              95000,
+              "2021-01-20",
+              5000,
+              null
+            ],
+            [
+              4,
+              "Dev",
+              2,
+              1,
+              70000,
+              "2020-11-09",
+              2000,
+              "dev@acme.test"
+            ],
+            [
+              5,
+              "Elena",
+              2,
+              4,
+              62000,
+              "2022-05-30",
+              null,
+              "elena@acme.test"
+            ],
+            [
+              6,
+              "Farid",
+              2,
+              4,
+              58000,
+              "2023-02-14",
+              0,
+              "farid@acme.test"
+            ],
+            [
+              7,
+              "Grace",
+              3,
+              1,
+              48000,
+              "2021-09-01",
+              null,
+              null
+            ],
+            [
+              8,
+              "Hugo",
+              null,
+              99,
+              41000,
+              "2024-01-10",
+              null,
+              "hugo@acme.test"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "department_id",
+            "manager_id",
+            "salary",
+            "hire_date",
+            "bonus",
+            "email"
+          ],
+          "rows": [
+            [
+              11,
+              "Ivy",
+              5,
+              null,
+              90000,
+              "2019-02-01",
+              900,
+              "ivy@acme.test"
+            ],
+            [
+              12,
+              "Jon",
+              5,
+              11,
+              70000,
+              "2020-06-15",
+              null,
+              null
+            ],
+            [
+              13,
+              "Kim",
+              6,
+              11,
+              70000,
+              "2023-03-03",
+              300,
+              "kim@acme.test"
+            ],
+            [
+              14,
+              "Leo",
+              null,
+              77,
+              30000,
+              "2024-08-20",
+              null,
+              "leo@acme.test"
+            ],
+            [
+              15,
+              "Mia",
+              6,
+              13,
+              55000,
+              "2022-12-31",
+              0,
+              "mia@acme.test"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT * FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT * FROM departments;",
+        "why": "Reads the wrong table"
+      },
+      {
+        "sql": "SELECT name FROM employees;",
+        "why": "Removes columns"
+      }
+    ]
+  },
+  {
+    "id": "s04-03",
+    "skill": 4,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [],
+    "title": "A column that doesn't exist",
+    "prompt": "This should show each employee's name, but it fails. Fix it.",
+    "dataset": "staff",
+    "starterSql": "SELECT nam FROM employees;",
+    "hints": [
+      "The error names the column it couldn't find."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Asha"
+            ],
+            [
+              "Ben"
+            ],
+            [
+              "Chloe"
+            ],
+            [
+              "Dev"
+            ],
+            [
+              "Elena"
+            ],
+            [
+              "Farid"
+            ],
+            [
+              "Grace"
+            ],
+            [
+              "Hugo"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Ivy"
+            ],
+            [
+              "Jon"
+            ],
+            [
+              "Kim"
+            ],
+            [
+              "Leo"
+            ],
+            [
+              "Mia"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT * FROM employees;",
+        "why": "Shows too many columns"
+      },
+      {
+        "sql": "SELECT email FROM employees;",
+        "why": "Shows the wrong column"
+      }
+    ]
+  },
+  {
+    "id": "s04-04",
+    "skill": 4,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      2
+    ],
+    "title": "No error, wrong result",
+    "prompt": "This should show two columns, title and price, but only one appears. There's no error message. Fix it.",
+    "dataset": "bookshop",
+    "starterSql": "SELECT title price\nFROM books;",
+    "hints": [
+      "Columns need a comma between them."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title",
+            "price"
+          ],
+          "rows": [
+            [
+              "The Salt Road",
+              18.5
+            ],
+            [
+              "Quiet Engines",
+              24
+            ],
+            [
+              "Paper Lanterns",
+              12
+            ],
+            [
+              "River of Glass",
+              15.5
+            ],
+            [
+              "Small Planets",
+              30
+            ],
+            [
+              "The Last Ferry",
+              9
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": {
+          "columns": [
+            "title",
+            "price"
+          ],
+          "rows": [
+            [
+              "Copper Moon",
+              20
+            ],
+            [
+              "North Light",
+              7.5
+            ],
+            [
+              "Sky Atlas",
+              25
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT title, price FROM books;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT title FROM books;",
+        "why": "Still shows one column"
+      },
+      {
+        "sql": "SELECT price, title FROM books;",
+        "why": "Reverses the columns"
+      }
+    ]
+  },
+  {
+    "id": "s04-05",
+    "skill": 4,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      2
+    ],
+    "title": "Missing quotes",
+    "prompt": "This should show customers from Rome, but it fails. Fix it.",
+    "dataset": "shop",
+    "starterSql": "SELECT name\nFROM customers\nWHERE city = Rome;",
+    "hints": [
+      "Text values need single quotes."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Marco"
+            ],
+            [
+              "Luis"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "UPDATE customers SET city = 'Rome' WHERE id = 5; UPDATE customers SET city = 'Oslo' WHERE id = 2;",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Luis"
+            ],
+            [
+              "Noor"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM customers WHERE city = 'Rome';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM customers;",
+        "why": "Removes the filter"
+      },
+      {
+        "sql": "SELECT name FROM customers WHERE city = 'rome';",
+        "why": "Capital letters must match"
+      }
+    ]
+  }
+]

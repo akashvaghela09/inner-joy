@@ -1,0 +1,15 @@
+{
+  "skill": 9,
+  "summary": "NULL means a value is missing or unknown. It behaves differently from every other value, and it causes many SQL mistakes.",
+  "points": [
+    "Test for it with IS NULL and IS NOT NULL. Writing = NULL never matches.",
+    "Any comparison with NULL gives unknown, and WHERE keeps only rows that are definitely true.",
+    "So bonus <> 0 also skips rows where bonus is NULL. Add OR bonus IS NULL if you want them.",
+    "NULL isn't zero or empty text: a bonus of 0 is known, and a NULL bonus isn't."
+  ],
+  "example": {
+    "dataset": "staff",
+    "sql": "SELECT name, bonus\nFROM employees\nWHERE bonus IS NULL OR bonus < 1000;",
+    "explanation": "Without the IS NULL part, employees with no recorded bonus would silently disappear."
+  }
+}

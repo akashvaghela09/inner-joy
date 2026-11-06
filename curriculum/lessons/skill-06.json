@@ -1,0 +1,15 @@
+{
+  "skill": 6,
+  "summary": "WHERE keeps only the rows that meet a condition. It's checked once for every row.",
+  "points": [
+    "The main comparisons are =, <> (not equal), <, <=, >, and >=.",
+    "Numbers need no quotes, and text needs single quotes.",
+    "Text comparison is case-sensitive: 'Fiction' doesn't match 'fiction'.",
+    "If no row matches, the result is empty, which is a valid answer."
+  ],
+  "example": {
+    "dataset": "bookshop",
+    "sql": "SELECT title, price\nFROM books\nWHERE price < 15;",
+    "explanation": "Only books cheaper than 15 appear. A book costing exactly 15 wouldn't, because < means strictly less."
+  }
+}

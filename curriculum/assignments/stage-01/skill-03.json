@@ -1,0 +1,339 @@
+[
+  {
+    "id": "s03-01",
+    "skill": 3,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Follow a link",
+    "prompt": "Ben's department_id is 1. Show the name of the department with that id. Replace the ___.",
+    "dataset": "staff",
+    "starterSql": "SELECT name\nFROM departments\nWHERE id = ___;",
+    "hints": [
+      "The value to look up is 1."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Engineering"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": []
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM departments WHERE id = 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM departments WHERE id = 2;",
+        "why": "Looks up the wrong department"
+      },
+      {
+        "sql": "SELECT name FROM departments;",
+        "why": "Shows every department"
+      }
+    ]
+  },
+  {
+    "id": "s03-02",
+    "skill": 3,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [],
+    "title": "Everyone linked to a row",
+    "prompt": "Show the name and department_id of the employees in department 2.",
+    "dataset": "staff",
+    "hints": [
+      "Filter on the foreign key: department_id = 2."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "department_id"
+          ],
+          "rows": [
+            [
+              "Dev",
+              2
+            ],
+            [
+              "Elena",
+              2
+            ],
+            [
+              "Farid",
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "department_id"
+          ],
+          "rows": []
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, department_id FROM employees WHERE department_id = 2;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, department_id FROM employees WHERE id = 2;",
+        "why": "Filters on the employee's own id"
+      },
+      {
+        "sql": "SELECT name, department_id FROM employees;",
+        "why": "Shows everyone"
+      }
+    ]
+  },
+  {
+    "id": "s03-03",
+    "skill": 3,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      1
+    ],
+    "title": "Is it unique?",
+    "prompt": "A primary key has no repeats. Check students by showing the row count as row_count and the number of different ids as unique_ids.",
+    "dataset": "school",
+    "hints": [
+      "COUNT(*) counts rows, and COUNT(DISTINCT id) counts different ids."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "row_count",
+            "unique_ids"
+          ],
+          "rows": [
+            [
+              5,
+              5
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9);",
+        "expected": {
+          "columns": [
+            "row_count",
+            "unique_ids"
+          ],
+          "rows": [
+            [
+              2,
+              2
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT COUNT(*) AS row_count, COUNT(DISTINCT id) AS unique_ids FROM students;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT COUNT(*) AS row_count, COUNT(DISTINCT year_group) AS unique_ids FROM students;",
+        "why": "Counts year groups, not ids"
+      },
+      {
+        "sql": "SELECT COUNT(*) AS row_count FROM students;",
+        "why": "Leaves out the unique count"
+      }
+    ]
+  },
+  {
+    "id": "s03-04",
+    "skill": 3,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [],
+    "title": "A customer's orders",
+    "prompt": "Customer 1 is Priya. Show the id and order_date of her orders, using the customer_id foreign key.",
+    "dataset": "shop",
+    "hints": [
+      "Filter orders where customer_id = 1."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "order_date"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-01-05"
+            ],
+            [
+              3,
+              "2024-02-03"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "UPDATE orders SET customer_id = 1 WHERE id = 6; UPDATE orders SET customer_id = 3 WHERE id = 1;",
+        "expected": {
+          "columns": [
+            "id",
+            "order_date"
+          ],
+          "rows": [
+            [
+              3,
+              "2024-02-03"
+            ],
+            [
+              6,
+              "2024-03-15"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, order_date FROM orders WHERE customer_id = 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, order_date FROM orders WHERE id = 1;",
+        "why": "Filters on the order's own id"
+      },
+      {
+        "sql": "SELECT id, order_date FROM orders;",
+        "why": "Shows every order"
+      }
+    ]
+  },
+  {
+    "id": "s03-05",
+    "skill": 3,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [],
+    "title": "A broken link",
+    "prompt": "Hugo's manager_id is 99, but no employee has that id. Show the name of anyone whose manager_id is 99.",
+    "dataset": "staff",
+    "hints": [
+      "Filter on manager_id, not id."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Hugo"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "UPDATE employees SET manager_id = 99 WHERE id = 7; UPDATE employees SET manager_id = 2 WHERE id = 8;",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Grace"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM employees WHERE manager_id = 99;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM employees WHERE id = 99;",
+        "why": "Looks for an employee whose own id is 99"
+      },
+      {
+        "sql": "SELECT name FROM employees WHERE manager_id = 1;",
+        "why": "Uses the wrong manager"
+      }
+    ]
+  }
+]

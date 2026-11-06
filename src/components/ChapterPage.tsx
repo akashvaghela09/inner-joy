@@ -1,11 +1,12 @@
 import type { Assignment } from "../../curriculum/tools/grade";
-import { EXTERNAL_PLATFORM, externalPracticeFor, isRequired, typeLabel, type Group, type Stage } from "../curriculum";
+import { startPath, EXTERNAL_PLATFORM, externalPracticeFor, findLesson, isRequired, typeLabel, type Group, type Stage } from "../curriculum";
 import styles from "../landing.module.css";
 import { groupProgress, stageProgress } from "../progress";
 import { useProgress } from "../storage";
 import ui from "../ui.module.css";
-import { AttemptedIcon, ChevronLeftIcon, DoneIcon, ExternalLinkIcon, ExtraIcon, NotStartedIcon } from "./Icons";
+import { AttemptedIcon, BookIcon, ChevronLeftIcon, DoneIcon, ExternalLinkIcon, ExtraIcon, NotStartedIcon } from "./Icons";
 import { ProgressBar } from "./ProgressBar";
+import { paths } from "../routes";
 
 function StatusIcon({ assignment }: { assignment: Assignment }) {
   const { completed, attempts } = useProgress();
@@ -35,6 +36,7 @@ function StatusIcon({ assignment }: { assignment: Assignment }) {
 function GroupSection({ group }: { group: Group }) {
   const { completed } = useProgress();
   const { done, total } = groupProgress(group, completed);
+  const lesson = group.kind === "skill" ? findLesson(Number(group.id.replace("skill-", ""))) : undefined;
   return (
     <section>
       <div className={styles.groupHeading}>
@@ -47,9 +49,22 @@ function GroupSection({ group }: { group: Group }) {
         </span>
       </div>
       <ul>
+        {lesson && (
+          <li>
+            <a className={styles.assignmentRow} href={paths.lesson(lesson.skill)}>
+              <span className={ui.muted} style={{ display: "inline-flex" }}>
+                <BookIcon />
+              </span>
+              <span />
+              <span className={styles.assignmentTitle}>Read the lesson</span>
+              <span className={styles.assignmentType}>Lesson</span>
+              <span />
+            </a>
+          </li>
+        )}
         {group.slots.map(({ position, assignment }) => (
           <li key={assignment.id}>
-            <a className={styles.assignmentRow} href={`#/a/${assignment.id}`}>
+            <a className={styles.assignmentRow} href={paths.assignment(assignment.id)}>
               <StatusIcon assignment={assignment} />
               <span className={styles.assignmentNumber}>{position}</span>
               <span className={styles.assignmentTitle}>{assignment.title}</span>
@@ -105,7 +120,7 @@ export function ChapterPage({ stage }: { stage: Stage }) {
 
   return (
     <div className={styles.page}>
-      <a className={styles.back} href="#/">
+      <a className={styles.back} href={paths.home}>
         <ChevronLeftIcon />
         All chapters
       </a>
@@ -115,7 +130,7 @@ export function ChapterPage({ stage }: { stage: Stage }) {
           <h1 className={styles.title}>{stage.title}</h1>
         </div>
         {target && (
-          <a className={`${ui.button} ${ui.primary} ${styles.continue}`} href={`#/a/${target.id}`}>
+          <a className={`${ui.button} ${ui.primary} ${styles.continue}`} href={startPath(target)}>
             {progress.done > 0 ? "Continue" : "Start"}: {target.title}
           </a>
         )}

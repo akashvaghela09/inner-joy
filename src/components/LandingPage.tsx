@@ -1,4 +1,4 @@
-import { stages, type Stage } from "../curriculum";
+import { stages, startPath, type Stage } from "../curriculum";
 import styles from "../landing.module.css";
 import {
   extraDone,
@@ -11,13 +11,14 @@ import { useProgress } from "../storage";
 import ui from "../ui.module.css";
 import { ChevronRightIcon } from "./Icons";
 import { ProgressBar } from "./ProgressBar";
+import { paths } from "../routes";
 
 function ContinueAction() {
   const { completed } = useProgress();
   const required = firstIncompleteRequired(completed);
   if (required) {
     return (
-      <a className={`${ui.button} ${ui.primary} ${styles.continue}`} href={`#/a/${required.id}`}>
+      <a className={`${ui.button} ${ui.primary} ${styles.continue}`} href={startPath(required)}>
         {completed.size > 0 ? "Continue" : "Start"}: {required.title}
       </a>
     );
@@ -29,7 +30,7 @@ function ContinueAction() {
       {extra && (
         <>
           {" "}
-          <a href={`#/a/${extra.id}`}>Try extra practice: {extra.title}</a>
+          <a href={paths.assignment(extra.id)}>Try extra practice: {extra.title}</a>
         </>
       )}
     </p>
@@ -41,7 +42,7 @@ function ChapterRow({ stage }: { stage: Stage }) {
   const progress = stageProgress(stage, completed);
   return (
     <li>
-      <a className={styles.chapterRow} href={`#/chapter/${stage.id}`}>
+      <a className={styles.chapterRow} href={paths.chapter(stage.id)}>
         <span className={styles.chapterNumber}>Chapter {stage.id}</span>
         <span className={styles.chapterName}>{stage.title}</span>
         <span className={styles.chapterBar}>

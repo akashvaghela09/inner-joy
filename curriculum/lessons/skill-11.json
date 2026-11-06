@@ -1,0 +1,15 @@
+{
+  "skill": 11,
+  "summary": "ORDER BY sorts results, and LIMIT returns only part of them. Without ORDER BY, row order isn't guaranteed.",
+  "points": [
+    "ORDER BY price sorts low to high. Add DESC for high to low.",
+    "Sort by several columns to break ties: ORDER BY genre, price DESC.",
+    "LIMIT 3 returns the first three rows.",
+    "OFFSET 2 skips two rows first, which helps with finding the second or third value."
+  ],
+  "example": {
+    "dataset": "bookshop",
+    "sql": "SELECT title, price\nFROM books\nORDER BY price DESC\nLIMIT 3;",
+    "explanation": "Sorting first and then limiting gives the three most expensive books."
+  }
+}

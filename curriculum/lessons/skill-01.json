@@ -1,0 +1,15 @@
+{
+  "skill": 1,
+  "summary": "A database stores information in tables. Each table describes one kind of thing, such as books or customers.",
+  "points": [
+    "A column is one piece of information, such as a name or a price.",
+    "A row is one complete record, such as one book.",
+    "SELECT * FROM table_name shows every column and row of a table.",
+    "COUNT(*) tells you how many rows a table has."
+  ],
+  "example": {
+    "dataset": "staff",
+    "sql": "SELECT * FROM departments;",
+    "explanation": "This shows the whole departments table. Each line in the result is one row, and each heading is a column."
+  }
+}

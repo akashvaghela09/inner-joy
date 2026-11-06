@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
+    "curriculum": "node curriculum/tools/build.mjs",
     "test": "vitest run"
   },
   "dependencies": {

@@ -1,0 +1,15 @@
+{
+  "skill": 7,
+  "summary": "AND, OR, and NOT combine conditions, so a filter can ask more than one question.",
+  "points": [
+    "AND needs both sides to be true. OR needs at least one.",
+    "NOT reverses a condition.",
+    "AND is applied before OR, so a OR b AND c means a OR (b AND c).",
+    "Use brackets whenever you mix AND with OR, so the order is clear."
+  ],
+  "example": {
+    "dataset": "bookshop",
+    "sql": "SELECT title, genre, price\nFROM books\nWHERE (genre = 'Science' OR genre = 'Fiction') AND price < 20;",
+    "explanation": "The brackets make the genre choice happen first, then the price limit applies to both genres."
+  }
+}

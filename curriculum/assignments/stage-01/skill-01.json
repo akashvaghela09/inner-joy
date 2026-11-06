@@ -1,0 +1,429 @@
+[
+  {
+    "id": "s01-01",
+    "skill": 1,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Look inside a table",
+    "prompt": "Show every column and row of the departments table. Replace the ___ with the table's name.",
+    "dataset": "staff",
+    "starterSql": "SELECT * FROM ___;",
+    "hints": [
+      "The table is called departments."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              1,
+              "Engineering"
+            ],
+            [
+              2,
+              "Sales"
+            ],
+            [
+              3,
+              "Support"
+            ],
+            [
+              4,
+              "Legal"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              5,
+              "Design"
+            ],
+            [
+              6,
+              "Finance"
+            ],
+            [
+              7,
+              "Ops"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT * FROM departments;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT * FROM employees;",
+        "why": "Reads the wrong table"
+      },
+      {
+        "sql": "SELECT name FROM departments;",
+        "why": "Shows only one column"
+      }
+    ]
+  },
+  {
+    "id": "s01-02",
+    "skill": 1,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [],
+    "title": "A whole table",
+    "prompt": "Show every column and row of the students table.",
+    "dataset": "school",
+    "hints": [
+      "Use SELECT * FROM followed by the table name."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "year_group"
+          ],
+          "rows": [
+            [
+              1,
+              "Anya",
+              10
+            ],
+            [
+              2,
+              "Bilal",
+              10
+            ],
+            [
+              3,
+              "Cara",
+              11
+            ],
+            [
+              4,
+              "Dmitri",
+              11
+            ],
+            [
+              5,
+              "Esi",
+              12
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "year_group"
+          ],
+          "rows": [
+            [
+              6,
+              "Femi",
+              9
+            ],
+            [
+              7,
+              "Gia",
+              9
+            ],
+            [
+              8,
+              "Hao",
+              10
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT * FROM students;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT * FROM courses;",
+        "why": "Reads the wrong table"
+      },
+      {
+        "sql": "SELECT name FROM students;",
+        "why": "Shows only one column"
+      }
+    ]
+  },
+  {
+    "id": "s01-03",
+    "skill": 1,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [],
+    "title": "Count the rows",
+    "prompt": "Each row in courses is one course. Show how many rows the table has, in a column named row_count.",
+    "dataset": "school",
+    "hints": [
+      "COUNT(*) counts rows. Name it with AS row_count."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "row_count"
+          ],
+          "rows": [
+            [
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "row_count"
+          ],
+          "rows": [
+            [
+              2
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT COUNT(*) AS row_count FROM courses;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT COUNT(*) FROM courses;",
+        "why": "Doesn't name the column"
+      },
+      {
+        "sql": "SELECT COUNT(*) AS row_count FROM students;",
+        "why": "Counts the wrong table"
+      }
+    ]
+  },
+  {
+    "id": "s01-04",
+    "skill": 1,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [],
+    "title": "Just one column",
+    "prompt": "Show only the name column of the products table.",
+    "dataset": "shop",
+    "hints": [
+      "Write the column name in place of the star."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Notebook"
+            ],
+            [
+              "Pen"
+            ],
+            [
+              "Mug"
+            ],
+            [
+              "Kettle"
+            ],
+            [
+              "Lamp"
+            ],
+            [
+              "Rug"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Stool"
+            ],
+            [
+              "Cup"
+            ],
+            [
+              "Ink"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM products;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT * FROM products;",
+        "why": "Shows every column"
+      },
+      {
+        "sql": "SELECT category FROM products;",
+        "why": "Shows the wrong column"
+      }
+    ]
+  },
+  {
+    "id": "s01-05",
+    "skill": 1,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [],
+    "title": "Empty cells",
+    "prompt": "Show the name and email of every customer. Some emails are missing, and those rows must still appear.",
+    "dataset": "shop",
+    "hints": [
+      "Don't filter anything. Missing values display as NULL."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "email"
+          ],
+          "rows": [
+            [
+              "Priya",
+              "priya@mail.test"
+            ],
+            [
+              "Marco",
+              null
+            ],
+            [
+              "Hana",
+              "hana@mail.test"
+            ],
+            [
+              "Luis",
+              "luis@mail.test"
+            ],
+            [
+              "Noor",
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "email"
+          ],
+          "rows": [
+            [
+              "Ravi",
+              "ravi@mail.test"
+            ],
+            [
+              "Sara",
+              null
+            ],
+            [
+              "Tom",
+              null
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, email FROM customers;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM customers;",
+        "why": "Leaves out the email"
+      },
+      {
+        "sql": "SELECT email, name FROM customers;",
+        "why": "Returns the columns in the wrong order"
+      }
+    ]
+  }
+]

@@ -1,0 +1,7 @@
+{
+  "id": "weather",
+  "title": "Weather Log",
+  "story": "A weather service logs one reading per city per day. Rainfall can be missing when a gauge fails.",
+  "schemaSql": "CREATE TABLE readings (id INTEGER PRIMARY KEY, city TEXT NOT NULL, reading_date TEXT NOT NULL, temp_c INTEGER NOT NULL, rainfall_mm REAL);",
+  "seedSql": "INSERT INTO readings VALUES (1, 'Oslo', '2024-03-01', 2, 1.5), (2, 'Oslo', '2024-03-02', 4, NULL), (3, 'Oslo', '2024-03-03', 3, 0.0), (4, 'Oslo', '2024-03-05', 7, 2.5), (5, 'Lima', '2024-03-01', 24, 0.0), (6, 'Lima', '2024-03-02', 26, NULL), (7, 'Lima', '2024-03-03', 26, 4.0), (8, 'Lima', '2024-03-04', 25, 1.0);"
+}

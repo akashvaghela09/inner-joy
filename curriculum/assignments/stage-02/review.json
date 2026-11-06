@@ -3,30 +3,756 @@
     "id": "st02-r01",
     "kind": "review",
     "stage": 2,
-    "skills": [5, 6],
+    "skills": [
+      5,
+      6
+    ],
     "recalls": [],
     "title": "Trails in miles",
     "prompt": "A visitor from abroad wants the North region's trails in miles. Show each trail's name, and its length multiplied by 0.62 as miles.",
     "dataset": "trail-club",
-    "hints": ["You'll need a filter and a calculated column."],
-    "check": { "mode": "result", "ordered": false, "columnNames": true, "decimals": 2 },
+    "hints": [
+      "You'll need a filter and a calculated column."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true,
+      "decimals": 2
+    },
     "cases": [
       {
         "name": "Club trails",
         "hidden": false,
-        "expected": { "columns": ["name", "miles"], "rows": [["Cedar Loop", 5.27], ["Stone Pass", 13.21]] }
+        "expected": {
+          "columns": [
+            "name",
+            "miles"
+          ],
+          "rows": [
+            [
+              "Cedar Loop",
+              5.27
+            ],
+            [
+              "Stone Pass",
+              13.21
+            ]
+          ]
+        }
       },
       {
         "name": "Different trails",
         "hidden": true,
         "setupSql": "DELETE FROM trails; INSERT INTO trails VALUES (8, 'High Moor', 'East', 12.6, 610), (10, 'Ash Hollow', 'North', 10.0, 200);",
-        "expected": { "columns": ["name", "miles"], "rows": [["Ash Hollow", 6.2]] }
+        "expected": {
+          "columns": [
+            "name",
+            "miles"
+          ],
+          "rows": [
+            [
+              "Ash Hollow",
+              6.2
+            ]
+          ]
+        }
       }
     ],
-    "solutions": ["SELECT name, length_km * 0.62 AS miles FROM trails WHERE region = 'North';"],
+    "solutions": [
+      "SELECT name, length_km * 0.62 AS miles FROM trails WHERE region = 'North';"
+    ],
     "wrongSolutions": [
-      { "sql": "SELECT name, length_km AS miles FROM trails WHERE region = 'North';", "why": "Doesn't convert the length" },
-      { "sql": "SELECT name, length_km * 0.62 AS miles FROM trails;", "why": "Includes every region" }
+      {
+        "sql": "SELECT name, length_km AS miles FROM trails WHERE region = 'North';",
+        "why": "Doesn't convert the length"
+      },
+      {
+        "sql": "SELECT name, length_km * 0.62 AS miles FROM trails;",
+        "why": "Includes every region"
+      }
+    ]
+  },
+  {
+    "id": "st02-r02",
+    "kind": "review",
+    "stage": 2,
+    "skills": [
+      6,
+      7,
+      11
+    ],
+    "recalls": [],
+    "title": "Budget stationery",
+    "prompt": "Show the name and price of Stationery products under 3, cheapest first.",
+    "dataset": "shop",
+    "hints": [
+      "This needs a filter and a sort."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "price"
+          ],
+          "rows": [
+            [
+              "Pen",
+              1.5
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); UPDATE products SET price = 2.5 WHERE id = 9;",
+        "expected": {
+          "columns": [
+            "name",
+            "price"
+          ],
+          "rows": [
+            [
+              "Ink",
+              2.5
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, price FROM products WHERE category = 'Stationery' AND price < 3 ORDER BY price;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, price FROM products WHERE category = 'Stationery' ORDER BY price;",
+        "why": "Ignores the price limit"
+      },
+      {
+        "sql": "SELECT name, price FROM products WHERE category = 'Stationery' OR price < 3 ORDER BY price;",
+        "why": "OR accepts one condition"
+      }
+    ]
+  },
+  {
+    "id": "st02-r03",
+    "kind": "review",
+    "stage": 2,
+    "skills": [
+      9,
+      11
+    ],
+    "recalls": [],
+    "title": "Without an email",
+    "prompt": "Show the name of employees with no email recorded, A to Z.",
+    "dataset": "staff",
+    "hints": [
+      "Missing values need a special test."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Chloe"
+            ],
+            [
+              "Grace"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Jon"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM employees WHERE email IS NULL ORDER BY name;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM employees WHERE email = NULL ORDER BY name;",
+        "why": "= NULL never matches"
+      },
+      {
+        "sql": "SELECT name FROM employees WHERE email IS NOT NULL ORDER BY name;",
+        "why": "Keeps those with an email"
+      }
+    ]
+  },
+  {
+    "id": "st02-r04",
+    "kind": "review",
+    "stage": 2,
+    "skills": [
+      6,
+      10,
+      11
+    ],
+    "recalls": [],
+    "title": "Devices in use",
+    "prompt": "Show each different device used for sessions lasting at least 20 minutes, A to Z.",
+    "dataset": "app",
+    "hints": [
+      "Filter, remove duplicates, and sort."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "device"
+          ],
+          "rows": [
+            [
+              "android"
+            ],
+            [
+              "ios"
+            ],
+            [
+              "web"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "device"
+          ],
+          "rows": [
+            [
+              "android"
+            ],
+            [
+              "web"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT DISTINCT device FROM sessions WHERE minutes >= 20 ORDER BY device;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT device FROM sessions WHERE minutes >= 20 ORDER BY device;",
+        "why": "Keeps duplicates"
+      },
+      {
+        "sql": "SELECT DISTINCT device FROM sessions WHERE minutes > 20 ORDER BY device;",
+        "why": "Leaves out exactly 20 minutes"
+      }
+    ]
+  },
+  {
+    "id": "st02-r05",
+    "kind": "review",
+    "stage": 2,
+    "skills": [
+      9
+    ],
+    "recalls": [],
+    "title": "Unfinished work",
+    "prompt": "Show the student_id and course_id of enrolments with no grade yet.",
+    "dataset": "school",
+    "hints": [
+      "Think about how a missing grade is stored."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "student_id",
+            "course_id"
+          ],
+          "rows": [
+            [
+              3,
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "student_id",
+            "course_id"
+          ],
+          "rows": [
+            [
+              7,
+              5
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT student_id, course_id FROM enrolments WHERE grade IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT student_id, course_id FROM enrolments WHERE grade = 0;",
+        "why": "Zero isn't missing"
+      },
+      {
+        "sql": "SELECT student_id, course_id FROM enrolments;",
+        "why": "Doesn't filter"
+      }
+    ]
+  },
+  {
+    "id": "st02-r06",
+    "kind": "review",
+    "stage": 2,
+    "skills": [
+      5,
+      8
+    ],
+    "recalls": [],
+    "title": "Mild spring days",
+    "prompt": "Show the city, reading_date, and temp_c as temperature for readings from 3 to 7 degrees inclusive.",
+    "dataset": "weather",
+    "hints": [
+      "There's a shorter way than two comparisons."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "city",
+            "reading_date",
+            "temperature"
+          ],
+          "rows": [
+            [
+              "Oslo",
+              "2024-03-02",
+              4
+            ],
+            [
+              "Oslo",
+              "2024-03-03",
+              3
+            ],
+            [
+              "Oslo",
+              "2024-03-05",
+              7
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL); UPDATE readings SET temp_c = 7 WHERE id = 14; UPDATE readings SET temp_c = 3 WHERE id = 15;",
+        "expected": {
+          "columns": [
+            "city",
+            "reading_date",
+            "temperature"
+          ],
+          "rows": [
+            [
+              "Quito",
+              "2024-07-31",
+              7
+            ],
+            [
+              "Quito",
+              "2024-08-01",
+              3
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT city, reading_date, temp_c AS temperature FROM readings WHERE temp_c BETWEEN 3 AND 7;",
+      "SELECT city, reading_date, temp_c AS temperature FROM readings WHERE temp_c >= 3 AND temp_c <= 7;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT city, reading_date, temp_c AS temperature FROM readings WHERE temp_c > 3 AND temp_c < 7;",
+        "why": "Leaves out the exact limits"
+      },
+      {
+        "sql": "SELECT city, reading_date, temp_c FROM readings WHERE temp_c BETWEEN 3 AND 7;",
+        "why": "Doesn't rename the column"
+      }
+    ]
+  },
+  {
+    "id": "st02-r07",
+    "kind": "review",
+    "stage": 2,
+    "skills": [
+      6,
+      7,
+      11
+    ],
+    "recalls": [],
+    "title": "Older non-fiction",
+    "prompt": "Show the title and year of books published before 2020 that aren't Fiction, newest first.",
+    "dataset": "bookshop",
+    "hints": [
+      "Combine two conditions, then sort."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title",
+            "year"
+          ],
+          "rows": [
+            [
+              "The Salt Road",
+              2019
+            ],
+            [
+              "Small Planets",
+              2018
+            ],
+            [
+              "The Last Ferry",
+              2014
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": {
+          "columns": [
+            "title",
+            "year"
+          ],
+          "rows": [
+            [
+              "North Light",
+              2015
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT title, year FROM books WHERE year < 2020 AND genre <> 'Fiction' ORDER BY year DESC;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT title, year FROM books WHERE year < 2020 ORDER BY year DESC;",
+        "why": "Keeps Fiction"
+      },
+      {
+        "sql": "SELECT title, year FROM books WHERE year < 2020 AND genre <> 'Fiction' ORDER BY year;",
+        "why": "Sorts oldest first"
+      }
+    ]
+  },
+  {
+    "id": "st02-r08",
+    "kind": "review",
+    "stage": 2,
+    "skills": [
+      5,
+      6
+    ],
+    "recalls": [],
+    "title": "Price of a bonus",
+    "prompt": "Show each employee's name and a pay_total equal to salary plus 5000, for employees earning under 60000.",
+    "dataset": "staff",
+    "hints": [
+      "Calculate in SELECT and filter in WHERE."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "pay_total"
+          ],
+          "rows": [
+            [
+              "Farid",
+              63000
+            ],
+            [
+              "Grace",
+              53000
+            ],
+            [
+              "Hugo",
+              46000
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "pay_total"
+          ],
+          "rows": [
+            [
+              "Leo",
+              35000
+            ],
+            [
+              "Mia",
+              60000
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, salary + 5000 AS pay_total FROM employees WHERE salary < 60000;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, salary AS pay_total FROM employees WHERE salary < 60000;",
+        "why": "Doesn't add 5000"
+      },
+      {
+        "sql": "SELECT name, salary + 5000 AS pay_total FROM employees;",
+        "why": "Doesn't filter"
+      }
+    ]
+  },
+  {
+    "id": "st02-r09",
+    "kind": "review",
+    "stage": 2,
+    "skills": [
+      11
+    ],
+    "recalls": [],
+    "title": "Largest quantity",
+    "prompt": "Show the order_id, product_id, and quantity of the order item with the largest quantity. If tied, use the lowest order_id.",
+    "dataset": "shop",
+    "hints": [
+      "Sort on two columns and keep one row."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "order_id",
+            "product_id",
+            "quantity"
+          ],
+          "rows": [
+            [
+              6,
+              2,
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "order_id",
+            "product_id",
+            "quantity"
+          ],
+          "rows": [
+            [
+              11,
+              8,
+              3
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT order_id, product_id, quantity FROM order_items ORDER BY quantity DESC, order_id LIMIT 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT order_id, product_id, quantity FROM order_items ORDER BY quantity LIMIT 1;",
+        "why": "Finds the smallest"
+      },
+      {
+        "sql": "SELECT order_id, product_id, quantity FROM order_items ORDER BY order_id LIMIT 1;",
+        "why": "Sorts by order, not quantity"
+      }
+    ]
+  },
+  {
+    "id": "st02-r10",
+    "kind": "review",
+    "stage": 2,
+    "skills": [
+      8,
+      9
+    ],
+    "recalls": [],
+    "title": "Contact cleanup",
+    "prompt": "Show the full_name and city of contacts in London or Geneva, or with no city recorded.",
+    "dataset": "contacts",
+    "hints": [
+      "A list won't match a missing value."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "full_name",
+            "city"
+          ],
+          "rows": [
+            [
+              "ada lovelace",
+              "London"
+            ],
+            [
+              "alan turing",
+              "London"
+            ],
+            [
+              "Katherine Johnson",
+              null
+            ],
+            [
+              "Tim Lee",
+              "Geneva"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3');",
+        "expected": {
+          "columns": [
+            "full_name",
+            "city"
+          ],
+          "rows": [
+            [
+              "BOB Kahn",
+              null
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT full_name, city FROM contacts WHERE city IN ('London', 'Geneva') OR city IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT full_name, city FROM contacts WHERE city IN ('London', 'Geneva');",
+        "why": "Drops missing cities"
+      },
+      {
+        "sql": "SELECT full_name, city FROM contacts WHERE city IS NULL;",
+        "why": "Keeps only missing cities"
+      }
     ]
   }
 ]

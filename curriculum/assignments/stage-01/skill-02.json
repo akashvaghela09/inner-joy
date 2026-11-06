@@ -1,0 +1,551 @@
+[
+  {
+    "id": "s02-01",
+    "skill": 2,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Check a type",
+    "prompt": "Show each employee's name and the type of their salary in a column named salary_type. Replace the ___.",
+    "dataset": "staff",
+    "starterSql": "SELECT name, typeof(___) AS salary_type\nFROM employees;",
+    "hints": [
+      "Put the column name inside typeof()."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "salary_type"
+          ],
+          "rows": [
+            [
+              "Asha",
+              "integer"
+            ],
+            [
+              "Ben",
+              "integer"
+            ],
+            [
+              "Chloe",
+              "integer"
+            ],
+            [
+              "Dev",
+              "integer"
+            ],
+            [
+              "Elena",
+              "integer"
+            ],
+            [
+              "Farid",
+              "integer"
+            ],
+            [
+              "Grace",
+              "integer"
+            ],
+            [
+              "Hugo",
+              "integer"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "salary_type"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              "integer"
+            ],
+            [
+              "Jon",
+              "integer"
+            ],
+            [
+              "Kim",
+              "integer"
+            ],
+            [
+              "Leo",
+              "integer"
+            ],
+            [
+              "Mia",
+              "integer"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, typeof(salary) AS salary_type FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, typeof(name) AS salary_type FROM employees;",
+        "why": "Checks the name column instead"
+      },
+      {
+        "sql": "SELECT name, salary AS salary_type FROM employees;",
+        "why": "Shows the salary, not its type"
+      }
+    ]
+  },
+  {
+    "id": "s02-02",
+    "skill": 2,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      1
+    ],
+    "title": "A decimal type",
+    "prompt": "Show each book's title and the type of its price in a column named price_type.",
+    "dataset": "bookshop",
+    "hints": [
+      "typeof(price) gives the type."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title",
+            "price_type"
+          ],
+          "rows": [
+            [
+              "The Salt Road",
+              "real"
+            ],
+            [
+              "Quiet Engines",
+              "real"
+            ],
+            [
+              "Paper Lanterns",
+              "real"
+            ],
+            [
+              "River of Glass",
+              "real"
+            ],
+            [
+              "Small Planets",
+              "real"
+            ],
+            [
+              "The Last Ferry",
+              "real"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": {
+          "columns": [
+            "title",
+            "price_type"
+          ],
+          "rows": [
+            [
+              "Copper Moon",
+              "real"
+            ],
+            [
+              "North Light",
+              "real"
+            ],
+            [
+              "Sky Atlas",
+              "real"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT title, typeof(price) AS price_type FROM books;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT title, typeof(pages) AS price_type FROM books;",
+        "why": "Checks pages instead"
+      },
+      {
+        "sql": "SELECT title, typeof(price) FROM books;",
+        "why": "Doesn't name the column"
+      }
+    ]
+  },
+  {
+    "id": "s02-03",
+    "skill": 2,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [],
+    "title": "Spot a missing value",
+    "prompt": "Show each employee's name, their bonus, and the type of the bonus as bonus_type. Look at how missing bonuses appear.",
+    "dataset": "staff",
+    "hints": [
+      "A missing value has the type null."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "bonus",
+            "bonus_type"
+          ],
+          "rows": [
+            [
+              "Asha",
+              10000,
+              "integer"
+            ],
+            [
+              "Ben",
+              null,
+              "null"
+            ],
+            [
+              "Chloe",
+              5000,
+              "integer"
+            ],
+            [
+              "Dev",
+              2000,
+              "integer"
+            ],
+            [
+              "Elena",
+              null,
+              "null"
+            ],
+            [
+              "Farid",
+              0,
+              "integer"
+            ],
+            [
+              "Grace",
+              null,
+              "null"
+            ],
+            [
+              "Hugo",
+              null,
+              "null"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "bonus",
+            "bonus_type"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              900,
+              "integer"
+            ],
+            [
+              "Jon",
+              null,
+              "null"
+            ],
+            [
+              "Kim",
+              300,
+              "integer"
+            ],
+            [
+              "Leo",
+              null,
+              "null"
+            ],
+            [
+              "Mia",
+              0,
+              "integer"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, bonus, typeof(bonus) AS bonus_type FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, bonus, typeof(salary) AS bonus_type FROM employees;",
+        "why": "Checks salary instead"
+      },
+      {
+        "sql": "SELECT name, typeof(bonus) AS bonus_type FROM employees;",
+        "why": "Leaves out the bonus"
+      }
+    ]
+  },
+  {
+    "id": "s02-04",
+    "skill": 2,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [],
+    "title": "Dates are text",
+    "prompt": "Show each reading's reading_date and its type as date_type. SQLite has no separate date type.",
+    "dataset": "weather",
+    "hints": [
+      "Use typeof(reading_date)."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "reading_date",
+            "date_type"
+          ],
+          "rows": [
+            [
+              "2024-03-01",
+              "text"
+            ],
+            [
+              "2024-03-02",
+              "text"
+            ],
+            [
+              "2024-03-03",
+              "text"
+            ],
+            [
+              "2024-03-05",
+              "text"
+            ],
+            [
+              "2024-03-01",
+              "text"
+            ],
+            [
+              "2024-03-02",
+              "text"
+            ],
+            [
+              "2024-03-03",
+              "text"
+            ],
+            [
+              "2024-03-04",
+              "text"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "reading_date",
+            "date_type"
+          ],
+          "rows": [
+            [
+              "2024-07-30",
+              "text"
+            ],
+            [
+              "2024-07-31",
+              "text"
+            ],
+            [
+              "2024-08-01",
+              "text"
+            ],
+            [
+              "2024-07-31",
+              "text"
+            ],
+            [
+              "2024-08-01",
+              "text"
+            ],
+            [
+              "2024-08-03",
+              "text"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT reading_date, typeof(reading_date) AS date_type FROM readings;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT reading_date, typeof(temp_c) AS date_type FROM readings;",
+        "why": "Checks the temperature instead"
+      },
+      {
+        "sql": "SELECT reading_date FROM readings;",
+        "why": "Leaves out the type"
+      }
+    ]
+  },
+  {
+    "id": "s02-05",
+    "skill": 2,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [],
+    "title": "A number that isn't a number",
+    "prompt": "Phone numbers look numeric, but check how they're stored. Show each contact's phone and its type as phone_type.",
+    "dataset": "contacts",
+    "hints": [
+      "Some phones are missing, so expect both text and null."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "phone",
+            "phone_type"
+          ],
+          "rows": [
+            [
+              "555-0101",
+              "text"
+            ],
+            [
+              "555-0102",
+              "text"
+            ],
+            [
+              null,
+              "null"
+            ],
+            [
+              "5550104",
+              "text"
+            ],
+            [
+              "555-0105",
+              "text"
+            ],
+            [
+              "555-0106",
+              "text"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3');",
+        "expected": {
+          "columns": [
+            "phone",
+            "phone_type"
+          ],
+          "rows": [
+            [
+              "555-0111",
+              "text"
+            ],
+            [
+              "555-0112",
+              "text"
+            ],
+            [
+              null,
+              "null"
+            ],
+            [
+              "5550114",
+              "text"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT phone, typeof(phone) AS phone_type FROM contacts;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT phone, typeof(id) AS phone_type FROM contacts;",
+        "why": "Checks the id instead"
+      },
+      {
+        "sql": "SELECT typeof(phone) AS phone_type FROM contacts;",
+        "why": "Leaves out the phone"
+      }
+    ]
+  }
+]

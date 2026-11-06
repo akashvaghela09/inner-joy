@@ -1,0 +1,15 @@
+{
+  "skill": 3,
+  "summary": "Keys connect tables. They're how a database knows which department an employee belongs to.",
+  "points": [
+    "A primary key uniquely identifies each row, usually a column called id.",
+    "A foreign key stores the primary key of a row in another table, such as department_id.",
+    "To follow a link by hand, read the foreign key, then look that id up in the other table.",
+    "A foreign key can point to a row that no longer exists, so don't assume every link is valid."
+  ],
+  "example": {
+    "dataset": "staff",
+    "sql": "SELECT name, department_id\nFROM employees\nWHERE department_id = 1;",
+    "explanation": "These employees all store 1 in department_id, which points to the row with id 1 in departments: Engineering."
+  }
+}

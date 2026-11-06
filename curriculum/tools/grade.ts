@@ -67,8 +67,16 @@ export function runStatements(db: Database, sql: string): ResultSet[] {
   return results;
 }
 
+/** SQLite parses REGEXP but leaves the function for the application to provide. */
+export function registerRegexp(db: Database) {
+  db.create_function("regexp", (pattern: string, value: unknown) =>
+    value !== null && new RegExp(pattern).test(String(value)) ? 1 : 0,
+  );
+}
+
 export function createCaseDb(SQL: SqlJsStatic, dataset: Dataset, testCase?: TestCase): Database {
   const db = new SQL.Database();
+  registerRegexp(db);
   db.run(dataset.schemaSql);
   db.run(dataset.seedSql);
   if (testCase?.setupSql) db.run(testCase.setupSql);

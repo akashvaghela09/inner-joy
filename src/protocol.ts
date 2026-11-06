@@ -4,7 +4,8 @@ export type WorkerRequestBody =
   | { op: "playground"; sql: string }
   | { op: "try"; sql: string; dataset: Dataset; assignment: Assignment }
   | { op: "check"; sql: string; dataset: Dataset; assignment: Assignment }
-  | { op: "describe"; dataset: Dataset };
+  | { op: "describe"; dataset: Dataset }
+  | { op: "example"; sql: string; dataset: Dataset };
 
 export type WorkerRequest = WorkerRequestBody & { id: number };
 

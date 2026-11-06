@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import type { Assignment } from "../../curriculum/tools/grade";
 import {
   datasetFor,
+  findLesson,
+  startPath,
   groupOf,
   isRequired,
   nextAssignment,
@@ -21,6 +23,7 @@ import { DataSection } from "./DataSection";
 import { ChevronLeftIcon, ChevronRightIcon } from "./Icons";
 import { SqlEditor } from "./SqlEditor";
 import { StepStrip } from "./StepStrip";
+import { paths } from "../routes";
 
 const UNDO_MS = 10_000;
 const IS_MAC = /Mac|iPhone|iPad/.test(navigator.userAgent);
@@ -121,7 +124,7 @@ export function AssignmentView({ assignment }: { assignment: Assignment }) {
     <>
       <div className={wb.topBar}>
         <nav className={wb.crumbs} aria-label="Breadcrumb">
-          <a href={`#/chapter/${stage.id}`}>Chapter {stage.id}</a>
+          <a href={paths.chapter(stage.id)}>Chapter {stage.id}</a>
           <span className={wb.crumbSeparator} aria-hidden="true">
             /
           </span>
@@ -130,7 +133,7 @@ export function AssignmentView({ assignment }: { assignment: Assignment }) {
         <div className={wb.topBarRight}>
           <StepStrip group={group} current={assignment} />
           {previous ? (
-            <a className={`${ui.button} ${ui.iconButton}`} href={`#/a/${previous.id}`} aria-label={`Previous: ${previous.title}`} title={`Previous: ${previous.title}`}>
+            <a className={`${ui.button} ${ui.iconButton}`} href={paths.assignment(previous.id)} aria-label={`Previous: ${previous.title}`} title={`Previous: ${previous.title}`}>
               <ChevronLeftIcon />
             </a>
           ) : (
@@ -139,7 +142,7 @@ export function AssignmentView({ assignment }: { assignment: Assignment }) {
             </button>
           )}
           {following ? (
-            <a className={`${ui.button} ${ui.iconButton}`} href={`#/a/${following.id}`} aria-label={`Next: ${following.title}`} title={`Next: ${following.title}`}>
+            <a className={`${ui.button} ${ui.iconButton}`} href={paths.assignment(following.id)} aria-label={`Next: ${following.title}`} title={`Next: ${following.title}`}>
               <ChevronRightIcon />
             </a>
           ) : (
@@ -159,6 +162,9 @@ export function AssignmentView({ assignment }: { assignment: Assignment }) {
               {typeLabel(assignment)}
             </span>
             {!isRequired(assignment) && <span className={wb.extraTag}>Extra practice</span>}
+            {assignment.skill !== undefined && findLesson(assignment.skill) && (
+              <a href={paths.lesson(assignment.skill)}>Read the lesson</a>
+            )}
           </p>
           <p className={wb.prompt}>{assignment.prompt}</p>
           {isDesktop && <DataSection dataset={dataset} label={`Data: ${dataset.title}`} />}
@@ -210,11 +216,11 @@ export function AssignmentView({ assignment }: { assignment: Assignment }) {
             {showNext ? (
               <span className={wb.spacerActions}>
                 {extra && (
-                  <a className={ui.button} href={`#/a/${extra.id}`}>
+                  <a className={ui.button} href={paths.assignment(extra.id)}>
                     Extra practice
                   </a>
                 )}
-                <a className={`${ui.button} ${ui.primary} ${wb.nextLink}`} href={`#/a/${next.assignment.id}`}>
+                <a className={`${ui.button} ${ui.primary} ${wb.nextLink}`} href={startPath(next.assignment)}>
                   {next.label}
                 </a>
               </span>
