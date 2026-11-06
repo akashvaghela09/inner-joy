@@ -422,7 +422,7 @@
     "stepType": "fixBug",
     "required": false,
     "recalls": [],
-    "title": "Fix the comparison",
+    "title": "Fix the subquery",
     "prompt": "This should show employees earning the top salary, but it fails because the subquery returns a whole column. Fix it.",
     "dataset": "staff",
     "starterSql": "SELECT name\nFROM employees\nWHERE salary = (SELECT salary FROM employees WHERE);",

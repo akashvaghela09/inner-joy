@@ -210,6 +210,46 @@ describe("assignments", () => {
   });
 });
 
+describe("completeness", () => {
+  it("has every planned assignment", () => {
+    expect(assignments.length).toBe(575);
+    for (const stage of stages) {
+      for (const skill of stage.skills) {
+        const steps = assignments.filter((assignment) => assignment.skill === skill.id).map((assignment) => assignment.step);
+        expect(steps.sort((a, b) => a! - b!)).toEqual(Array.from({ length: stage.assignmentsPerSkill }, (_, index) => index + 1));
+      }
+      const ofKind = (kind: string) => assignments.filter((assignment) => assignment.kind === kind && assignment.stage === stage.id);
+      expect(ofKind("review").length).toBe(stage.reviewCount);
+      expect(ofKind("checkpoint").length).toBe(stage.checkpoints.sourceProblems.length + stage.checkpoints.originalCount);
+      const sources = ofKind("checkpoint").flatMap((assignment) => (assignment.sourceProblem ? [assignment.sourceProblem] : []));
+      expect(sources.sort((a, b) => a - b)).toEqual([...stage.checkpoints.sourceProblems].sort((a, b) => a - b));
+    }
+  });
+
+  it("uses every planned recall in a real assignment", () => {
+    const unused = skills.flatMap((skill) => {
+      const used = new Set(assignments.filter((assignment) => assignment.skill === skill.id).flatMap((assignment) => assignment.recalls));
+      return skill.recalls.filter((recall) => !used.has(recall)).map((recall) => `${skill.id} recalls ${recall}`);
+    });
+    expect(unused).toEqual([]);
+  });
+
+  it("recalls every skill before the optional final chapter", () => {
+    const recalled = new Set(assignments.flatMap((assignment) => assignment.recalls));
+    const forgotten = skills.filter((skill) => stageOfSkill.get(skill.id)!.id < 10 && !recalled.has(skill.id)).map((skill) => skill.id);
+    expect(forgotten).toEqual([]);
+  });
+
+  it("gives every assignment a different title", () => {
+    const titles = assignments.map((assignment) => assignment.title);
+    expect(titles.filter((title, index) => titles.indexOf(title) !== index)).toEqual([]);
+  });
+
+  it("has a lesson for every skill", () => {
+    expect(lessons.map((lesson) => lesson.skill).sort((a, b) => a - b)).toEqual(skills.map((skill) => skill.id));
+  });
+});
+
 describe("planned recalls", () => {
   it("are all earlier than the assignment's skill", () => {
     for (const assignment of assignments) {

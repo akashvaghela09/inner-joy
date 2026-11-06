@@ -1,0 +1,15 @@
+{
+  "skill": 48,
+  "summary": "DELETE removes rows from a table.",
+  "points": [
+    "DELETE FROM table WHERE condition removes the matching rows.",
+    "Without WHERE, it removes every row, though the table itself stays.",
+    "Run the same WHERE as a SELECT first, to see what would go.",
+    "SQLite doesn't support MySQL's DELETE ... JOIN, so use a subquery in WHERE."
+  ],
+  "example": {
+    "dataset": "trail-club",
+    "sql": "DELETE FROM trails\nWHERE length_km < 6;\n\nSELECT name FROM trails;",
+    "explanation": "The short trail is gone. A SELECT with the same WHERE would have shown it first."
+  }
+}

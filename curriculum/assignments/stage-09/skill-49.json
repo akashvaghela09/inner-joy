@@ -1,0 +1,1029 @@
+[
+  {
+    "id": "s49-01",
+    "skill": 49,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [
+      48
+    ],
+    "title": "Undo a mistake",
+    "prompt": "Someone ran a delete on every trail inside a transaction. Undo it, then delete only the North trails, which is what was wanted. Replace the ___.",
+    "dataset": "trail-club",
+    "starterSql": "BEGIN;\nDELETE FROM trails;\n___;\nDELETE FROM trails WHERE region = 'North';",
+    "hints": [
+      "ROLLBACK undoes everything since BEGIN."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name FROM trails ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Trail Club",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              2,
+              "Fox Ridge"
+            ],
+            [
+              3,
+              "Mill Stream"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM trails; INSERT INTO trails VALUES (7, 'Birch Walk', 'West', 3.1, 40), (8, 'High Moor', 'East', 12.6, 610), (9, 'Crag Top', 'North', 6.0, 900);",
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              7,
+              "Birch Walk"
+            ],
+            [
+              8,
+              "High Moor"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "BEGIN; DELETE FROM trails; ROLLBACK; DELETE FROM trails WHERE region = 'North';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "DELETE FROM trails;",
+        "why": "Deletes everything"
+      },
+      {
+        "sql": "BEGIN; DELETE FROM trails; COMMIT;",
+        "why": "COMMIT makes the mistake permanent"
+      },
+      {
+        "sql": "BEGIN; DELETE FROM trails; ROLLBACK;",
+        "why": "Doesn't delete the North trails"
+      }
+    ]
+  },
+  {
+    "id": "s49-02",
+    "skill": 49,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      48
+    ],
+    "title": "Commit a change",
+    "prompt": "Inside a transaction, delete the trails in the East region, and commit.",
+    "dataset": "trail-club",
+    "hints": [
+      "COMMIT makes it permanent."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name FROM trails ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Trail Club",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              1,
+              "Cedar Loop"
+            ],
+            [
+              3,
+              "Mill Stream"
+            ],
+            [
+              4,
+              "Stone Pass"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM trails; INSERT INTO trails VALUES (7, 'Birch Walk', 'West', 3.1, 40), (8, 'High Moor', 'East', 12.6, 610), (9, 'Crag Top', 'North', 6.0, 900);",
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              7,
+              "Birch Walk"
+            ],
+            [
+              9,
+              "Crag Top"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "BEGIN; DELETE FROM trails WHERE region = 'East'; COMMIT;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "BEGIN; DELETE FROM trails WHERE region = 'East'; ROLLBACK;",
+        "why": "Undoes the change"
+      },
+      {
+        "sql": "BEGIN; DELETE FROM trails; COMMIT;",
+        "why": "Deletes every trail"
+      }
+    ]
+  },
+  {
+    "id": "s49-03",
+    "skill": 49,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      47
+    ],
+    "title": "Two changes together",
+    "prompt": "In one transaction, raise book 1's price by 1 and lower book 2's by 1, then commit.",
+    "dataset": "bookshop",
+    "hints": [
+      "Both UPDATEs go between BEGIN and COMMIT."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, title, author, genre, price, pages, year FROM books ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "title",
+            "author",
+            "genre",
+            "price",
+            "pages",
+            "year"
+          ],
+          "rows": [
+            [
+              1,
+              "The Salt Road",
+              "Mina Rao",
+              "History",
+              19.5,
+              320,
+              2019
+            ],
+            [
+              2,
+              "Quiet Engines",
+              "Tom Okafor",
+              "Science",
+              23,
+              412,
+              2021
+            ],
+            [
+              3,
+              "Paper Lanterns",
+              "Mina Rao",
+              "Fiction",
+              12,
+              250,
+              2016
+            ],
+            [
+              4,
+              "River of Glass",
+              "Lena Park",
+              "Fiction",
+              15.5,
+              298,
+              2022
+            ],
+            [
+              5,
+              "Small Planets",
+              "Tom Okafor",
+              "Science",
+              30,
+              540,
+              2018
+            ],
+            [
+              6,
+              "The Last Ferry",
+              "Ivan Cole",
+              "Mystery",
+              9,
+              210,
+              2014
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023); INSERT INTO books VALUES (1, 'The Salt Road', 'Mina Rao', 'History', 18.5, 320, 2019), (2, 'Quiet Engines', 'Tom Okafor', 'Science', 24.0, 412, 2021);",
+        "expected": {
+          "columns": [
+            "id",
+            "title",
+            "author",
+            "genre",
+            "price",
+            "pages",
+            "year"
+          ],
+          "rows": [
+            [
+              1,
+              "The Salt Road",
+              "Mina Rao",
+              "History",
+              19.5,
+              320,
+              2019
+            ],
+            [
+              2,
+              "Quiet Engines",
+              "Tom Okafor",
+              "Science",
+              23,
+              412,
+              2021
+            ],
+            [
+              10,
+              "Copper Moon",
+              "Ada Hill",
+              "Fantasy",
+              20,
+              100,
+              2020
+            ],
+            [
+              11,
+              "North Light",
+              "Raj Dev",
+              "Travel",
+              7.5,
+              180,
+              2015
+            ],
+            [
+              12,
+              "Sky Atlas",
+              "Ada Hill",
+              "Science",
+              25,
+              300,
+              2023
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "BEGIN; UPDATE books SET price = price + 1 WHERE id = 1; UPDATE books SET price = price - 1 WHERE id = 2; COMMIT;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "BEGIN; UPDATE books SET price = price + 1 WHERE id = 1; COMMIT;",
+        "why": "Makes only one change"
+      },
+      {
+        "sql": "BEGIN; UPDATE books SET price = price + 1 WHERE id = 1; UPDATE books SET price = price - 1 WHERE id = 2; ROLLBACK;",
+        "why": "Undoes both"
+      }
+    ]
+  },
+  {
+    "id": "s49-04",
+    "skill": 49,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      47
+    ],
+    "title": "Move a person",
+    "prompt": "In one transaction, move employee 4 to department 3 and set their bonus to 500, then commit.",
+    "dataset": "staff",
+    "hints": [
+      "Two changes, or a single UPDATE, inside the transaction."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name, department_id, salary, bonus FROM employees ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "department_id",
+            "salary",
+            "bonus"
+          ],
+          "rows": [
+            [
+              1,
+              "Asha",
+              1,
+              120000,
+              10000
+            ],
+            [
+              2,
+              "Ben",
+              1,
+              95000,
+              null
+            ],
+            [
+              3,
+              "Chloe",
+              1,
+              95000,
+              5000
+            ],
+            [
+              4,
+              "Dev",
+              3,
+              70000,
+              500
+            ],
+            [
+              5,
+              "Elena",
+              2,
+              62000,
+              null
+            ],
+            [
+              6,
+              "Farid",
+              2,
+              58000,
+              0
+            ],
+            [
+              7,
+              "Grace",
+              3,
+              48000,
+              null
+            ],
+            [
+              8,
+              "Hugo",
+              null,
+              41000,
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); INSERT INTO employees VALUES (4, 'Dev', 2, 1, 70000, '2020-11-09', 2000, 'dev@acme.test');",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "department_id",
+            "salary",
+            "bonus"
+          ],
+          "rows": [
+            [
+              4,
+              "Dev",
+              3,
+              70000,
+              500
+            ],
+            [
+              11,
+              "Ivy",
+              5,
+              90000,
+              900
+            ],
+            [
+              12,
+              "Jon",
+              5,
+              70000,
+              null
+            ],
+            [
+              13,
+              "Kim",
+              6,
+              70000,
+              300
+            ],
+            [
+              14,
+              "Leo",
+              null,
+              30000,
+              null
+            ],
+            [
+              15,
+              "Mia",
+              6,
+              55000,
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "BEGIN; UPDATE employees SET department_id = 3 WHERE id = 4; UPDATE employees SET bonus = 500 WHERE id = 4; COMMIT;",
+      "BEGIN; UPDATE employees SET department_id = 3, bonus = 500 WHERE id = 4; COMMIT;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "BEGIN; UPDATE employees SET department_id = 3 WHERE id = 4; COMMIT;",
+        "why": "Leaves the bonus"
+      },
+      {
+        "sql": "BEGIN; UPDATE employees SET department_id = 3, bonus = 500 WHERE id = 4; ROLLBACK;",
+        "why": "Undoes the change"
+      }
+    ]
+  },
+  {
+    "id": "s49-05",
+    "skill": 49,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      46
+    ],
+    "title": "Partial undo isn't automatic",
+    "prompt": "Without using a transaction, an error doesn't undo earlier statements. Here, insert id 70, Ivy Path, North, 1.0, 10, on its own, with no BEGIN.",
+    "dataset": "trail-club",
+    "hints": [
+      "A single statement saves on its own."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name, elevation_m FROM trails ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Trail Club",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "elevation_m"
+          ],
+          "rows": [
+            [
+              1,
+              "Cedar Loop",
+              320
+            ],
+            [
+              2,
+              "Fox Ridge",
+              870
+            ],
+            [
+              3,
+              "Mill Stream",
+              90
+            ],
+            [
+              4,
+              "Stone Pass",
+              1450
+            ],
+            [
+              70,
+              "Ivy Path",
+              10
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM trails; INSERT INTO trails VALUES (7, 'Birch Walk', 'West', 3.1, 40), (8, 'High Moor', 'East', 12.6, 610), (9, 'Crag Top', 'North', 6.0, 900);",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "elevation_m"
+          ],
+          "rows": [
+            [
+              7,
+              "Birch Walk",
+              40
+            ],
+            [
+              8,
+              "High Moor",
+              610
+            ],
+            [
+              9,
+              "Crag Top",
+              900
+            ],
+            [
+              70,
+              "Ivy Path",
+              10
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "INSERT INTO trails (id, name, region, length_km, elevation_m) VALUES (70, 'Ivy Path', 'North', 1.0, 10);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "BEGIN; INSERT INTO trails (id, name, region, length_km, elevation_m) VALUES (70, 'Ivy Path', 'North', 1.0, 10); ROLLBACK;",
+        "why": "The rollback undoes it"
+      },
+      {
+        "sql": "INSERT INTO trails (id, name, region, length_km, elevation_m) VALUES (70, 'Ivy Path', 'North', 1.0, 11);",
+        "why": "Uses the wrong elevation"
+      }
+    ]
+  },
+  {
+    "id": "s49-06",
+    "skill": 49,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [
+      47
+    ],
+    "title": "Fix the unfinished transaction",
+    "prompt": "This should cancel order 2 and save the change, but it ends with the wrong command. Fix it.",
+    "dataset": "shop",
+    "starterSql": "BEGIN;\nUPDATE orders SET status = 'cancelled' WHERE id = 2;\nROLLBACK;",
+    "hints": [
+      "End with COMMIT to keep it."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, customer_id, status FROM orders ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "customer_id",
+            "status"
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "shipped"
+            ],
+            [
+              2,
+              2,
+              "cancelled"
+            ],
+            [
+              3,
+              1,
+              "cancelled"
+            ],
+            [
+              4,
+              3,
+              "shipped"
+            ],
+            [
+              5,
+              4,
+              "pending"
+            ],
+            [
+              6,
+              3,
+              "shipped"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO orders VALUES (2, 9, '2024-04-01', 'pending');",
+        "expected": {
+          "columns": [
+            "id",
+            "customer_id",
+            "status"
+          ],
+          "rows": [
+            [
+              2,
+              9,
+              "cancelled"
+            ],
+            [
+              11,
+              7,
+              "shipped"
+            ],
+            [
+              12,
+              8,
+              "pending"
+            ],
+            [
+              13,
+              7,
+              "cancelled"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "BEGIN; UPDATE orders SET status = 'cancelled' WHERE id = 2; COMMIT;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "BEGIN; UPDATE orders SET status = 'cancelled' WHERE id = 2; ROLLBACK;",
+        "why": "Still undoes it"
+      },
+      {
+        "sql": "BEGIN; UPDATE orders SET status = 'cancelled'; COMMIT;",
+        "why": "Cancels every order"
+      }
+    ]
+  },
+  {
+    "id": "s49-07",
+    "skill": 49,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      46,
+      48
+    ],
+    "title": "Archive and remove",
+    "prompt": "In one transaction: add a product copy of product 1 with id 300, name Archived, the same category, price, and cost; then delete product 1. Commit.",
+    "dataset": "shop",
+    "hints": [
+      "INSERT ... SELECT, then DELETE."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name, category, price FROM products ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "category",
+            "price"
+          ],
+          "rows": [
+            [
+              2,
+              "Pen",
+              "Stationery",
+              1.5
+            ],
+            [
+              3,
+              "Mug",
+              "Kitchen",
+              9
+            ],
+            [
+              4,
+              "Kettle",
+              "Kitchen",
+              35
+            ],
+            [
+              5,
+              "Lamp",
+              "Home",
+              25
+            ],
+            [
+              6,
+              "Rug",
+              "Home",
+              60
+            ],
+            [
+              300,
+              "Archived",
+              "Stationery",
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO products VALUES (1, 'Notebook', 'Stationery', 4.0, 1.5);",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "category",
+            "price"
+          ],
+          "rows": [
+            [
+              7,
+              "Stool",
+              "Home",
+              40
+            ],
+            [
+              8,
+              "Cup",
+              "Kitchen",
+              9
+            ],
+            [
+              9,
+              "Ink",
+              "Stationery",
+              12.5
+            ],
+            [
+              300,
+              "Archived",
+              "Stationery",
+              4
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "BEGIN; INSERT INTO products (id, name, category, price, cost) SELECT 300, 'Archived', category, price, cost FROM products WHERE id = 1; DELETE FROM products WHERE id = 1; COMMIT;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "BEGIN; DELETE FROM products WHERE id = 1; INSERT INTO products (id, name, category, price, cost) SELECT 300, 'Archived', category, price, cost FROM products WHERE id = 1; COMMIT;",
+        "why": "The row is gone before copying"
+      },
+      {
+        "sql": "BEGIN; INSERT INTO products (id, name, category, price, cost) SELECT 300, 'Archived', category, price, cost FROM products WHERE id = 1; COMMIT;",
+        "why": "Doesn't delete the original"
+      }
+    ]
+  },
+  {
+    "id": "s49-08",
+    "skill": 49,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      47
+    ],
+    "title": "Salary swap",
+    "prompt": "In one transaction, swap the salaries of employees 2 and 4, using the values 70000 and 95000 directly, then commit. Employee 2 gets 70000.",
+    "dataset": "staff",
+    "hints": [
+      "Two UPDATEs inside the transaction."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name, department_id, salary, bonus FROM employees ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "department_id",
+            "salary",
+            "bonus"
+          ],
+          "rows": [
+            [
+              1,
+              "Asha",
+              1,
+              120000,
+              10000
+            ],
+            [
+              2,
+              "Ben",
+              1,
+              70000,
+              null
+            ],
+            [
+              3,
+              "Chloe",
+              1,
+              95000,
+              5000
+            ],
+            [
+              4,
+              "Dev",
+              2,
+              95000,
+              2000
+            ],
+            [
+              5,
+              "Elena",
+              2,
+              62000,
+              null
+            ],
+            [
+              6,
+              "Farid",
+              2,
+              58000,
+              0
+            ],
+            [
+              7,
+              "Grace",
+              3,
+              48000,
+              null
+            ],
+            [
+              8,
+              "Hugo",
+              null,
+              41000,
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); INSERT INTO employees VALUES (2, 'Ben', 1, 1, 80000, '2019-07-01', NULL, NULL), (4, 'Dev', 2, 1, 60000, '2020-11-09', 2000, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "department_id",
+            "salary",
+            "bonus"
+          ],
+          "rows": [
+            [
+              2,
+              "Ben",
+              1,
+              70000,
+              null
+            ],
+            [
+              4,
+              "Dev",
+              2,
+              95000,
+              2000
+            ],
+            [
+              11,
+              "Ivy",
+              5,
+              90000,
+              900
+            ],
+            [
+              12,
+              "Jon",
+              5,
+              70000,
+              null
+            ],
+            [
+              13,
+              "Kim",
+              6,
+              70000,
+              300
+            ],
+            [
+              14,
+              "Leo",
+              null,
+              30000,
+              null
+            ],
+            [
+              15,
+              "Mia",
+              6,
+              55000,
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "BEGIN; UPDATE employees SET salary = 70000 WHERE id = 2; UPDATE employees SET salary = 95000 WHERE id = 4; COMMIT;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "BEGIN; UPDATE employees SET salary = 70000 WHERE id = 2; COMMIT;",
+        "why": "Changes only one"
+      },
+      {
+        "sql": "BEGIN; UPDATE employees SET salary = 95000 WHERE id = 2; UPDATE employees SET salary = 70000 WHERE id = 4; COMMIT;",
+        "why": "Doesn't swap them"
+      }
+    ]
+  }
+]

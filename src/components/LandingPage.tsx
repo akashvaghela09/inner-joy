@@ -26,7 +26,7 @@ function ContinueAction() {
   const extra = firstIncompleteExtra(completed);
   return (
     <p>
-      You've finished everything written so far.
+      You've finished every required assignment.
       {extra && (
         <>
           {" "}
@@ -49,7 +49,7 @@ function ChapterRow({ stage }: { stage: Stage }) {
           <ProgressBar progress={progress} name={`Chapter ${stage.id} progress`} size="small" />
         </span>
         <span className={styles.count}>
-          {progress.available === 0 ? "Coming soon" : `${progress.done} of ${progress.total}`}
+          {progress.done} of {progress.total}
         </span>
         <span className={styles.rowArrow}>
           <ChevronRightIcon />
@@ -78,7 +78,7 @@ export function LandingPage() {
         <p className={styles.progressLabel}>
           <span className={styles.progressName}>Inner Joy progress</span>
           <span className={ui.muted}>
-            {overall.done} of {overall.total} required · {overall.available} available now
+            {overall.done} of {overall.total} required
             {extras > 0 && ` · ${extras} extra done`}
           </span>
         </p>

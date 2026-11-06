@@ -1,0 +1,505 @@
+[
+  {
+    "id": "st10-c01",
+    "kind": "checkpoint",
+    "stage": 10,
+    "skills": [
+      50,
+      51
+    ],
+    "recalls": [],
+    "title": "A safe new table",
+    "prompt": "Create a table named bookings with id INTEGER PRIMARY KEY, trail_id INTEGER NOT NULL REFERENCES trails(id), and people INTEGER with CHECK (people > 0). Add one booking: id 1, trail 1, 4 people.",
+    "dataset": "trail-club",
+    "hints": [
+      "Combine constraints, then INSERT."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT i.name, i.\"notnull\", i.pk, (SELECT COUNT(*) FROM pragma_foreign_key_list('bookings')) AS foreign_keys, (SELECT instr(upper(sql), 'CHECK') > 0 FROM sqlite_master WHERE name = 'bookings') AS has_check, (SELECT COUNT(*) FROM bookings) + (SELECT COUNT(*) FROM trails) AS total_rows FROM pragma_table_info('bookings') i ORDER BY i.cid;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Trail Club",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "notnull",
+            "pk",
+            "foreign_keys",
+            "has_check",
+            "total_rows"
+          ],
+          "rows": [
+            [
+              "id",
+              0,
+              1,
+              1,
+              1,
+              5
+            ],
+            [
+              "trail_id",
+              1,
+              0,
+              1,
+              1,
+              5
+            ],
+            [
+              "people",
+              0,
+              0,
+              1,
+              1,
+              5
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM trails; INSERT INTO trails VALUES (7, 'Birch Walk', 'West', 3.1, 40), (8, 'High Moor', 'East', 12.6, 610), (9, 'Crag Top', 'North', 6.0, 900);",
+        "expected": {
+          "columns": [
+            "name",
+            "notnull",
+            "pk",
+            "foreign_keys",
+            "has_check",
+            "total_rows"
+          ],
+          "rows": [
+            [
+              "id",
+              0,
+              1,
+              1,
+              1,
+              4
+            ],
+            [
+              "trail_id",
+              1,
+              0,
+              1,
+              1,
+              4
+            ],
+            [
+              "people",
+              0,
+              0,
+              1,
+              1,
+              4
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE TABLE bookings (id INTEGER PRIMARY KEY, trail_id INTEGER NOT NULL REFERENCES trails(id), people INTEGER CHECK (people > 0)); INSERT INTO bookings VALUES (1, 1, 4);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE TABLE bookings (id INTEGER PRIMARY KEY, trail_id INTEGER NOT NULL REFERENCES trails(id), people INTEGER); INSERT INTO bookings VALUES (1, 1, 4);",
+        "why": "Has no people rule"
+      },
+      {
+        "sql": "CREATE TABLE bookings (id INTEGER PRIMARY KEY, trail_id INTEGER, people INTEGER CHECK (people > 0)); INSERT INTO bookings VALUES (1, 1, 4);",
+        "why": "Allows a missing trail"
+      }
+    ]
+  },
+  {
+    "id": "st10-c02",
+    "kind": "checkpoint",
+    "stage": 10,
+    "skills": [
+      52,
+      50
+    ],
+    "recalls": [],
+    "title": "Normalise the tags",
+    "prompt": "Contacts' cities repeat. Create a table cities with id INTEGER PRIMARY KEY and name TEXT UNIQUE, filled with each known city. Then add a city_id column to contacts, and set it from the new table.",
+    "dataset": "contacts",
+    "hints": [
+      "CREATE, INSERT with DISTINCT, ALTER, and UPDATE."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT c.id, ci.name FROM contacts c JOIN cities ci ON ci.id = c.city_id ORDER BY c.id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              1,
+              "London"
+            ],
+            [
+              2,
+              "New York"
+            ],
+            [
+              3,
+              "London"
+            ],
+            [
+              5,
+              "Austin"
+            ],
+            [
+              6,
+              "Geneva"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3');",
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              11,
+              "Hampton"
+            ],
+            [
+              13,
+              "Tuskegee"
+            ],
+            [
+              14,
+              "Murray"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE TABLE cities (id INTEGER PRIMARY KEY, name TEXT UNIQUE); INSERT INTO cities (name) SELECT DISTINCT city FROM contacts WHERE city IS NOT NULL; ALTER TABLE contacts ADD COLUMN city_id INTEGER; UPDATE contacts SET city_id = (SELECT id FROM cities WHERE cities.name = contacts.city);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE TABLE cities (id INTEGER PRIMARY KEY, name TEXT UNIQUE); INSERT INTO cities (name) SELECT DISTINCT city FROM contacts WHERE city IS NOT NULL; ALTER TABLE contacts ADD COLUMN city_id INTEGER;",
+        "why": "Doesn't set the link"
+      },
+      {
+        "sql": "CREATE TABLE cities (id INTEGER PRIMARY KEY, name TEXT UNIQUE); ALTER TABLE contacts ADD COLUMN city_id INTEGER;",
+        "why": "Doesn't fill anything"
+      }
+    ]
+  },
+  {
+    "id": "st10-c03",
+    "kind": "checkpoint",
+    "stage": 10,
+    "skills": [
+      53,
+      32
+    ],
+    "recalls": [],
+    "title": "Sales view",
+    "prompt": "Create a view named sales with order_id, customer name as customer, product name as product, and quantity times price as line_total.",
+    "dataset": "shop",
+    "hints": [
+      "Four tables inside one view."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT order_id, customer, product, line_total FROM sales ORDER BY order_id, product;",
+      "ordered": true,
+      "columnNames": true,
+      "decimals": 2
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "order_id",
+            "customer",
+            "product",
+            "line_total"
+          ],
+          "rows": [
+            [
+              1,
+              "Priya",
+              "Notebook",
+              12
+            ],
+            [
+              1,
+              "Priya",
+              "Pen",
+              3
+            ],
+            [
+              2,
+              "Marco",
+              "Mug",
+              9
+            ],
+            [
+              3,
+              "Priya",
+              "Kettle",
+              35
+            ],
+            [
+              4,
+              "Hana",
+              "Lamp",
+              50
+            ],
+            [
+              4,
+              "Hana",
+              "Notebook",
+              4
+            ],
+            [
+              5,
+              "Luis",
+              "Mug",
+              18
+            ],
+            [
+              6,
+              "Hana",
+              "Kettle",
+              35
+            ],
+            [
+              6,
+              "Hana",
+              "Pen",
+              6
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "order_id",
+            "customer",
+            "product",
+            "line_total"
+          ],
+          "rows": [
+            [
+              11,
+              "Ravi",
+              "Cup",
+              27
+            ],
+            [
+              11,
+              "Ravi",
+              "Stool",
+              40
+            ],
+            [
+              12,
+              "Sara",
+              "Ink",
+              25
+            ],
+            [
+              13,
+              "Ravi",
+              "Cup",
+              9
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE VIEW sales AS SELECT o.id AS order_id, c.name AS customer, p.name AS product, i.quantity * p.price AS line_total FROM orders o JOIN customers c ON c.id = o.customer_id JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE VIEW sales AS SELECT o.id AS order_id, c.name AS customer, p.name AS product, p.price AS line_total FROM orders o JOIN customers c ON c.id = o.customer_id JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id;",
+        "why": "Ignores quantity"
+      },
+      {
+        "sql": "CREATE VIEW sales AS SELECT o.id AS order_id, c.name AS customer, i.product_id AS product, i.quantity * p.price AS line_total FROM orders o JOIN customers c ON c.id = o.customer_id JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id;",
+        "why": "Shows ids, not names"
+      }
+    ]
+  },
+  {
+    "id": "st10-c04",
+    "kind": "checkpoint",
+    "stage": 10,
+    "skills": [
+      54
+    ],
+    "recalls": [],
+    "title": "Tune a lookup",
+    "prompt": "Queries often filter employees by department_id and sort by salary. Create a composite index named idx_dept_salary on (department_id, salary).",
+    "dataset": "staff",
+    "hints": [
+      "Put the filter column first."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT c.seqno, c.name FROM pragma_index_info('idx_dept_salary') c ORDER BY c.seqno;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "seqno",
+            "name"
+          ],
+          "rows": [
+            [
+              0,
+              "department_id"
+            ],
+            [
+              1,
+              "salary"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "INSERT INTO departments VALUES (50, 'x');",
+        "expected": {
+          "columns": [
+            "seqno",
+            "name"
+          ],
+          "rows": [
+            [
+              0,
+              "department_id"
+            ],
+            [
+              1,
+              "salary"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE INDEX idx_dept_salary ON employees (department_id, salary);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE INDEX idx_dept_salary ON employees (salary, department_id);",
+        "why": "Puts sort before filter"
+      },
+      {
+        "sql": "CREATE INDEX idx_dept_salary ON employees (department_id);",
+        "why": "Covers only one column"
+      }
+    ]
+  },
+  {
+    "id": "st10-c05",
+    "kind": "checkpoint",
+    "stage": 10,
+    "skills": [
+      55,
+      30
+    ],
+    "recalls": [],
+    "title": "Team size with reports",
+    "prompt": "For the employee with no manager, show their name and the total number of people below them at any depth as team_size.",
+    "dataset": "staff",
+    "hints": [
+      "Walk down, then count all but the top."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "team_size"
+          ],
+          "rows": [
+            [
+              "Asha",
+              6
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "team_size"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              3
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "WITH RECURSIVE t AS (SELECT id, id AS root FROM employees WHERE manager_id IS NULL UNION ALL SELECT e.id, t.root FROM employees e JOIN t ON e.manager_id = t.id) SELECT m.name, COUNT(*) - 1 AS team_size FROM t JOIN employees m ON m.id = t.root GROUP BY m.id, m.name;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT m.name, COUNT(*) AS team_size FROM employees e JOIN employees m ON m.id = e.manager_id WHERE m.manager_id IS NULL GROUP BY m.id, m.name;",
+        "why": "Counts only direct reports"
+      },
+      {
+        "sql": "WITH RECURSIVE t AS (SELECT id, id AS root FROM employees WHERE manager_id IS NULL UNION ALL SELECT e.id, t.root FROM employees e JOIN t ON e.manager_id = t.id) SELECT m.name, COUNT(*) AS team_size FROM t JOIN employees m ON m.id = t.root GROUP BY m.id, m.name;",
+        "why": "Counts the top person too"
+      }
+    ]
+  }
+]

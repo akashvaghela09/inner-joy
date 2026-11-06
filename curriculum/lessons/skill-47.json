@@ -1,0 +1,15 @@
+{
+  "skill": 47,
+  "summary": "UPDATE changes values in existing rows.",
+  "points": [
+    "UPDATE table SET column = value WHERE condition changes the matching rows.",
+    "Without WHERE, every row changes, so test your condition with a SELECT first.",
+    "SET can use the current value: SET price = price * 1.1.",
+    "Change several columns by separating them with commas."
+  ],
+  "example": {
+    "dataset": "bookshop",
+    "sql": "UPDATE books\nSET price = price * 1.1\nWHERE genre = 'Science';\n\nSELECT title, price FROM books;",
+    "explanation": "Only Science books change. Run the WHERE as a SELECT first to see which rows it affects."
+  }
+}

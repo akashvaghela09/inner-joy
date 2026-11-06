@@ -1,0 +1,15 @@
+{
+  "skill": 49,
+  "summary": "A transaction groups changes so they all succeed or all get undone.",
+  "points": [
+    "BEGIN starts a transaction, and COMMIT makes its changes permanent.",
+    "ROLLBACK undoes everything since BEGIN.",
+    "Use one when changes must happen together, such as moving money between accounts.",
+    "Without BEGIN, each statement saves on its own."
+  ],
+  "example": {
+    "dataset": "trail-club",
+    "sql": "BEGIN;\nDELETE FROM trails;\nROLLBACK;\n\nSELECT COUNT(*) AS trails_left FROM trails;",
+    "explanation": "The delete is undone, so every trail is still there."
+  }
+}

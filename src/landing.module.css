@@ -164,25 +164,6 @@
   text-align: right;
 }
 
-.comingSoonHeading {
-  padding: 32px 8px 8px;
-  border-bottom: 1px solid var(--border);
-  color: var(--text-muted);
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.comingSoonRow {
-  padding: 8px;
-  border-bottom: 1px solid var(--border-muted);
-}
-
-.comingSoonOutcome {
-  display: block;
-  color: var(--text-muted);
-  font-size: 13px;
-}
-
 .verifySection {
   padding-top: 32px;
 }
@@ -266,11 +247,6 @@
 
 .lessonAction {
   margin-top: 24px;
-}
-
-.emptyNote {
-  padding: 8px;
-  color: var(--text-muted);
 }
 
 @media (max-width: 640px) {

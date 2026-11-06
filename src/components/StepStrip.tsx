@@ -16,16 +16,7 @@ export function StepStrip({ group, current }: { group: Group; current: Assignmen
           <span className={wb.stripDivider} aria-hidden="true" />
         );
 
-        if (!assignment) {
-          return (
-            <span key={position} style={{ display: "contents" }}>
-              {divider}
-              <span className={`${wb.stepCell} ${wb.stepUnwritten}`} role="img" aria-label={`Step ${position}: not written yet`}>
-                {position}
-              </span>
-            </span>
-          );
-        }
+        if (!assignment) return null;
 
         const isCurrent = assignment.id === current.id;
         const done = completed.has(assignment.id);

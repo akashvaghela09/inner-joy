@@ -28,7 +28,7 @@ Most skills use 8 steps. Steps 1-5 are required, and later steps are extra pract
 | 7 | Requirement change | Applies the skill to a less obvious request |
 | 8 | Apply | Solves a realistic task, using an earlier skill if it fits |
 
-Stage 1 uses 5 steps, Stage 10 uses 6, and Stage 7 uses 10. Stage 7's extra two steps add practice on realistic analysis tasks.
+Stage 1 uses 5 steps, Stage 10 uses 6, and Stage 7 uses 10. Stage 7's extra two steps, Scenario and Challenge, add practice on realistic analysis tasks.
 
 ## Recall rules
 
@@ -63,9 +63,5 @@ The 61 checkpoints are our own versions of the 50 concepts in the [SQL 50 assess
 ## Verifying skills elsewhere
 
 The last item on each chapter screen links to problems on another platform that use the chapter's skills. Learners can open these at any time, because nothing is locked. They're optional and don't count towards progress, since we can't see outside results. Chapters 1 and 10 have no linked problems yet.
-
-## Writing order
-
-Stage 2 comes first because it proves the format on real SQL. Stage 1 follows, because it's mostly concepts, and the remaining stages then run in order.
 
 See [the curriculum format](curriculum-format.md) for how assignments are written and validated, and [the roadmap](roadmap.md) for the full delivery plan.

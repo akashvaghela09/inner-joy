@@ -1,0 +1,15 @@
+{
+  "skill": 50,
+  "summary": "CREATE, ALTER, and DROP manage tables themselves, rather than the rows inside them.",
+  "points": [
+    "CREATE TABLE name (column TYPE, ...) makes a new table.",
+    "ALTER TABLE name ADD COLUMN column TYPE adds a column, with NULL in existing rows.",
+    "ALTER TABLE can also RENAME TO a new table name or RENAME COLUMN.",
+    "DROP TABLE name deletes the table and all its rows, so be careful."
+  ],
+  "example": {
+    "dataset": "trail-club",
+    "sql": "ALTER TABLE trails ADD COLUMN difficulty TEXT;\n\nSELECT name, difficulty FROM trails;",
+    "explanation": "The new column exists, and it's NULL for every existing row."
+  }
+}

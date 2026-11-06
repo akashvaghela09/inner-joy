@@ -1,0 +1,1141 @@
+[
+  {
+    "id": "s46-01",
+    "skill": 46,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Add a row",
+    "prompt": "Add a trail with id 50, name Pine Hill, region West, length_km 4.5, and elevation_m 120. Replace the ___.",
+    "dataset": "trail-club",
+    "starterSql": "INSERT INTO trails (id, name, region, length_km, elevation_m)\nVALUES (50, 'Pine Hill', 'West', 4.5, ___);",
+    "hints": [
+      "Text in single quotes, numbers without."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name, region, length_km, elevation_m FROM trails ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Trail Club",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "region",
+            "length_km",
+            "elevation_m"
+          ],
+          "rows": [
+            [
+              1,
+              "Cedar Loop",
+              "North",
+              8.5,
+              320
+            ],
+            [
+              2,
+              "Fox Ridge",
+              "East",
+              14,
+              870
+            ],
+            [
+              3,
+              "Mill Stream",
+              "South",
+              5.2,
+              90
+            ],
+            [
+              4,
+              "Stone Pass",
+              "North",
+              21.3,
+              1450
+            ],
+            [
+              50,
+              "Pine Hill",
+              "West",
+              4.5,
+              120
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM trails; INSERT INTO trails VALUES (7, 'Birch Walk', 'West', 3.1, 40), (8, 'High Moor', 'East', 12.6, 610), (9, 'Crag Top', 'North', 6.0, 900);",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "region",
+            "length_km",
+            "elevation_m"
+          ],
+          "rows": [
+            [
+              7,
+              "Birch Walk",
+              "West",
+              3.1,
+              40
+            ],
+            [
+              8,
+              "High Moor",
+              "East",
+              12.6,
+              610
+            ],
+            [
+              9,
+              "Crag Top",
+              "North",
+              6,
+              900
+            ],
+            [
+              50,
+              "Pine Hill",
+              "West",
+              4.5,
+              120
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "INSERT INTO trails (id, name, region, length_km, elevation_m) VALUES (50, 'Pine Hill', 'West', 4.5, 120);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT * FROM trails;",
+        "why": "Doesn't change the table"
+      },
+      {
+        "sql": "INSERT INTO trails (id, name, region, length_km, elevation_m) VALUES (50, 'Pine Hill', 'East', 4.5, 120);",
+        "why": "Uses the wrong region"
+      }
+    ]
+  },
+  {
+    "id": "s46-02",
+    "skill": 46,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      2
+    ],
+    "title": "Add a book",
+    "prompt": "Add a book with id 40, title Long Shore, author Ann Cho, genre Travel, price 11.5, pages 200, and year 2023.",
+    "dataset": "bookshop",
+    "hints": [
+      "List the columns, then VALUES."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, title, author, genre, price, pages, year FROM books ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "title",
+            "author",
+            "genre",
+            "price",
+            "pages",
+            "year"
+          ],
+          "rows": [
+            [
+              1,
+              "The Salt Road",
+              "Mina Rao",
+              "History",
+              18.5,
+              320,
+              2019
+            ],
+            [
+              2,
+              "Quiet Engines",
+              "Tom Okafor",
+              "Science",
+              24,
+              412,
+              2021
+            ],
+            [
+              3,
+              "Paper Lanterns",
+              "Mina Rao",
+              "Fiction",
+              12,
+              250,
+              2016
+            ],
+            [
+              4,
+              "River of Glass",
+              "Lena Park",
+              "Fiction",
+              15.5,
+              298,
+              2022
+            ],
+            [
+              5,
+              "Small Planets",
+              "Tom Okafor",
+              "Science",
+              30,
+              540,
+              2018
+            ],
+            [
+              6,
+              "The Last Ferry",
+              "Ivan Cole",
+              "Mystery",
+              9,
+              210,
+              2014
+            ],
+            [
+              40,
+              "Long Shore",
+              "Ann Cho",
+              "Travel",
+              11.5,
+              200,
+              2023
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": {
+          "columns": [
+            "id",
+            "title",
+            "author",
+            "genre",
+            "price",
+            "pages",
+            "year"
+          ],
+          "rows": [
+            [
+              10,
+              "Copper Moon",
+              "Ada Hill",
+              "Fantasy",
+              20,
+              100,
+              2020
+            ],
+            [
+              11,
+              "North Light",
+              "Raj Dev",
+              "Travel",
+              7.5,
+              180,
+              2015
+            ],
+            [
+              12,
+              "Sky Atlas",
+              "Ada Hill",
+              "Science",
+              25,
+              300,
+              2023
+            ],
+            [
+              40,
+              "Long Shore",
+              "Ann Cho",
+              "Travel",
+              11.5,
+              200,
+              2023
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "INSERT INTO books (id, title, author, genre, price, pages, year) VALUES (40, 'Long Shore', 'Ann Cho', 'Travel', 11.5, 200, 2023);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "INSERT INTO books (id, title, author, genre, price, pages, year) VALUES (40, 'Long Shore', 'Ann Cho', 'Travel', 11.5, 200, 2022);",
+        "why": "Uses the wrong year"
+      },
+      {
+        "sql": "SELECT 40, 'Long Shore', 'Ann Cho', 'Travel', 11.5, 200, 2023;",
+        "why": "Doesn't change the table"
+      }
+    ]
+  },
+  {
+    "id": "s46-03",
+    "skill": 46,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [],
+    "title": "Several rows at once",
+    "prompt": "Add two trails in one statement: id 51, Oak Bend, South, 3.0, 50; and id 52, Elm Rise, East, 7.5, 300.",
+    "dataset": "trail-club",
+    "hints": [
+      "Separate value lists with commas."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name, region, length_km, elevation_m FROM trails ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Trail Club",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "region",
+            "length_km",
+            "elevation_m"
+          ],
+          "rows": [
+            [
+              1,
+              "Cedar Loop",
+              "North",
+              8.5,
+              320
+            ],
+            [
+              2,
+              "Fox Ridge",
+              "East",
+              14,
+              870
+            ],
+            [
+              3,
+              "Mill Stream",
+              "South",
+              5.2,
+              90
+            ],
+            [
+              4,
+              "Stone Pass",
+              "North",
+              21.3,
+              1450
+            ],
+            [
+              51,
+              "Oak Bend",
+              "South",
+              3,
+              50
+            ],
+            [
+              52,
+              "Elm Rise",
+              "East",
+              7.5,
+              300
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM trails; INSERT INTO trails VALUES (7, 'Birch Walk', 'West', 3.1, 40), (8, 'High Moor', 'East', 12.6, 610), (9, 'Crag Top', 'North', 6.0, 900);",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "region",
+            "length_km",
+            "elevation_m"
+          ],
+          "rows": [
+            [
+              7,
+              "Birch Walk",
+              "West",
+              3.1,
+              40
+            ],
+            [
+              8,
+              "High Moor",
+              "East",
+              12.6,
+              610
+            ],
+            [
+              9,
+              "Crag Top",
+              "North",
+              6,
+              900
+            ],
+            [
+              51,
+              "Oak Bend",
+              "South",
+              3,
+              50
+            ],
+            [
+              52,
+              "Elm Rise",
+              "East",
+              7.5,
+              300
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "INSERT INTO trails (id, name, region, length_km, elevation_m) VALUES (51, 'Oak Bend', 'South', 3.0, 50), (52, 'Elm Rise', 'East', 7.5, 300);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "INSERT INTO trails (id, name, region, length_km, elevation_m) VALUES (51, 'Oak Bend', 'South', 3.0, 50);",
+        "why": "Adds only one"
+      },
+      {
+        "sql": "INSERT INTO trails (id, name, region, length_km, elevation_m) VALUES (51, 'Oak Bend', 'South', 3.0, 50), (52, 'Elm Rise', 'East', 7.5, 30);",
+        "why": "Uses the wrong elevation"
+      }
+    ]
+  },
+  {
+    "id": "s46-04",
+    "skill": 46,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      2
+    ],
+    "title": "New department",
+    "prompt": "Add a department with id 50 named Research. Then the check shows every department.",
+    "dataset": "staff",
+    "hints": [
+      "The table has two columns."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name FROM departments ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              1,
+              "Engineering"
+            ],
+            [
+              2,
+              "Sales"
+            ],
+            [
+              3,
+              "Support"
+            ],
+            [
+              4,
+              "Legal"
+            ],
+            [
+              50,
+              "Research"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              5,
+              "Design"
+            ],
+            [
+              6,
+              "Finance"
+            ],
+            [
+              7,
+              "Ops"
+            ],
+            [
+              50,
+              "Research"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "INSERT INTO departments (id, name) VALUES (50, 'Research');"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "INSERT INTO departments (id, name) VALUES (50, 'research');",
+        "why": "Capital letters must match"
+      },
+      {
+        "sql": "UPDATE departments SET name = 'Research' WHERE id = 1;",
+        "why": "Changes an existing row"
+      }
+    ]
+  },
+  {
+    "id": "s46-05",
+    "skill": 46,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      3
+    ],
+    "title": "Leaving columns out",
+    "prompt": "Add an employee with id 60, name Zed, salary 30000, and hire_date 2025-01-01. Leave every other column out, so they become NULL.",
+    "dataset": "staff",
+    "hints": [
+      "Name only the columns you're setting."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name, department_id, salary, bonus FROM employees ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "department_id",
+            "salary",
+            "bonus"
+          ],
+          "rows": [
+            [
+              1,
+              "Asha",
+              1,
+              120000,
+              10000
+            ],
+            [
+              2,
+              "Ben",
+              1,
+              95000,
+              null
+            ],
+            [
+              3,
+              "Chloe",
+              1,
+              95000,
+              5000
+            ],
+            [
+              4,
+              "Dev",
+              2,
+              70000,
+              2000
+            ],
+            [
+              5,
+              "Elena",
+              2,
+              62000,
+              null
+            ],
+            [
+              6,
+              "Farid",
+              2,
+              58000,
+              0
+            ],
+            [
+              7,
+              "Grace",
+              3,
+              48000,
+              null
+            ],
+            [
+              8,
+              "Hugo",
+              null,
+              41000,
+              null
+            ],
+            [
+              60,
+              "Zed",
+              null,
+              30000,
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "department_id",
+            "salary",
+            "bonus"
+          ],
+          "rows": [
+            [
+              11,
+              "Ivy",
+              5,
+              90000,
+              900
+            ],
+            [
+              12,
+              "Jon",
+              5,
+              70000,
+              null
+            ],
+            [
+              13,
+              "Kim",
+              6,
+              70000,
+              300
+            ],
+            [
+              14,
+              "Leo",
+              null,
+              30000,
+              null
+            ],
+            [
+              15,
+              "Mia",
+              6,
+              55000,
+              0
+            ],
+            [
+              60,
+              "Zed",
+              null,
+              30000,
+              null
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "INSERT INTO employees (id, name, salary, hire_date) VALUES (60, 'Zed', 30000, '2025-01-01');"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "INSERT INTO employees (id, name, salary, hire_date, bonus) VALUES (60, 'Zed', 30000, '2025-01-01', 0);",
+        "why": "Sets a bonus of 0 instead of leaving it empty"
+      },
+      {
+        "sql": "INSERT INTO employees (id, name, salary, hire_date) VALUES (60, 'Zed', 3000, '2025-01-01');",
+        "why": "Uses the wrong salary"
+      }
+    ]
+  },
+  {
+    "id": "s46-06",
+    "skill": 46,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the insert",
+    "prompt": "This should add a trail, but it has fewer values than columns. Add elevation_m 200 to fix it.",
+    "dataset": "trail-club",
+    "starterSql": "INSERT INTO trails (id, name, region, length_km, elevation_m)\nVALUES (53, 'Ash Lane', 'North', 2.0);",
+    "hints": [
+      "Every listed column needs a value."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name, region, length_km, elevation_m FROM trails ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Trail Club",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "region",
+            "length_km",
+            "elevation_m"
+          ],
+          "rows": [
+            [
+              1,
+              "Cedar Loop",
+              "North",
+              8.5,
+              320
+            ],
+            [
+              2,
+              "Fox Ridge",
+              "East",
+              14,
+              870
+            ],
+            [
+              3,
+              "Mill Stream",
+              "South",
+              5.2,
+              90
+            ],
+            [
+              4,
+              "Stone Pass",
+              "North",
+              21.3,
+              1450
+            ],
+            [
+              53,
+              "Ash Lane",
+              "North",
+              2,
+              200
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM trails; INSERT INTO trails VALUES (7, 'Birch Walk', 'West', 3.1, 40), (8, 'High Moor', 'East', 12.6, 610), (9, 'Crag Top', 'North', 6.0, 900);",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "region",
+            "length_km",
+            "elevation_m"
+          ],
+          "rows": [
+            [
+              7,
+              "Birch Walk",
+              "West",
+              3.1,
+              40
+            ],
+            [
+              8,
+              "High Moor",
+              "East",
+              12.6,
+              610
+            ],
+            [
+              9,
+              "Crag Top",
+              "North",
+              6,
+              900
+            ],
+            [
+              53,
+              "Ash Lane",
+              "North",
+              2,
+              200
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "INSERT INTO trails (id, name, region, length_km, elevation_m) VALUES (53, 'Ash Lane', 'North', 2.0, 200);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "INSERT INTO trails (id, name, region, length_km, elevation_m) VALUES (53, 'Ash Lane', 'North', 2.0, 20);",
+        "why": "Uses the wrong elevation"
+      },
+      {
+        "sql": "SELECT * FROM trails;",
+        "why": "Doesn't change the table"
+      }
+    ]
+  },
+  {
+    "id": "s46-07",
+    "skill": 46,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      35
+    ],
+    "title": "Copy from a query",
+    "prompt": "Add every Kitchen product to the products table as a copy, with its id plus 100, name ending in the text ' copy', and category Archive. Keep the same price and cost.",
+    "dataset": "shop",
+    "hints": [
+      "INSERT INTO ... SELECT."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name, category, price FROM products ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "category",
+            "price"
+          ],
+          "rows": [
+            [
+              1,
+              "Notebook",
+              "Stationery",
+              4
+            ],
+            [
+              2,
+              "Pen",
+              "Stationery",
+              1.5
+            ],
+            [
+              3,
+              "Mug",
+              "Kitchen",
+              9
+            ],
+            [
+              4,
+              "Kettle",
+              "Kitchen",
+              35
+            ],
+            [
+              5,
+              "Lamp",
+              "Home",
+              25
+            ],
+            [
+              6,
+              "Rug",
+              "Home",
+              60
+            ],
+            [
+              103,
+              "Mug copy",
+              "Archive",
+              9
+            ],
+            [
+              104,
+              "Kettle copy",
+              "Archive",
+              35
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "category",
+            "price"
+          ],
+          "rows": [
+            [
+              7,
+              "Stool",
+              "Home",
+              40
+            ],
+            [
+              8,
+              "Cup",
+              "Kitchen",
+              9
+            ],
+            [
+              9,
+              "Ink",
+              "Stationery",
+              12.5
+            ],
+            [
+              108,
+              "Cup copy",
+              "Archive",
+              9
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "INSERT INTO products (id, name, category, price, cost) SELECT id + 100, name || ' copy', 'Archive', price, cost FROM products WHERE category = 'Kitchen';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "INSERT INTO products (id, name, category, price, cost) SELECT id + 100, name || ' copy', 'Archive', price, cost FROM products;",
+        "why": "Copies every product"
+      },
+      {
+        "sql": "INSERT INTO products (id, name, category, price, cost) SELECT id + 100, name, 'Archive', price, cost FROM products WHERE category = 'Kitchen';",
+        "why": "Doesn't change the name"
+      }
+    ]
+  },
+  {
+    "id": "s46-08",
+    "skill": 46,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      35
+    ],
+    "title": "Summary table",
+    "prompt": "Add a product named after each category, with id 200 plus its lowest product id, the text Bundle as category, price set to the category's average, and cost 0.",
+    "dataset": "shop",
+    "hints": [
+      "Use GROUP BY in the SELECT part."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name, category, price FROM products ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "category",
+            "price"
+          ],
+          "rows": [
+            [
+              1,
+              "Notebook",
+              "Stationery",
+              4
+            ],
+            [
+              2,
+              "Pen",
+              "Stationery",
+              1.5
+            ],
+            [
+              3,
+              "Mug",
+              "Kitchen",
+              9
+            ],
+            [
+              4,
+              "Kettle",
+              "Kitchen",
+              35
+            ],
+            [
+              5,
+              "Lamp",
+              "Home",
+              25
+            ],
+            [
+              6,
+              "Rug",
+              "Home",
+              60
+            ],
+            [
+              201,
+              "Stationery",
+              "Bundle",
+              2.75
+            ],
+            [
+              203,
+              "Kitchen",
+              "Bundle",
+              22
+            ],
+            [
+              205,
+              "Home",
+              "Bundle",
+              42.5
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "category",
+            "price"
+          ],
+          "rows": [
+            [
+              7,
+              "Stool",
+              "Home",
+              40
+            ],
+            [
+              8,
+              "Cup",
+              "Kitchen",
+              9
+            ],
+            [
+              9,
+              "Ink",
+              "Stationery",
+              12.5
+            ],
+            [
+              207,
+              "Home",
+              "Bundle",
+              40
+            ],
+            [
+              208,
+              "Kitchen",
+              "Bundle",
+              9
+            ],
+            [
+              209,
+              "Stationery",
+              "Bundle",
+              12.5
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "INSERT INTO products (id, name, category, price, cost) SELECT 200 + MIN(id), category, 'Bundle', AVG(price), 0 FROM products GROUP BY category;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "INSERT INTO products (id, name, category, price, cost) SELECT 200 + MIN(id), category, 'Bundle', MAX(price), 0 FROM products GROUP BY category;",
+        "why": "Uses the highest price"
+      },
+      {
+        "sql": "INSERT INTO products (id, name, category, price, cost) SELECT 200 + id, category, 'Bundle', price, 0 FROM products;",
+        "why": "Doesn't group"
+      }
+    ]
+  }
+]

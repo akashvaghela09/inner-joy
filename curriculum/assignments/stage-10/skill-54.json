@@ -1,0 +1,426 @@
+[
+  {
+    "id": "s54-01",
+    "skill": 54,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Create an index",
+    "prompt": "Create an index named idx_orders_customer on orders (customer_id). Replace the ___.",
+    "dataset": "shop",
+    "starterSql": "CREATE INDEX idx_orders_customer\nON orders (___);",
+    "hints": [
+      "CREATE INDEX name ON table (column)."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT i.name, c.name AS column_name FROM pragma_index_list('orders') i, pragma_index_info(i.name) c ORDER BY i.name;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "column_name"
+          ],
+          "rows": [
+            [
+              "idx_orders_customer",
+              "customer_id"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "INSERT INTO customers VALUES (50, 'x', 'y', NULL, '2024-01-01');",
+        "expected": {
+          "columns": [
+            "name",
+            "column_name"
+          ],
+          "rows": [
+            [
+              "idx_orders_customer",
+              "customer_id"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE INDEX idx_orders_customer ON orders (customer_id);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE INDEX idx_orders_customer ON orders (status);",
+        "why": "Uses the wrong column"
+      },
+      {
+        "sql": "CREATE INDEX idx_orders ON orders (customer_id);",
+        "why": "Uses the wrong name"
+      }
+    ]
+  },
+  {
+    "id": "s54-02",
+    "skill": 54,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      6
+    ],
+    "title": "Index for a filter",
+    "prompt": "Queries often filter employees by department_id. Create an index named idx_emp_dept for that.",
+    "dataset": "staff",
+    "hints": [
+      "Index the filtered column."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT i.name, c.name AS column_name FROM pragma_index_list('employees') i, pragma_index_info(i.name) c ORDER BY i.name;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "column_name"
+          ],
+          "rows": [
+            [
+              "idx_emp_dept",
+              "department_id"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "INSERT INTO departments VALUES (50, 'x');",
+        "expected": {
+          "columns": [
+            "name",
+            "column_name"
+          ],
+          "rows": [
+            [
+              "idx_emp_dept",
+              "department_id"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE INDEX idx_emp_dept ON employees (department_id);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE INDEX idx_emp_dept ON employees (name);",
+        "why": "Uses the wrong column"
+      },
+      {
+        "sql": "CREATE INDEX idx_emp_dept ON departments (id);",
+        "why": "Uses the wrong table"
+      }
+    ]
+  },
+  {
+    "id": "s54-03",
+    "skill": 54,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      23
+    ],
+    "title": "Read a plan",
+    "prompt": "Finding orders by customer_id currently scans the whole table. Create an index named idx_c that lets that query use SEARCH instead. You can check with EXPLAIN QUERY PLAN.",
+    "dataset": "shop",
+    "hints": [
+      "Index the column the query filters on."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT detail FROM (SELECT 1 AS x) JOIN pragma_index_list('orders') ON 1 = 1 JOIN (SELECT 'uses index' AS detail) ON 1 = 1 WHERE name = 'idx_c' AND EXISTS (SELECT 1 FROM pragma_index_info('idx_c') WHERE name = 'customer_id');",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "detail"
+          ],
+          "rows": [
+            [
+              "uses index"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "INSERT INTO customers VALUES (50, 'x', 'y', NULL, '2024-01-01');",
+        "expected": {
+          "columns": [
+            "detail"
+          ],
+          "rows": [
+            [
+              "uses index"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE INDEX idx_c ON orders (customer_id);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE INDEX idx_c ON orders (status);",
+        "why": "A status index won't help"
+      },
+      {
+        "sql": "SELECT * FROM orders WHERE customer_id = 1;",
+        "why": "Doesn't create an index"
+      }
+    ]
+  },
+  {
+    "id": "s54-04",
+    "skill": 54,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      25
+    ],
+    "title": "Composite index",
+    "prompt": "Queries filter enrolments by student_id and course_id together. Create idx_student_course on both, in that order.",
+    "dataset": "school",
+    "hints": [
+      "List both columns."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT c.seqno, c.name FROM pragma_index_info('idx_student_course') c ORDER BY c.seqno;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "seqno",
+            "name"
+          ],
+          "rows": [
+            [
+              0,
+              "student_id"
+            ],
+            [
+              1,
+              "course_id"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "INSERT INTO students VALUES (50, 'x', 9);",
+        "expected": {
+          "columns": [
+            "seqno",
+            "name"
+          ],
+          "rows": [
+            [
+              0,
+              "student_id"
+            ],
+            [
+              1,
+              "course_id"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE INDEX idx_student_course ON enrolments (student_id, course_id);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE INDEX idx_student_course ON enrolments (course_id, student_id);",
+        "why": "Uses the wrong order"
+      },
+      {
+        "sql": "CREATE INDEX idx_student_course ON enrolments (student_id);",
+        "why": "Covers only one column"
+      }
+    ]
+  },
+  {
+    "id": "s54-05",
+    "skill": 54,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      34
+    ],
+    "title": "Unique index",
+    "prompt": "Each customer's email should be unique when present. Create a unique index named idx_email on customers (email).",
+    "dataset": "shop",
+    "hints": [
+      "CREATE UNIQUE INDEX. Multiple NULLs are allowed."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT i.\"unique\" AS is_unique, c.name FROM pragma_index_list('customers') i, pragma_index_info(i.name) c;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "is_unique",
+            "name"
+          ],
+          "rows": [
+            [
+              1,
+              "email"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "INSERT INTO products VALUES (50, 'x', 'y', 1.0, 1.0);",
+        "expected": {
+          "columns": [
+            "is_unique",
+            "name"
+          ],
+          "rows": [
+            [
+              1,
+              "email"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE UNIQUE INDEX idx_email ON customers (email);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE INDEX idx_email ON customers (email);",
+        "why": "Not unique"
+      },
+      {
+        "sql": "CREATE UNIQUE INDEX idx_email ON customers (name);",
+        "why": "Uses the wrong column"
+      }
+    ]
+  },
+  {
+    "id": "s54-06",
+    "skill": 54,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [
+      23
+    ],
+    "title": "Fix the index",
+    "prompt": "This should create an index named idx_status on orders' status column, but the syntax is wrong. Fix it.",
+    "dataset": "shop",
+    "starterSql": "CREATE INDEX idx_status FROM orders (status);",
+    "hints": [
+      "The table name comes after ON."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT i.name, c.name AS column_name FROM pragma_index_list('orders') i, pragma_index_info(i.name) c ORDER BY i.name;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "column_name"
+          ],
+          "rows": [
+            [
+              "idx_status",
+              "status"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "INSERT INTO customers VALUES (50, 'x', 'y', NULL, '2024-01-01');",
+        "expected": {
+          "columns": [
+            "name",
+            "column_name"
+          ],
+          "rows": [
+            [
+              "idx_status",
+              "status"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE INDEX idx_status ON orders (status);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE INDEX idx_status ON orders (id);",
+        "why": "Uses the wrong column"
+      },
+      {
+        "sql": "CREATE INDEX idx_status ON customers (city);",
+        "why": "Uses the wrong table"
+      }
+    ]
+  }
+]

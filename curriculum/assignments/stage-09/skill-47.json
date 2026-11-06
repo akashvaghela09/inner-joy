@@ -1,0 +1,1234 @@
+[
+  {
+    "id": "s47-01",
+    "skill": 47,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Change one row",
+    "prompt": "Change the price of the book with id 3 to 13. Replace the ___.",
+    "dataset": "bookshop",
+    "starterSql": "UPDATE books\nSET price = 13\nWHERE ___;",
+    "hints": [
+      "The WHERE picks the row."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, title, author, genre, price, pages, year FROM books ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "title",
+            "author",
+            "genre",
+            "price",
+            "pages",
+            "year"
+          ],
+          "rows": [
+            [
+              1,
+              "The Salt Road",
+              "Mina Rao",
+              "History",
+              18.5,
+              320,
+              2019
+            ],
+            [
+              2,
+              "Quiet Engines",
+              "Tom Okafor",
+              "Science",
+              24,
+              412,
+              2021
+            ],
+            [
+              3,
+              "Paper Lanterns",
+              "Mina Rao",
+              "Fiction",
+              13,
+              250,
+              2016
+            ],
+            [
+              4,
+              "River of Glass",
+              "Lena Park",
+              "Fiction",
+              15.5,
+              298,
+              2022
+            ],
+            [
+              5,
+              "Small Planets",
+              "Tom Okafor",
+              "Science",
+              30,
+              540,
+              2018
+            ],
+            [
+              6,
+              "The Last Ferry",
+              "Ivan Cole",
+              "Mystery",
+              9,
+              210,
+              2014
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023); INSERT INTO books VALUES (3, 'Paper Lanterns', 'Mina Rao', 'Fiction', 12.0, 250, 2016), (4, 'River of Glass', 'Lena Park', 'Fiction', 15.5, 298, 2022);",
+        "expected": {
+          "columns": [
+            "id",
+            "title",
+            "author",
+            "genre",
+            "price",
+            "pages",
+            "year"
+          ],
+          "rows": [
+            [
+              3,
+              "Paper Lanterns",
+              "Mina Rao",
+              "Fiction",
+              13,
+              250,
+              2016
+            ],
+            [
+              4,
+              "River of Glass",
+              "Lena Park",
+              "Fiction",
+              15.5,
+              298,
+              2022
+            ],
+            [
+              10,
+              "Copper Moon",
+              "Ada Hill",
+              "Fantasy",
+              20,
+              100,
+              2020
+            ],
+            [
+              11,
+              "North Light",
+              "Raj Dev",
+              "Travel",
+              7.5,
+              180,
+              2015
+            ],
+            [
+              12,
+              "Sky Atlas",
+              "Ada Hill",
+              "Science",
+              25,
+              300,
+              2023
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "UPDATE books SET price = 13 WHERE id = 3;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "UPDATE books SET price = 13;",
+        "why": "Changes every book"
+      },
+      {
+        "sql": "UPDATE books SET price = 13 WHERE id = 4;",
+        "why": "Changes the wrong book"
+      }
+    ]
+  },
+  {
+    "id": "s47-02",
+    "skill": 47,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      12
+    ],
+    "title": "Raise a department",
+    "prompt": "Add 1000 to the salary of everyone in department 2.",
+    "dataset": "staff",
+    "hints": [
+      "SET can use the current value."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name, department_id, salary, bonus FROM employees ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "department_id",
+            "salary",
+            "bonus"
+          ],
+          "rows": [
+            [
+              1,
+              "Asha",
+              1,
+              120000,
+              10000
+            ],
+            [
+              2,
+              "Ben",
+              1,
+              95000,
+              null
+            ],
+            [
+              3,
+              "Chloe",
+              1,
+              95000,
+              5000
+            ],
+            [
+              4,
+              "Dev",
+              2,
+              71000,
+              2000
+            ],
+            [
+              5,
+              "Elena",
+              2,
+              63000,
+              null
+            ],
+            [
+              6,
+              "Farid",
+              2,
+              59000,
+              0
+            ],
+            [
+              7,
+              "Grace",
+              3,
+              48000,
+              null
+            ],
+            [
+              8,
+              "Hugo",
+              null,
+              41000,
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET department_id = 2 WHERE id IN (11, 13);",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "department_id",
+            "salary",
+            "bonus"
+          ],
+          "rows": [
+            [
+              11,
+              "Ivy",
+              2,
+              91000,
+              900
+            ],
+            [
+              12,
+              "Jon",
+              5,
+              70000,
+              null
+            ],
+            [
+              13,
+              "Kim",
+              2,
+              71000,
+              300
+            ],
+            [
+              14,
+              "Leo",
+              null,
+              30000,
+              null
+            ],
+            [
+              15,
+              "Mia",
+              6,
+              55000,
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "UPDATE employees SET salary = salary + 1000 WHERE department_id = 2;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "UPDATE employees SET salary = 1000 WHERE department_id = 2;",
+        "why": "Replaces the salary"
+      },
+      {
+        "sql": "UPDATE employees SET salary = salary + 1000;",
+        "why": "Changes everyone"
+      }
+    ]
+  },
+  {
+    "id": "s47-03",
+    "skill": 47,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [],
+    "title": "Two columns",
+    "prompt": "For the book with id 1, set the genre to Travel and the year to 2020.",
+    "dataset": "bookshop",
+    "hints": [
+      "Separate assignments with a comma."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, title, author, genre, price, pages, year FROM books ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "title",
+            "author",
+            "genre",
+            "price",
+            "pages",
+            "year"
+          ],
+          "rows": [
+            [
+              1,
+              "The Salt Road",
+              "Mina Rao",
+              "Travel",
+              18.5,
+              320,
+              2020
+            ],
+            [
+              2,
+              "Quiet Engines",
+              "Tom Okafor",
+              "Science",
+              24,
+              412,
+              2021
+            ],
+            [
+              3,
+              "Paper Lanterns",
+              "Mina Rao",
+              "Fiction",
+              12,
+              250,
+              2016
+            ],
+            [
+              4,
+              "River of Glass",
+              "Lena Park",
+              "Fiction",
+              15.5,
+              298,
+              2022
+            ],
+            [
+              5,
+              "Small Planets",
+              "Tom Okafor",
+              "Science",
+              30,
+              540,
+              2018
+            ],
+            [
+              6,
+              "The Last Ferry",
+              "Ivan Cole",
+              "Mystery",
+              9,
+              210,
+              2014
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023); INSERT INTO books VALUES (1, 'The Salt Road', 'Mina Rao', 'History', 18.5, 320, 2019);",
+        "expected": {
+          "columns": [
+            "id",
+            "title",
+            "author",
+            "genre",
+            "price",
+            "pages",
+            "year"
+          ],
+          "rows": [
+            [
+              1,
+              "The Salt Road",
+              "Mina Rao",
+              "Travel",
+              18.5,
+              320,
+              2020
+            ],
+            [
+              10,
+              "Copper Moon",
+              "Ada Hill",
+              "Fantasy",
+              20,
+              100,
+              2020
+            ],
+            [
+              11,
+              "North Light",
+              "Raj Dev",
+              "Travel",
+              7.5,
+              180,
+              2015
+            ],
+            [
+              12,
+              "Sky Atlas",
+              "Ada Hill",
+              "Science",
+              25,
+              300,
+              2023
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "UPDATE books SET genre = 'Travel', year = 2020 WHERE id = 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "UPDATE books SET genre = 'Travel' WHERE id = 1;",
+        "why": "Leaves the year"
+      },
+      {
+        "sql": "UPDATE books SET genre = 'Travel', year = 2020;",
+        "why": "Changes every book"
+      }
+    ]
+  },
+  {
+    "id": "s47-04",
+    "skill": 47,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      6
+    ],
+    "title": "Cancel an order",
+    "prompt": "Set the status of order 5 to cancelled.",
+    "dataset": "shop",
+    "hints": [
+      "Text needs quotes."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, customer_id, status FROM orders ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "customer_id",
+            "status"
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "shipped"
+            ],
+            [
+              2,
+              2,
+              "shipped"
+            ],
+            [
+              3,
+              1,
+              "cancelled"
+            ],
+            [
+              4,
+              3,
+              "shipped"
+            ],
+            [
+              5,
+              4,
+              "cancelled"
+            ],
+            [
+              6,
+              3,
+              "shipped"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO orders VALUES (5, 9, '2024-04-01', 'pending');",
+        "expected": {
+          "columns": [
+            "id",
+            "customer_id",
+            "status"
+          ],
+          "rows": [
+            [
+              5,
+              9,
+              "cancelled"
+            ],
+            [
+              11,
+              7,
+              "shipped"
+            ],
+            [
+              12,
+              8,
+              "pending"
+            ],
+            [
+              13,
+              7,
+              "cancelled"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "UPDATE orders SET status = 'cancelled' WHERE id = 5;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "UPDATE orders SET status = 'cancelled';",
+        "why": "Cancels every order"
+      },
+      {
+        "sql": "UPDATE orders SET status = 'shipped' WHERE id = 5;",
+        "why": "Sets the wrong status"
+      }
+    ]
+  },
+  {
+    "id": "s47-05",
+    "skill": 47,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      6
+    ],
+    "title": "Fill in the blanks",
+    "prompt": "Set the bonus to 0 for employees whose bonus is NULL. Leave all others alone.",
+    "dataset": "staff",
+    "hints": [
+      "Use IS NULL in WHERE."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name, department_id, salary, bonus FROM employees ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "department_id",
+            "salary",
+            "bonus"
+          ],
+          "rows": [
+            [
+              1,
+              "Asha",
+              1,
+              120000,
+              10000
+            ],
+            [
+              2,
+              "Ben",
+              1,
+              95000,
+              0
+            ],
+            [
+              3,
+              "Chloe",
+              1,
+              95000,
+              5000
+            ],
+            [
+              4,
+              "Dev",
+              2,
+              70000,
+              2000
+            ],
+            [
+              5,
+              "Elena",
+              2,
+              62000,
+              0
+            ],
+            [
+              6,
+              "Farid",
+              2,
+              58000,
+              0
+            ],
+            [
+              7,
+              "Grace",
+              3,
+              48000,
+              0
+            ],
+            [
+              8,
+              "Hugo",
+              null,
+              41000,
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "department_id",
+            "salary",
+            "bonus"
+          ],
+          "rows": [
+            [
+              11,
+              "Ivy",
+              5,
+              90000,
+              900
+            ],
+            [
+              12,
+              "Jon",
+              5,
+              70000,
+              0
+            ],
+            [
+              13,
+              "Kim",
+              6,
+              70000,
+              300
+            ],
+            [
+              14,
+              "Leo",
+              null,
+              30000,
+              0
+            ],
+            [
+              15,
+              "Mia",
+              6,
+              55000,
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "UPDATE employees SET bonus = 0 WHERE bonus IS NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "UPDATE employees SET bonus = 0 WHERE bonus = NULL;",
+        "why": "= NULL never matches, so nothing changes"
+      },
+      {
+        "sql": "UPDATE employees SET bonus = 0;",
+        "why": "Overwrites real bonuses"
+      }
+    ]
+  },
+  {
+    "id": "s47-06",
+    "skill": 47,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the missing filter",
+    "prompt": "This should cut only Science books' prices by 10%, but it changes every book. Fix it.",
+    "dataset": "bookshop",
+    "starterSql": "UPDATE books\nSET price = price * 0.9;",
+    "hints": [
+      "It needs a WHERE."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, title, author, genre, price, pages, year FROM books ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "title",
+            "author",
+            "genre",
+            "price",
+            "pages",
+            "year"
+          ],
+          "rows": [
+            [
+              1,
+              "The Salt Road",
+              "Mina Rao",
+              "History",
+              18.5,
+              320,
+              2019
+            ],
+            [
+              2,
+              "Quiet Engines",
+              "Tom Okafor",
+              "Science",
+              21.6,
+              412,
+              2021
+            ],
+            [
+              3,
+              "Paper Lanterns",
+              "Mina Rao",
+              "Fiction",
+              12,
+              250,
+              2016
+            ],
+            [
+              4,
+              "River of Glass",
+              "Lena Park",
+              "Fiction",
+              15.5,
+              298,
+              2022
+            ],
+            [
+              5,
+              "Small Planets",
+              "Tom Okafor",
+              "Science",
+              27,
+              540,
+              2018
+            ],
+            [
+              6,
+              "The Last Ferry",
+              "Ivan Cole",
+              "Mystery",
+              9,
+              210,
+              2014
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": {
+          "columns": [
+            "id",
+            "title",
+            "author",
+            "genre",
+            "price",
+            "pages",
+            "year"
+          ],
+          "rows": [
+            [
+              10,
+              "Copper Moon",
+              "Ada Hill",
+              "Fantasy",
+              20,
+              100,
+              2020
+            ],
+            [
+              11,
+              "North Light",
+              "Raj Dev",
+              "Travel",
+              7.5,
+              180,
+              2015
+            ],
+            [
+              12,
+              "Sky Atlas",
+              "Ada Hill",
+              "Science",
+              22.5,
+              300,
+              2023
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "UPDATE books SET price = price * 0.9 WHERE genre = 'Science';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "UPDATE books SET price = price * 0.9;",
+        "why": "Still changes every book"
+      },
+      {
+        "sql": "UPDATE books SET price = 0.9 WHERE genre = 'Science';",
+        "why": "Replaces the price"
+      }
+    ]
+  },
+  {
+    "id": "s47-07",
+    "skill": 47,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      17
+    ],
+    "title": "Conditional raises",
+    "prompt": "Raise salaries with one statement: under 50000 goes up by 5000, and everyone else goes up by 1000.",
+    "dataset": "staff",
+    "hints": [
+      "Use CASE in SET."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name, department_id, salary, bonus FROM employees ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "department_id",
+            "salary",
+            "bonus"
+          ],
+          "rows": [
+            [
+              1,
+              "Asha",
+              1,
+              121000,
+              10000
+            ],
+            [
+              2,
+              "Ben",
+              1,
+              96000,
+              null
+            ],
+            [
+              3,
+              "Chloe",
+              1,
+              96000,
+              5000
+            ],
+            [
+              4,
+              "Dev",
+              2,
+              71000,
+              2000
+            ],
+            [
+              5,
+              "Elena",
+              2,
+              63000,
+              null
+            ],
+            [
+              6,
+              "Farid",
+              2,
+              59000,
+              0
+            ],
+            [
+              7,
+              "Grace",
+              3,
+              53000,
+              null
+            ],
+            [
+              8,
+              "Hugo",
+              null,
+              46000,
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "department_id",
+            "salary",
+            "bonus"
+          ],
+          "rows": [
+            [
+              11,
+              "Ivy",
+              5,
+              91000,
+              900
+            ],
+            [
+              12,
+              "Jon",
+              5,
+              71000,
+              null
+            ],
+            [
+              13,
+              "Kim",
+              6,
+              71000,
+              300
+            ],
+            [
+              14,
+              "Leo",
+              null,
+              35000,
+              null
+            ],
+            [
+              15,
+              "Mia",
+              6,
+              56000,
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "UPDATE employees SET salary = salary + CASE WHEN salary < 50000 THEN 5000 ELSE 1000 END;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "UPDATE employees SET salary = salary + 5000 WHERE salary < 50000;",
+        "why": "Leaves others alone"
+      },
+      {
+        "sql": "UPDATE employees SET salary = salary + CASE WHEN salary <= 50000 THEN 1000 ELSE 5000 END;",
+        "why": "Reverses the amounts"
+      }
+    ]
+  },
+  {
+    "id": "s47-08",
+    "skill": 47,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      33
+    ],
+    "title": "Bring up to the average",
+    "prompt": "Set the salary of anyone earning below the overall average to that average.",
+    "dataset": "staff",
+    "hints": [
+      "A subquery can supply both the value and the filter."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name, department_id, salary, bonus FROM employees ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "department_id",
+            "salary",
+            "bonus"
+          ],
+          "rows": [
+            [
+              1,
+              "Asha",
+              1,
+              120000,
+              10000
+            ],
+            [
+              2,
+              "Ben",
+              1,
+              95000,
+              null
+            ],
+            [
+              3,
+              "Chloe",
+              1,
+              95000,
+              5000
+            ],
+            [
+              4,
+              "Dev",
+              2,
+              73625,
+              2000
+            ],
+            [
+              5,
+              "Elena",
+              2,
+              73625,
+              null
+            ],
+            [
+              6,
+              "Farid",
+              2,
+              73625,
+              0
+            ],
+            [
+              7,
+              "Grace",
+              3,
+              73625,
+              null
+            ],
+            [
+              8,
+              "Hugo",
+              null,
+              73625,
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "department_id",
+            "salary",
+            "bonus"
+          ],
+          "rows": [
+            [
+              11,
+              "Ivy",
+              5,
+              90000,
+              900
+            ],
+            [
+              12,
+              "Jon",
+              5,
+              70000,
+              null
+            ],
+            [
+              13,
+              "Kim",
+              6,
+              70000,
+              300
+            ],
+            [
+              14,
+              "Leo",
+              null,
+              63000,
+              null
+            ],
+            [
+              15,
+              "Mia",
+              6,
+              63000,
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "UPDATE employees SET salary = (SELECT AVG(salary) FROM employees) WHERE salary < (SELECT AVG(salary) FROM employees);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "UPDATE employees SET salary = (SELECT AVG(salary) FROM employees);",
+        "why": "Changes everyone"
+      },
+      {
+        "sql": "UPDATE employees SET salary = (SELECT MAX(salary) FROM employees) WHERE salary < (SELECT AVG(salary) FROM employees);",
+        "why": "Uses the highest salary"
+      }
+    ]
+  }
+]

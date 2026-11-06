@@ -55,7 +55,7 @@ function specialGroup(stage: (typeof skillMap.stages)[number], kind: "review" | 
   return { id: `${kind}-${stage.id}`, kind, stageId: stage.id, title, planned, requiredPlanned: planned, slots };
 }
 
-/** Every planned stage in learning order, including those not written yet. */
+/** Every stage in learning order. */
 export const stages: Stage[] = skillMap.stages.map((stage) => {
   const skills: Group[] = stage.skills.map((skill) => ({
     id: `skill-${skill.id}`,

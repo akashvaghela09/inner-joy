@@ -1,0 +1,15 @@
+{
+  "skill": 46,
+  "summary": "INSERT adds new rows to a table.",
+  "points": [
+    "INSERT INTO table (col1, col2) VALUES (1, 'a') adds one row. Naming the columns makes it clear and safe.",
+    "List several value sets, separated by commas, to add many rows at once.",
+    "Columns you leave out get NULL, or their default.",
+    "INSERT INTO table SELECT ... copies rows from a query."
+  ],
+  "example": {
+    "dataset": "bookshop",
+    "sql": "INSERT INTO books (id, title, author, genre, price, pages, year)\nVALUES (7, 'Amber Skies', 'Lena Park', 'Fiction', 14.0, 280, 2024);\n\nSELECT id, title FROM books;",
+    "explanation": "This example adds a row and shows the result. Examples run on a temporary copy, so nothing is saved."
+  }
+}

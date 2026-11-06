@@ -206,11 +206,6 @@
   background: var(--bar-done);
 }
 
-.barAvailable {
-  min-width: 2px;
-  background: var(--bar-available);
-}
-
 /* Tables */
 
 .tableBox {
@@ -366,9 +361,5 @@
 @media (forced-colors: active) {
   .barDone {
     background: Highlight;
-  }
-
-  .barAvailable {
-    background: GrayText;
   }
 }

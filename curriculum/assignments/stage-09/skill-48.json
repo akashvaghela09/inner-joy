@@ -1,5 +1,121 @@
 [
   {
+    "id": "s48-01",
+    "skill": 48,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Delete one row",
+    "prompt": "Delete the trail with id 2. Replace the ___.",
+    "dataset": "trail-club",
+    "starterSql": "DELETE FROM trails\nWHERE ___;",
+    "hints": [
+      "WHERE decides which row goes."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name, region, length_km, elevation_m FROM trails ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Trail Club",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "region",
+            "length_km",
+            "elevation_m"
+          ],
+          "rows": [
+            [
+              1,
+              "Cedar Loop",
+              "North",
+              8.5,
+              320
+            ],
+            [
+              3,
+              "Mill Stream",
+              "South",
+              5.2,
+              90
+            ],
+            [
+              4,
+              "Stone Pass",
+              "North",
+              21.3,
+              1450
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM trails; INSERT INTO trails VALUES (7, 'Birch Walk', 'West', 3.1, 40), (8, 'High Moor', 'East', 12.6, 610), (9, 'Crag Top', 'North', 6.0, 900); INSERT INTO trails VALUES (2, 'Fox Ridge', 'East', 14.0, 870), (3, 'Mill Stream', 'South', 5.2, 90);",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "region",
+            "length_km",
+            "elevation_m"
+          ],
+          "rows": [
+            [
+              3,
+              "Mill Stream",
+              "South",
+              5.2,
+              90
+            ],
+            [
+              7,
+              "Birch Walk",
+              "West",
+              3.1,
+              40
+            ],
+            [
+              8,
+              "High Moor",
+              "East",
+              12.6,
+              610
+            ],
+            [
+              9,
+              "Crag Top",
+              "North",
+              6,
+              900
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "DELETE FROM trails WHERE id = 2;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "DELETE FROM trails;",
+        "why": "Deletes every row"
+      },
+      {
+        "sql": "DELETE FROM trails WHERE id = 3;",
+        "why": "Deletes the wrong trail"
+      }
+    ]
+  },
+  {
     "id": "s48-02",
     "skill": 48,
     "step": 2,
@@ -9,26 +125,742 @@
     "title": "Remove short trails",
     "prompt": "The club is retiring trails shorter than 6 km. Delete them from the trails table. The check looks at the table after your SQL runs, so a SELECT alone won't pass.",
     "dataset": "trail-club",
-    "hints": ["Use DELETE FROM with a WHERE clause. Without WHERE, every row is deleted."],
-    "check": { "mode": "table", "sql": "SELECT id, name FROM trails ORDER BY id;", "ordered": true, "columnNames": true },
+    "hints": [
+      "Use DELETE FROM with a WHERE clause. Without WHERE, every row is deleted."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name FROM trails ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
     "cases": [
       {
         "name": "Club trails",
         "hidden": false,
-        "expected": { "columns": ["id", "name"], "rows": [[1, "Cedar Loop"], [2, "Fox Ridge"], [4, "Stone Pass"]] }
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              1,
+              "Cedar Loop"
+            ],
+            [
+              2,
+              "Fox Ridge"
+            ],
+            [
+              4,
+              "Stone Pass"
+            ]
+          ]
+        }
       },
       {
         "name": "A trail of exactly 6 km",
         "hidden": true,
         "setupSql": "DELETE FROM trails; INSERT INTO trails VALUES (7, 'Birch Walk', 'West', 3.1, 40), (11, 'Six Mile Lane', 'East', 6.0, 75);",
-        "expected": { "columns": ["id", "name"], "rows": [[11, "Six Mile Lane"]] }
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              11,
+              "Six Mile Lane"
+            ]
+          ]
+        }
       }
     ],
-    "solutions": ["DELETE FROM trails WHERE length_km < 6;"],
+    "solutions": [
+      "DELETE FROM trails WHERE length_km < 6;"
+    ],
     "wrongSolutions": [
-      { "sql": "DELETE FROM trails;", "why": "Deletes every trail" },
-      { "sql": "DELETE FROM trails WHERE length_km <= 6;", "why": "Also deletes a trail of exactly 6 km" },
-      { "sql": "SELECT * FROM trails WHERE length_km >= 6;", "why": "Displays rows without changing the table" }
+      {
+        "sql": "DELETE FROM trails;",
+        "why": "Deletes every trail"
+      },
+      {
+        "sql": "DELETE FROM trails WHERE length_km <= 6;",
+        "why": "Also deletes a trail of exactly 6 km"
+      },
+      {
+        "sql": "SELECT * FROM trails WHERE length_km >= 6;",
+        "why": "Displays rows without changing the table"
+      }
+    ]
+  },
+  {
+    "id": "s48-03",
+    "skill": 48,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      4
+    ],
+    "title": "By condition",
+    "prompt": "Delete books published before 2016.",
+    "dataset": "bookshop",
+    "hints": [
+      "Compare the year."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, title, author, genre, price, pages, year FROM books ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "title",
+            "author",
+            "genre",
+            "price",
+            "pages",
+            "year"
+          ],
+          "rows": [
+            [
+              1,
+              "The Salt Road",
+              "Mina Rao",
+              "History",
+              18.5,
+              320,
+              2019
+            ],
+            [
+              2,
+              "Quiet Engines",
+              "Tom Okafor",
+              "Science",
+              24,
+              412,
+              2021
+            ],
+            [
+              3,
+              "Paper Lanterns",
+              "Mina Rao",
+              "Fiction",
+              12,
+              250,
+              2016
+            ],
+            [
+              4,
+              "River of Glass",
+              "Lena Park",
+              "Fiction",
+              15.5,
+              298,
+              2022
+            ],
+            [
+              5,
+              "Small Planets",
+              "Tom Okafor",
+              "Science",
+              30,
+              540,
+              2018
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023); UPDATE books SET year = 2016 WHERE id = 11; UPDATE books SET year = 2010 WHERE id = 12;",
+        "expected": {
+          "columns": [
+            "id",
+            "title",
+            "author",
+            "genre",
+            "price",
+            "pages",
+            "year"
+          ],
+          "rows": [
+            [
+              10,
+              "Copper Moon",
+              "Ada Hill",
+              "Fantasy",
+              20,
+              100,
+              2020
+            ],
+            [
+              11,
+              "North Light",
+              "Raj Dev",
+              "Travel",
+              7.5,
+              180,
+              2016
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "DELETE FROM books WHERE year < 2016;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "DELETE FROM books WHERE year <= 2016;",
+        "why": "Also deletes 2016"
+      },
+      {
+        "sql": "DELETE FROM books WHERE year > 2016;",
+        "why": "Deletes the newer books"
+      }
+    ]
+  },
+  {
+    "id": "s48-04",
+    "skill": 48,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      39
+    ],
+    "title": "Never ordered",
+    "prompt": "Delete customers who have never placed an order. Use EXCEPT inside a subquery to find them.",
+    "dataset": "shop",
+    "hints": [
+      "The subquery lists customer ids except those in orders."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name FROM customers ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              1,
+              "Priya"
+            ],
+            [
+              2,
+              "Marco"
+            ],
+            [
+              3,
+              "Hana"
+            ],
+            [
+              4,
+              "Luis"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              7,
+              "Ravi"
+            ],
+            [
+              8,
+              "Sara"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "DELETE FROM customers WHERE id IN (SELECT id FROM customers EXCEPT SELECT customer_id FROM orders);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "DELETE FROM customers;",
+        "why": "Deletes everyone"
+      },
+      {
+        "sql": "DELETE FROM customers WHERE id IN (SELECT id FROM customers INTERSECT SELECT customer_id FROM orders);",
+        "why": "Deletes those who did order"
+      }
+    ]
+  },
+  {
+    "id": "s48-05",
+    "skill": 48,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      34
+    ],
+    "title": "Delete using a list",
+    "prompt": "Delete employees whose department isn't in the departments table. Keep employees with a NULL department.",
+    "dataset": "staff",
+    "hints": [
+      "NOT IN against departments, which skips NULLs."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name, department_id, salary, bonus FROM employees ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "department_id",
+            "salary",
+            "bonus"
+          ],
+          "rows": [
+            [
+              1,
+              "Asha",
+              1,
+              120000,
+              10000
+            ],
+            [
+              2,
+              "Ben",
+              1,
+              95000,
+              null
+            ],
+            [
+              3,
+              "Chloe",
+              1,
+              95000,
+              5000
+            ],
+            [
+              4,
+              "Dev",
+              2,
+              70000,
+              2000
+            ],
+            [
+              5,
+              "Elena",
+              2,
+              62000,
+              null
+            ],
+            [
+              6,
+              "Farid",
+              2,
+              58000,
+              0
+            ],
+            [
+              7,
+              "Grace",
+              3,
+              48000,
+              null
+            ],
+            [
+              8,
+              "Hugo",
+              null,
+              41000,
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET department_id = 99 WHERE id = 13;",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "department_id",
+            "salary",
+            "bonus"
+          ],
+          "rows": [
+            [
+              11,
+              "Ivy",
+              5,
+              90000,
+              900
+            ],
+            [
+              12,
+              "Jon",
+              5,
+              70000,
+              null
+            ],
+            [
+              14,
+              "Leo",
+              null,
+              30000,
+              null
+            ],
+            [
+              15,
+              "Mia",
+              6,
+              55000,
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "DELETE FROM employees WHERE department_id NOT IN (SELECT id FROM departments);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "DELETE FROM employees WHERE department_id IS NULL;",
+        "why": "Deletes the wrong employees"
+      },
+      {
+        "sql": "DELETE FROM employees WHERE department_id IN (SELECT id FROM departments);",
+        "why": "Deletes valid employees"
+      }
+    ]
+  },
+  {
+    "id": "s48-06",
+    "skill": 48,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [
+      4
+    ],
+    "title": "Fix the join delete",
+    "prompt": "This uses MySQL's syntax to delete contacts in London. SQLite doesn't support it. Fix it with a simple DELETE.",
+    "dataset": "contacts",
+    "starterSql": "DELETE c FROM contacts c\nWHERE c.city = 'London';",
+    "hints": [
+      "Use just DELETE FROM and WHERE."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, full_name FROM contacts ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "full_name"
+          ],
+          "rows": [
+            [
+              2,
+              "Grace HOPPER"
+            ],
+            [
+              4,
+              "Katherine Johnson"
+            ],
+            [
+              5,
+              "edsger dijkstra"
+            ],
+            [
+              6,
+              "Tim Lee"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3'); UPDATE contacts SET city = 'London' WHERE id = 12;",
+        "expected": {
+          "columns": [
+            "id",
+            "full_name"
+          ],
+          "rows": [
+            [
+              11,
+              "mary jackson"
+            ],
+            [
+              13,
+              "Rosa Park"
+            ],
+            [
+              14,
+              "Ken Thompson"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "DELETE FROM contacts WHERE city = 'London';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "DELETE FROM contacts;",
+        "why": "Deletes everyone"
+      },
+      {
+        "sql": "DELETE FROM contacts WHERE city <> 'London';",
+        "why": "Deletes all the others"
+      }
+    ]
+  },
+  {
+    "id": "s48-07",
+    "skill": 48,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      36,
+      10
+    ],
+    "title": "Keep the first",
+    "prompt": "Several contacts share a city. Using EXISTS, delete any contact when another contact in the same city has a lower id. Contacts with no city stay.",
+    "dataset": "contacts",
+    "hints": [
+      "A correlated subquery compares each row with the others."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, full_name FROM contacts ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "full_name"
+          ],
+          "rows": [
+            [
+              1,
+              "ada lovelace"
+            ],
+            [
+              2,
+              "Grace HOPPER"
+            ],
+            [
+              4,
+              "Katherine Johnson"
+            ],
+            [
+              5,
+              "edsger dijkstra"
+            ],
+            [
+              6,
+              "Tim Lee"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3'); UPDATE contacts SET city = NULL WHERE id = 13; UPDATE contacts SET city = 'Murray' WHERE id = 11;",
+        "expected": {
+          "columns": [
+            "id",
+            "full_name"
+          ],
+          "rows": [
+            [
+              11,
+              "mary jackson"
+            ],
+            [
+              12,
+              "BOB Kahn"
+            ],
+            [
+              13,
+              "Rosa Park"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "DELETE FROM contacts WHERE EXISTS (SELECT 1 FROM contacts x WHERE x.city = contacts.city AND x.id < contacts.id);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "DELETE FROM contacts WHERE EXISTS (SELECT 1 FROM contacts x WHERE x.id < contacts.id);",
+        "why": "Doesn't compare cities"
+      },
+      {
+        "sql": "DELETE FROM contacts WHERE EXISTS (SELECT 1 FROM contacts x WHERE x.city = contacts.city AND x.id > contacts.id);",
+        "why": "Keeps the highest id"
+      }
+    ]
+  },
+  {
+    "id": "s48-08",
+    "skill": 48,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      41
+    ],
+    "title": "Keep the top seller per order",
+    "prompt": "For each order, keep only the item with the highest quantity, breaking ties with the lowest product_id, and delete the other items. The check shows order_items.",
+    "dataset": "shop",
+    "hints": [
+      "Use ROW_NUMBER over rowid in a subquery."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT order_id, product_id, quantity FROM order_items ORDER BY order_id, product_id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "order_id",
+            "product_id",
+            "quantity"
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              3
+            ],
+            [
+              2,
+              3,
+              1
+            ],
+            [
+              3,
+              4,
+              1
+            ],
+            [
+              4,
+              5,
+              2
+            ],
+            [
+              5,
+              3,
+              2
+            ],
+            [
+              6,
+              2,
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "order_id",
+            "product_id",
+            "quantity"
+          ],
+          "rows": [
+            [
+              11,
+              8,
+              3
+            ],
+            [
+              12,
+              9,
+              2
+            ],
+            [
+              13,
+              8,
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "DELETE FROM order_items WHERE rowid IN (SELECT rowid FROM (SELECT rowid, ROW_NUMBER() OVER (PARTITION BY order_id ORDER BY quantity DESC, product_id) AS n FROM order_items) WHERE n > 1);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "DELETE FROM order_items WHERE rowid IN (SELECT rowid FROM (SELECT rowid, ROW_NUMBER() OVER (PARTITION BY order_id ORDER BY quantity, product_id) AS n FROM order_items) WHERE n > 1);",
+        "why": "Keeps the lowest quantity"
+      },
+      {
+        "sql": "DELETE FROM order_items WHERE quantity < 2;",
+        "why": "Doesn't work per order"
+      }
     ]
   }
 ]

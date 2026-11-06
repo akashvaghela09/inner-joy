@@ -28,12 +28,12 @@
       "id": 3, "title": "Transforming values", "assignmentsPerSkill": 8, "reviewCount": 10,
       "checkpoints": { "sourceProblems": [5, 15, 32, 38, 44, 45], "originalCount": 0 },
       "skills": [
-        { "id": 12, "title": "Arithmetic", "outcome": "Use % and avoid integer division mistakes", "statusInSql50": "assumed", "prerequisites": [5], "recalls": [2, 5, 6, 9] },
+        { "id": 12, "title": "Arithmetic", "outcome": "Use % and avoid integer division mistakes", "statusInSql50": "assumed", "prerequisites": [5], "recalls": [5, 6, 9] },
         { "id": 13, "title": "CAST and ROUND", "outcome": "Convert types and round results", "statusInSql50": "assumed", "prerequisites": [2, 12], "recalls": [2, 12] },
         { "id": 14, "title": "String functions", "outcome": "Use LENGTH, SUBSTR, UPPER, LOWER, and ||", "statusInSql50": "practised", "prerequisites": [5], "recalls": [5, 6, 11] },
         { "id": 15, "title": "LIKE", "outcome": "Match text patterns, including word-boundary cases", "statusInSql50": "practised", "prerequisites": [6, 14], "recalls": [7, 9, 14] },
-        { "id": 16, "title": "Date functions", "outcome": "Filter, format, and subtract dates", "statusInSql50": "assumed", "prerequisites": [2, 12], "recalls": [2, 8, 12, 14] },
-        { "id": 17, "title": "CASE and COALESCE", "outcome": "Add conditional logic and replace NULLs", "statusInSql50": "assumed", "prerequisites": [6, 7, 9], "recalls": [7, 9, 12, 16] }
+        { "id": 16, "title": "Date functions", "outcome": "Filter, format, and subtract dates", "statusInSql50": "assumed", "prerequisites": [2, 12], "recalls": [2, 8, 12] },
+        { "id": 17, "title": "CASE and COALESCE", "outcome": "Add conditional logic and replace NULLs", "statusInSql50": "assumed", "prerequisites": [6, 7, 9], "recalls": [7, 9] }
       ]
     },
     {
@@ -53,14 +53,14 @@
       "checkpoints": { "sourceProblems": [6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 30, 49], "originalCount": 0 },
       "skills": [
         { "id": 24, "title": "Relationships and grain", "outcome": "Identify one-to-many links and what one row represents", "statusInSql50": "assumed", "prerequisites": [3], "recalls": [3, 20] },
-        { "id": 25, "title": "INNER JOIN", "outcome": "Combine matching rows", "statusInSql50": "practised", "prerequisites": [3, 24], "recalls": [3, 7, 12, 20] },
+        { "id": 25, "title": "INNER JOIN", "outcome": "Combine matching rows", "statusInSql50": "practised", "prerequisites": [3, 24], "recalls": [3, 12, 20] },
         { "id": 26, "title": "LEFT JOIN", "outcome": "Keep rows that have no match", "statusInSql50": "practised", "prerequisites": [25], "recalls": [9, 17, 18, 20] },
         { "id": 27, "title": "ON vs WHERE", "outcome": "Avoid accidentally turning a left join into an inner join", "statusInSql50": "assumed", "prerequisites": [6, 26], "recalls": [4, 6, 9, 16] },
         { "id": 28, "title": "Finding unmatched rows", "outcome": "Find records missing from another table", "statusInSql50": "practised", "prerequisites": [9, 26], "recalls": [9, 18, 20, 26] },
         { "id": 29, "title": "Join duplication", "outcome": "Spot and fix totals inflated by a join", "statusInSql50": "missing", "prerequisites": [10, 18, 24, 25], "recalls": [4, 10, 19, 24] },
         { "id": 30, "title": "Self join", "outcome": "Compare rows within the same table", "statusInSql50": "practised", "prerequisites": [25], "recalls": [6, 7, 16, 20] },
         { "id": 31, "title": "CROSS JOIN", "outcome": "Generate every combination, including zero-count rows", "statusInSql50": "practised", "prerequisites": [25, 26], "recalls": [17, 18, 20, 26, 28] },
-        { "id": 32, "title": "Joining 3+ tables", "outcome": "Build a multi-table query in stages", "statusInSql50": "practised", "prerequisites": [25, 26], "recalls": [11, 20, 21, 24, 26, 27, 29] }
+        { "id": 32, "title": "Joining 3+ tables", "outcome": "Build a multi-table query in stages", "statusInSql50": "practised", "prerequisites": [25, 26], "recalls": [11, 20, 21, 24, 26, 27] }
       ]
     },
     {
@@ -111,7 +111,7 @@
         { "id": 50, "title": "Managing tables", "outcome": "Use CREATE, ALTER, and DROP", "statusInSql50": "missing", "prerequisites": [1, 2, 3], "recalls": [1, 2, 46] },
         { "id": 51, "title": "Constraints", "outcome": "Apply PRIMARY KEY, FOREIGN KEY, UNIQUE, NOT NULL, and CHECK", "statusInSql50": "missing", "prerequisites": [3, 50], "recalls": [3, 9, 45, 46, 49] },
         { "id": 52, "title": "Normalisation", "outcome": "Split messy data into well-structured tables", "statusInSql50": "missing", "prerequisites": [24, 51], "recalls": [3, 24, 25, 51] },
-        { "id": 53, "title": "Views", "outcome": "Save a query for reuse", "statusInSql50": "missing", "prerequisites": [37, 50], "recalls": [20, 25, 32, 37, 39, 42, 43, 44] },
+        { "id": 53, "title": "Views", "outcome": "Save a query for reuse", "statusInSql50": "missing", "prerequisites": [37, 50], "recalls": [20, 25, 37, 42, 43, 44] },
         { "id": 54, "title": "Indexes and query plans", "outcome": "Speed up a slow query using EXPLAIN QUERY PLAN", "statusInSql50": "missing", "prerequisites": [3, 23, 50], "recalls": [6, 23, 25, 34] },
         { "id": 55, "title": "Recursive CTEs", "outcome": "Query hierarchies and generate sequences", "statusInSql50": "missing", "prerequisites": [37, 38], "recalls": [3, 30, 37, 38] }
       ]

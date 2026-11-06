@@ -1,0 +1,552 @@
+[
+  {
+    "id": "s50-01",
+    "skill": 50,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [
+      2
+    ],
+    "title": "Create a table",
+    "prompt": "Create a table named hikers with an id INTEGER column and a name TEXT column. Replace the ___.",
+    "dataset": "trail-club",
+    "starterSql": "CREATE TABLE hikers (id INTEGER, ___);",
+    "hints": [
+      "List columns in brackets."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT name, type, \"notnull\", pk FROM pragma_table_info('hikers') ORDER BY cid;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Trail Club",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "type",
+            "notnull",
+            "pk"
+          ],
+          "rows": [
+            [
+              "id",
+              "INTEGER",
+              0,
+              0
+            ],
+            [
+              "name",
+              "TEXT",
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "INSERT INTO trails VALUES (50, 'Extra', 'West', 1.0, 1);",
+        "expected": {
+          "columns": [
+            "name",
+            "type",
+            "notnull",
+            "pk"
+          ],
+          "rows": [
+            [
+              "id",
+              "INTEGER",
+              0,
+              0
+            ],
+            [
+              "name",
+              "TEXT",
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE TABLE hikers (id INTEGER, name TEXT);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE TABLE hikers (id INTEGER);",
+        "why": "Leaves out name"
+      },
+      {
+        "sql": "CREATE TABLE hiker (id INTEGER, name TEXT);",
+        "why": "Uses the wrong table name"
+      }
+    ]
+  },
+  {
+    "id": "s50-02",
+    "skill": 50,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      1
+    ],
+    "title": "Add a column",
+    "prompt": "Add a column named difficulty of type TEXT to trails.",
+    "dataset": "trail-club",
+    "hints": [
+      "ALTER TABLE ... ADD COLUMN."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT name, type, \"notnull\", pk FROM pragma_table_info('trails') ORDER BY cid;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Trail Club",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "type",
+            "notnull",
+            "pk"
+          ],
+          "rows": [
+            [
+              "id",
+              "INTEGER",
+              0,
+              1
+            ],
+            [
+              "name",
+              "TEXT",
+              1,
+              0
+            ],
+            [
+              "region",
+              "TEXT",
+              1,
+              0
+            ],
+            [
+              "length_km",
+              "REAL",
+              1,
+              0
+            ],
+            [
+              "elevation_m",
+              "INTEGER",
+              1,
+              0
+            ],
+            [
+              "difficulty",
+              "TEXT",
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM trails; INSERT INTO trails VALUES (7, 'Birch Walk', 'West', 3.1, 40), (8, 'High Moor', 'East', 12.6, 610), (9, 'Crag Top', 'North', 6.0, 900);",
+        "expected": {
+          "columns": [
+            "name",
+            "type",
+            "notnull",
+            "pk"
+          ],
+          "rows": [
+            [
+              "id",
+              "INTEGER",
+              0,
+              1
+            ],
+            [
+              "name",
+              "TEXT",
+              1,
+              0
+            ],
+            [
+              "region",
+              "TEXT",
+              1,
+              0
+            ],
+            [
+              "length_km",
+              "REAL",
+              1,
+              0
+            ],
+            [
+              "elevation_m",
+              "INTEGER",
+              1,
+              0
+            ],
+            [
+              "difficulty",
+              "TEXT",
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "ALTER TABLE trails ADD COLUMN difficulty TEXT;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "ALTER TABLE trails ADD COLUMN difficulty INTEGER;",
+        "why": "Uses the wrong type"
+      },
+      {
+        "sql": "ALTER TABLE trails ADD COLUMN level TEXT;",
+        "why": "Uses the wrong name"
+      }
+    ]
+  },
+  {
+    "id": "s50-03",
+    "skill": 50,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      1
+    ],
+    "title": "Rename a table",
+    "prompt": "Rename the trails table to routes.",
+    "dataset": "trail-club",
+    "hints": [
+      "ALTER TABLE ... RENAME TO."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name FROM routes ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Trail Club",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              1,
+              "Cedar Loop"
+            ],
+            [
+              2,
+              "Fox Ridge"
+            ],
+            [
+              3,
+              "Mill Stream"
+            ],
+            [
+              4,
+              "Stone Pass"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM trails; INSERT INTO trails VALUES (7, 'Birch Walk', 'West', 3.1, 40), (8, 'High Moor', 'East', 12.6, 610), (9, 'Crag Top', 'North', 6.0, 900);",
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              7,
+              "Birch Walk"
+            ],
+            [
+              8,
+              "High Moor"
+            ],
+            [
+              9,
+              "Crag Top"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "ALTER TABLE trails RENAME TO routes;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "ALTER TABLE trails RENAME TO route;",
+        "why": "Uses the wrong name"
+      },
+      {
+        "sql": "DROP TABLE trails;",
+        "why": "Deletes the table"
+      }
+    ]
+  },
+  {
+    "id": "s50-04",
+    "skill": 50,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      46
+    ],
+    "title": "Create and fill",
+    "prompt": "Create a table named authors with id INTEGER and name TEXT, and add one row with id 1 and name Mina Rao.",
+    "dataset": "bookshop",
+    "hints": [
+      "CREATE, then INSERT."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT a.id, a.name, (SELECT COUNT(*) FROM books) AS books FROM authors a;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "books"
+          ],
+          "rows": [
+            [
+              1,
+              "Mina Rao",
+              6
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "books"
+          ],
+          "rows": [
+            [
+              1,
+              "Mina Rao",
+              3
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE TABLE authors (id INTEGER, name TEXT); INSERT INTO authors VALUES (1, 'Mina Rao');"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE TABLE authors (id INTEGER, name TEXT);",
+        "why": "Doesn't add the row"
+      },
+      {
+        "sql": "CREATE TABLE authors (id INTEGER, name TEXT); INSERT INTO authors VALUES (1, 'Mina');",
+        "why": "Uses the wrong name"
+      }
+    ]
+  },
+  {
+    "id": "s50-05",
+    "skill": 50,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      1
+    ],
+    "title": "Removing a table",
+    "prompt": "Delete the books table entirely. The check counts the tables that remain.",
+    "dataset": "bookshop",
+    "hints": [
+      "DROP TABLE removes it."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT COUNT(*) AS tables_left FROM sqlite_master WHERE type = 'table';",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "tables_left"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "CREATE TABLE other (id INTEGER);",
+        "expected": {
+          "columns": [
+            "tables_left"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "DROP TABLE books;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "DELETE FROM books;",
+        "why": "Keeps an empty table"
+      },
+      {
+        "sql": "ALTER TABLE books RENAME TO old_books;",
+        "why": "Only renames it"
+      }
+    ]
+  },
+  {
+    "id": "s50-06",
+    "skill": 50,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [
+      2
+    ],
+    "title": "Fix the create",
+    "prompt": "This should create a table named visits with id INTEGER and trail_id INTEGER, but it has a syntax error. Fix it.",
+    "dataset": "trail-club",
+    "starterSql": "CREATE TABLE visits (id INTEGER trail_id INTEGER);",
+    "hints": [
+      "Columns are separated by commas, inside brackets."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT name, type, \"notnull\", pk FROM pragma_table_info('visits') ORDER BY cid;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Trail Club",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "type",
+            "notnull",
+            "pk"
+          ],
+          "rows": [
+            [
+              "id",
+              "INTEGER",
+              0,
+              0
+            ],
+            [
+              "trail_id",
+              "INTEGER",
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "INSERT INTO trails VALUES (50, 'Extra', 'West', 1.0, 1);",
+        "expected": {
+          "columns": [
+            "name",
+            "type",
+            "notnull",
+            "pk"
+          ],
+          "rows": [
+            [
+              "id",
+              "INTEGER",
+              0,
+              0
+            ],
+            [
+              "trail_id",
+              "INTEGER",
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE TABLE visits (id INTEGER, trail_id INTEGER);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE TABLE visits (id INTEGER);",
+        "why": "Leaves out trail_id"
+      },
+      {
+        "sql": "CREATE TABLE visit (id INTEGER, trail_id INTEGER);",
+        "why": "Uses the wrong name"
+      }
+    ]
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "skill": 51,
+  "summary": "Constraints make the database reject bad data, instead of relying on every query to be careful.",
+  "points": [
+    "PRIMARY KEY means unique, and identifies each row.",
+    "NOT NULL forbids missing values, and UNIQUE forbids repeats.",
+    "CHECK (condition) enforces a rule, such as price > 0.",
+    "FOREIGN KEY links to another table. SQLite enforces it only after PRAGMA foreign_keys = ON."
+  ],
+  "example": {
+    "dataset": "app",
+    "sql": "CREATE TABLE plans (\n  id INTEGER PRIMARY KEY,\n  code TEXT NOT NULL UNIQUE,\n  price REAL CHECK (price >= 0)\n);\n\nSELECT name, type, \"notnull\", pk FROM pragma_table_info('plans');",
+    "explanation": "The rules live in the table definition, so every future insert must follow them."
+  }
+}

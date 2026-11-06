@@ -1,0 +1,15 @@
+{
+  "skill": 53,
+  "summary": "A view is a saved query that you can use like a table.",
+  "points": [
+    "CREATE VIEW name AS SELECT ... saves the query, not its rows.",
+    "Each use runs the query again, so results stay current.",
+    "Views hide complicated joins behind a simple name.",
+    "DROP VIEW name removes the view and leaves the underlying data alone."
+  ],
+  "example": {
+    "dataset": "staff",
+    "sql": "CREATE VIEW dept_staff AS\nSELECT d.name AS department, COUNT(e.id) AS staff\nFROM departments d\nLEFT JOIN employees e ON e.department_id = d.id\nGROUP BY d.id, d.name;\n\nSELECT * FROM dept_staff;",
+    "explanation": "After creating the view, a one-line SELECT gives the whole report."
+  }
+}

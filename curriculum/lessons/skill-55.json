@@ -1,0 +1,15 @@
+{
+  "skill": 55,
+  "summary": "A recursive CTE refers to itself, which lets SQL walk hierarchies and generate sequences.",
+  "points": [
+    "It has a starting query, then UNION ALL, then a query that reads the CTE itself.",
+    "Each round uses the rows from the previous round, until no new rows appear.",
+    "Always include a stopping condition, or it runs forever.",
+    "It's ideal for org charts and for generating a series of dates or numbers."
+  ],
+  "example": {
+    "dataset": "staff",
+    "sql": "WITH RECURSIVE chain AS (\n  SELECT id, name, 0 AS depth FROM employees WHERE manager_id IS NULL\n  UNION ALL\n  SELECT e.id, e.name, c.depth + 1\n  FROM employees e\n  JOIN chain c ON e.manager_id = c.id\n)\nSELECT name, depth FROM chain ORDER BY depth, name;",
+    "explanation": "It starts at the top and adds one level of reports each round, until none remain."
+  }
+}

@@ -6,9 +6,9 @@ We work in small slices that combine content and interface, so each can shape th
 |---:|---|---|---|
 | 0 | Feasibility prototype | Done | - |
 | 1 | Curriculum foundations | Done | 0 |
-| 1.5 | Working slice | In review | 1 |
-| 2 | Stage 2 content | Next | 1.5 |
-| 3 | Complete curriculum | Planned | 2 |
+| 1.5 | Working slice | Done | 1 |
+| 2 | Stage 2 content | First draft done | 1.5 |
+| 3 | Complete curriculum | First draft done | 2 |
 | 4 | UX and visual design | Planned | 3 |
 | 5 | Application foundation and engine | Partly done | 1.5 |
 | 6 | UI components and styling | Partly done | 4, 5 |
@@ -55,9 +55,9 @@ A small set of assignments running in a real interface, used to judge the struct
 
 ### Milestone 2: Stage 2 content
 
-- [ ] Write skills 7-11, the remaining Stage 2 skills
-- [ ] Add the other 9 stage reviews
-- [ ] Add the other 3 original checkpoints
+- [x] Write skills 7-11, the remaining Stage 2 skills
+- [x] Add the other 9 stage reviews
+- [x] Add the other 3 original checkpoints
 - [ ] Trial a sample with peers using a generated Markdown pack and the current prototype
 - [ ] Revise the ladder and format based on their feedback
 
@@ -65,19 +65,21 @@ A small set of assignments running in a real interface, used to judge the struct
 
 ### Milestone 3: Complete curriculum
 
-- [ ] Stage 1: Database basics (28)
-- [ ] Stage 3: Transforming values (64)
-- [ ] Stage 4: Summarising data (64)
-- [ ] Stage 5: Combining tables (100)
-- [ ] Stage 6: Multi-step queries (85)
-- [ ] Stage 7: Window functions (54)
-- [ ] Stage 8: Advanced text (23)
-- [ ] Stage 9: Changing data (41)
-- [ ] Stage 10: Design and performance (46)
-- [ ] Write a lesson for each skill
+- [x] Stage 1: Database basics (28)
+- [x] Stage 3: Transforming values (64)
+- [x] Stage 4: Summarising data (64)
+- [x] Stage 5: Combining tables (100)
+- [x] Stage 6: Multi-step queries (85)
+- [x] Stage 7: Window functions (54)
+- [x] Stage 8: Advanced text (23)
+- [x] Stage 9: Changing data (41)
+- [x] Stage 10: Design and performance (46)
+- [x] Write a lesson for each skill
 - [ ] Write a dialect guide covering SQLite, MySQL, and PostgreSQL
 
 **Done when:** all 575 assignments pass validation, each skill's recall plan is met, and all lessons are reviewed.
+
+**Status:** all 575 assignments and 55 lessons are written and pass validation. They still need a human review and the peer trial. The dialect guide isn't written.
 
 ## Application
 
@@ -96,7 +98,7 @@ A small set of assignments running in a real interface, used to judge the struct
 - [x] Restructure the prototype around the curriculum data
 - [x] Remove the prototype's grader test
 - [ ] Generate the content bundle, removing wrong-solution SQL that the app doesn't use
-- [x] Add routing using hash URLs, which work on GitHub Pages
+- [x] Add routing using real paths, with a 404.html fallback for GitHub Pages
 - [x] Support multi-table datasets and all comparison options
 - [x] Add query timeouts by stopping and restarting the worker
 - [ ] Add row limits for oversized results
@@ -125,7 +127,7 @@ A small set of assignments running in a real interface, used to judge the struct
 ### Milestone 7: Learning experience
 
 - [ ] Home page and curriculum map
-- [ ] Lessons and worked examples
+- [x] Lessons and worked examples
 - [ ] Assignment flow with hints and test results
 - [ ] Solutions that unlock after attempts
 - [ ] Links back to lessons after recall failures

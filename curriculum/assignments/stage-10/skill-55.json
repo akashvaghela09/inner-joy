@@ -1,0 +1,527 @@
+[
+  {
+    "id": "s55-01",
+    "skill": 55,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [
+      37
+    ],
+    "title": "Count up",
+    "prompt": "Using a recursive CTE, show the numbers from 1 up to the number of books, in a column named n. Replace the ___ with the stopping condition.",
+    "dataset": "bookshop",
+    "starterSql": "WITH RECURSIVE c(n) AS (\n  SELECT 1\n  UNION ALL\n  SELECT n + 1 FROM c WHERE ___\n)\nSELECT n FROM c;",
+    "hints": [
+      "Keep going while n is below the count."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "n"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ],
+            [
+              4
+            ],
+            [
+              5
+            ],
+            [
+              6
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": {
+          "columns": [
+            "n"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "WITH RECURSIVE c(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM c WHERE n < (SELECT COUNT(*) FROM books)) SELECT n FROM c;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "WITH RECURSIVE c(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM c WHERE n < 5) SELECT n FROM c;",
+        "why": "Stops at a fixed number"
+      },
+      {
+        "sql": "WITH RECURSIVE c(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM c WHERE n <= (SELECT COUNT(*) FROM books)) SELECT n FROM c;",
+        "why": "Goes one too far"
+      }
+    ]
+  },
+  {
+    "id": "s55-02",
+    "skill": 55,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      3,
+      30
+    ],
+    "title": "Up the chain",
+    "prompt": "Starting from the employee with no manager, walk down the org chart. Show each reachable employee's name and depth, with the top at 0.",
+    "dataset": "staff",
+    "hints": [
+      "Start with manager_id IS NULL, then join reports."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "depth"
+          ],
+          "rows": [
+            [
+              "Asha",
+              0
+            ],
+            [
+              "Ben",
+              1
+            ],
+            [
+              "Chloe",
+              1
+            ],
+            [
+              "Dev",
+              1
+            ],
+            [
+              "Grace",
+              1
+            ],
+            [
+              "Elena",
+              2
+            ],
+            [
+              "Farid",
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "depth"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              0
+            ],
+            [
+              "Jon",
+              1
+            ],
+            [
+              "Kim",
+              1
+            ],
+            [
+              "Mia",
+              2
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "WITH RECURSIVE chain AS (SELECT id, name, 0 AS depth FROM employees WHERE manager_id IS NULL UNION ALL SELECT e.id, e.name, c.depth + 1 FROM employees e JOIN chain c ON e.manager_id = c.id) SELECT name, depth FROM chain;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, 0 AS depth FROM employees;",
+        "why": "Doesn't walk the chart"
+      },
+      {
+        "sql": "WITH RECURSIVE chain AS (SELECT id, name, 0 AS depth FROM employees WHERE manager_id IS NULL UNION ALL SELECT e.id, e.name, c.depth FROM employees e JOIN chain c ON e.manager_id = c.id) SELECT name, depth FROM chain;",
+        "why": "Doesn't increase the depth"
+      }
+    ]
+  },
+  {
+    "id": "s55-03",
+    "skill": 55,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      37
+    ],
+    "title": "Generate dates",
+    "prompt": "Generate every date from 2024-03-01 to 2024-03-05 in a column named day, then count readings per day as readings, including 0.",
+    "dataset": "weather",
+    "hints": [
+      "Generate dates recursively, then LEFT JOIN."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "day",
+            "readings"
+          ],
+          "rows": [
+            [
+              "2024-03-01",
+              2
+            ],
+            [
+              "2024-03-02",
+              2
+            ],
+            [
+              "2024-03-03",
+              2
+            ],
+            [
+              "2024-03-04",
+              1
+            ],
+            [
+              "2024-03-05",
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "day",
+            "readings"
+          ],
+          "rows": [
+            [
+              "2024-03-01",
+              0
+            ],
+            [
+              "2024-03-02",
+              0
+            ],
+            [
+              "2024-03-03",
+              0
+            ],
+            [
+              "2024-03-04",
+              0
+            ],
+            [
+              "2024-03-05",
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "WITH RECURSIVE d(day) AS (SELECT '2024-03-01' UNION ALL SELECT date(day, '+1 day') FROM d WHERE day < '2024-03-05') SELECT d.day, COUNT(r.id) AS readings FROM d LEFT JOIN readings r ON r.reading_date = d.day GROUP BY d.day;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT reading_date AS day, COUNT(*) AS readings FROM readings GROUP BY reading_date;",
+        "why": "Misses days with none"
+      },
+      {
+        "sql": "WITH RECURSIVE d(day) AS (SELECT '2024-03-01' UNION ALL SELECT date(day, '+1 day') FROM d WHERE day < '2024-03-05') SELECT d.day, COUNT(*) AS readings FROM d LEFT JOIN readings r ON r.reading_date = d.day GROUP BY d.day;",
+        "why": "COUNT(*) shows 1 for none"
+      }
+    ]
+  },
+  {
+    "id": "s55-04",
+    "skill": 55,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      30,
+      37
+    ],
+    "title": "Everyone invited by",
+    "prompt": "Show the username of everyone directly or indirectly invited by user 1. Don't include user 1.",
+    "dataset": "app",
+    "hints": [
+      "Start from user 1's direct invitees, then keep walking."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "username"
+          ],
+          "rows": [
+            [
+              "orbit"
+            ],
+            [
+              "pixel"
+            ],
+            [
+              "quark"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "UPDATE users SET referrer_id = 1 WHERE id = 5; INSERT INTO users VALUES (6, 'sage', 5, '2024-01-15');",
+        "expected": {
+          "columns": [
+            "username"
+          ],
+          "rows": [
+            [
+              "orbit"
+            ],
+            [
+              "pixel"
+            ],
+            [
+              "raven"
+            ],
+            [
+              "quark"
+            ],
+            [
+              "sage"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "WITH RECURSIVE t AS (SELECT id, username FROM users WHERE referrer_id = 1 UNION ALL SELECT u.id, u.username FROM users u JOIN t ON u.referrer_id = t.id) SELECT username FROM t;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT username FROM users WHERE referrer_id = 1;",
+        "why": "Finds only direct invites"
+      },
+      {
+        "sql": "WITH RECURSIVE t AS (SELECT id, username FROM users WHERE id = 1 UNION ALL SELECT u.id, u.username FROM users u JOIN t ON u.referrer_id = t.id) SELECT username FROM t;",
+        "why": "Includes user 1"
+      }
+    ]
+  },
+  {
+    "id": "s55-05",
+    "skill": 55,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      38,
+      30
+    ],
+    "title": "A broken chain",
+    "prompt": "Hugo's manager no longer exists, so he isn't reachable from the top. Show the name of employees who aren't reached when walking down from anyone with no manager.",
+    "dataset": "staff",
+    "hints": [
+      "Walk the chart, then find who's missing."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Hugo"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Leo"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "WITH RECURSIVE chain AS (SELECT id FROM employees WHERE manager_id IS NULL UNION ALL SELECT e.id FROM employees e JOIN chain c ON e.manager_id = c.id) SELECT name FROM employees WHERE id NOT IN (SELECT id FROM chain);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM employees WHERE manager_id IS NULL;",
+        "why": "Finds the top instead"
+      },
+      {
+        "sql": "WITH RECURSIVE chain AS (SELECT id FROM employees WHERE manager_id IS NULL UNION ALL SELECT e.id FROM employees e JOIN chain c ON e.manager_id = c.id) SELECT name FROM employees WHERE id IN (SELECT id FROM chain);",
+        "why": "Finds who's reached"
+      }
+    ]
+  },
+  {
+    "id": "s55-06",
+    "skill": 55,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [
+      37
+    ],
+    "title": "Fix the endless query",
+    "prompt": "This should show level from 1 up to the number of departments, but its stopping condition is missing, so it would never end. Replace the ___ to fix it.",
+    "dataset": "staff",
+    "starterSql": "WITH RECURSIVE c(level) AS (\n  SELECT 1\n  UNION ALL\n  SELECT level + 1 FROM c WHERE ___\n)\nSELECT level FROM c;",
+    "hints": [
+      "Add a condition to the recursive part."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "level"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ],
+            [
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "level"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "WITH RECURSIVE c(level) AS (SELECT 1 UNION ALL SELECT level + 1 FROM c WHERE level < (SELECT COUNT(*) FROM departments)) SELECT level FROM c;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "WITH RECURSIVE c(level) AS (SELECT 1 UNION ALL SELECT level + 1 FROM c WHERE level < 2) SELECT level FROM c;",
+        "why": "Stops at a fixed number"
+      },
+      {
+        "sql": "WITH RECURSIVE c(level) AS (SELECT 1 UNION ALL SELECT level + 1 FROM c WHERE level <= (SELECT COUNT(*) FROM departments)) SELECT level FROM c;",
+        "why": "Goes one too far"
+      }
+    ]
+  }
+]

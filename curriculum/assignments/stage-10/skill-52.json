@@ -1,0 +1,557 @@
+[
+  {
+    "id": "s52-01",
+    "skill": 52,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [
+      24
+    ],
+    "title": "Spot the repeats",
+    "prompt": "Customer cities repeat across rows. Show each different city as city with a count as customers, to see what could become its own table. Replace the ___.",
+    "dataset": "shop",
+    "starterSql": "SELECT city, COUNT(*) AS customers\nFROM customers\nGROUP BY ___;",
+    "hints": [
+      "GROUP BY city."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "city",
+            "customers"
+          ],
+          "rows": [
+            [
+              "Pune",
+              2
+            ],
+            [
+              "Rome",
+              2
+            ],
+            [
+              "Tokyo",
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "city",
+            "customers"
+          ],
+          "rows": [
+            [
+              "Lima",
+              1
+            ],
+            [
+              "Oslo",
+              2
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT city, COUNT(*) AS customers FROM customers GROUP BY city;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT city FROM customers;",
+        "why": "Keeps repeats"
+      },
+      {
+        "sql": "SELECT name, COUNT(*) AS customers FROM customers GROUP BY name;",
+        "why": "Groups by name"
+      }
+    ]
+  },
+  {
+    "id": "s52-02",
+    "skill": 52,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      3
+    ],
+    "title": "Extract a table",
+    "prompt": "Create a table named cities with id INTEGER PRIMARY KEY and name TEXT, filled with each different customer city. Let SQLite assign ids.",
+    "dataset": "shop",
+    "hints": [
+      "INSERT INTO cities (name) SELECT DISTINCT."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT name FROM cities ORDER BY name;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Pune"
+            ],
+            [
+              "Rome"
+            ],
+            [
+              "Tokyo"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Lima"
+            ],
+            [
+              "Oslo"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE TABLE cities (id INTEGER PRIMARY KEY, name TEXT); INSERT INTO cities (name) SELECT DISTINCT city FROM customers;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE TABLE cities (id INTEGER PRIMARY KEY, name TEXT); INSERT INTO cities (name) SELECT city FROM customers;",
+        "why": "Keeps repeats"
+      },
+      {
+        "sql": "CREATE TABLE cities (id INTEGER PRIMARY KEY, name TEXT);",
+        "why": "Leaves it empty"
+      }
+    ]
+  },
+  {
+    "id": "s52-03",
+    "skill": 52,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      51,
+      3
+    ],
+    "title": "Add the link",
+    "prompt": "Add a city_id INTEGER column to customers, then create and fill cities as before, and set each customer's city_id from the matching row.",
+    "dataset": "shop",
+    "hints": [
+      "ALTER, CREATE, INSERT, then UPDATE with a subquery."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT c.id, ci.name FROM customers c JOIN cities ci ON ci.id = c.city_id ORDER BY c.id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              1,
+              "Pune"
+            ],
+            [
+              2,
+              "Rome"
+            ],
+            [
+              3,
+              "Tokyo"
+            ],
+            [
+              4,
+              "Rome"
+            ],
+            [
+              5,
+              "Pune"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              7,
+              "Oslo"
+            ],
+            [
+              8,
+              "Lima"
+            ],
+            [
+              9,
+              "Oslo"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE TABLE cities (id INTEGER PRIMARY KEY, name TEXT); INSERT INTO cities (name) SELECT DISTINCT city FROM customers ORDER BY city; ALTER TABLE customers ADD COLUMN city_id INTEGER; UPDATE customers SET city_id = (SELECT id FROM cities WHERE cities.name = customers.city);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE TABLE cities (id INTEGER PRIMARY KEY, name TEXT); INSERT INTO cities (name) SELECT DISTINCT city FROM customers ORDER BY city; ALTER TABLE customers ADD COLUMN city_id INTEGER;",
+        "why": "Doesn't set the link"
+      },
+      {
+        "sql": "CREATE TABLE cities (id INTEGER PRIMARY KEY, name TEXT); INSERT INTO cities (name) SELECT DISTINCT city FROM customers ORDER BY city; ALTER TABLE customers ADD COLUMN city_id INTEGER; UPDATE customers SET city_id = 1;",
+        "why": "Sets everyone to one city"
+      }
+    ]
+  },
+  {
+    "id": "s52-04",
+    "skill": 52,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      24,
+      51
+    ],
+    "title": "A linking table",
+    "prompt": "Students take many clubs, and clubs have many students. Create club_members with student_id INTEGER, club_id INTEGER, and PRIMARY KEY (student_id, club_id).",
+    "dataset": "school",
+    "hints": [
+      "A composite primary key prevents repeat memberships."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT name, type, \"notnull\", pk FROM pragma_table_info('club_members') ORDER BY cid;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "type",
+            "notnull",
+            "pk"
+          ],
+          "rows": [
+            [
+              "student_id",
+              "INTEGER",
+              0,
+              1
+            ],
+            [
+              "club_id",
+              "INTEGER",
+              0,
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "INSERT INTO students VALUES (50, 'x', 9);",
+        "expected": {
+          "columns": [
+            "name",
+            "type",
+            "notnull",
+            "pk"
+          ],
+          "rows": [
+            [
+              "student_id",
+              "INTEGER",
+              0,
+              1
+            ],
+            [
+              "club_id",
+              "INTEGER",
+              0,
+              2
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE TABLE club_members (student_id INTEGER, club_id INTEGER, PRIMARY KEY (student_id, club_id));"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE TABLE club_members (student_id INTEGER PRIMARY KEY, club_id INTEGER);",
+        "why": "A student could join just one club"
+      },
+      {
+        "sql": "CREATE TABLE club_members (student_id INTEGER, club_id INTEGER);",
+        "why": "No key, so memberships can repeat"
+      }
+    ]
+  },
+  {
+    "id": "s52-05",
+    "skill": 52,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      25
+    ],
+    "title": "One fact, one place",
+    "prompt": "A course's subject is stored once, in courses. Using a join rather than a copied column, show each enrolment's id and subject.",
+    "dataset": "school",
+    "hints": [
+      "Join enrolments to courses."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "subject"
+          ],
+          "rows": [
+            [
+              1,
+              "Maths"
+            ],
+            [
+              2,
+              "Science"
+            ],
+            [
+              3,
+              "Maths"
+            ],
+            [
+              4,
+              "Maths"
+            ],
+            [
+              5,
+              "Maths"
+            ],
+            [
+              6,
+              "Science"
+            ],
+            [
+              7,
+              "Maths"
+            ],
+            [
+              8,
+              "Maths"
+            ],
+            [
+              9,
+              "Science"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "id",
+            "subject"
+          ],
+          "rows": [
+            [
+              11,
+              "Science"
+            ],
+            [
+              12,
+              "Science"
+            ],
+            [
+              13,
+              "Science"
+            ],
+            [
+              14,
+              "Arts"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT e.id, c.subject FROM enrolments e JOIN courses c ON c.id = e.course_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT e.id, c.subject FROM enrolments e JOIN courses c ON c.id = e.student_id;",
+        "why": "Joins on the wrong column"
+      },
+      {
+        "sql": "SELECT e.id, e.term AS subject FROM enrolments e;",
+        "why": "Shows the wrong value"
+      }
+    ]
+  },
+  {
+    "id": "s52-06",
+    "skill": 52,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [
+      3
+    ],
+    "title": "Fix the duplicated fact",
+    "prompt": "Marco moved to Milan, and his city must change in one place. This statement changes the wrong row. Fix it.",
+    "dataset": "shop",
+    "starterSql": "UPDATE customers\nSET city = 'Milan'\nWHERE id = 3;",
+    "hints": [
+      "Identify Marco by his id, 2."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, city FROM customers ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "city"
+          ],
+          "rows": [
+            [
+              1,
+              "Pune"
+            ],
+            [
+              2,
+              "Milan"
+            ],
+            [
+              3,
+              "Tokyo"
+            ],
+            [
+              4,
+              "Rome"
+            ],
+            [
+              5,
+              "Pune"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO customers VALUES (2, 'Marco', 'Rome', NULL, '2023-02-14');",
+        "expected": {
+          "columns": [
+            "id",
+            "city"
+          ],
+          "rows": [
+            [
+              2,
+              "Milan"
+            ],
+            [
+              7,
+              "Oslo"
+            ],
+            [
+              8,
+              "Lima"
+            ],
+            [
+              9,
+              "Oslo"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "UPDATE customers SET city = 'Milan' WHERE id = 2;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "UPDATE customers SET city = 'Milan' WHERE city = 'Rome';",
+        "why": "Moves everyone in Rome"
+      },
+      {
+        "sql": "UPDATE customers SET city = 'Milan';",
+        "why": "Moves everyone"
+      }
+    ]
+  }
+]

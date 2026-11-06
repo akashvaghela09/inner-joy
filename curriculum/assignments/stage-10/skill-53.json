@@ -1,0 +1,597 @@
+[
+  {
+    "id": "s53-01",
+    "skill": 53,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [
+      20
+    ],
+    "title": "A first view",
+    "prompt": "Create a view named names that selects each employee's name. Replace the ___.",
+    "dataset": "staff",
+    "starterSql": "CREATE VIEW names AS\nSELECT ___ FROM employees;",
+    "hints": [
+      "CREATE VIEW name AS SELECT ..."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT name FROM names ORDER BY name;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Asha"
+            ],
+            [
+              "Ben"
+            ],
+            [
+              "Chloe"
+            ],
+            [
+              "Dev"
+            ],
+            [
+              "Elena"
+            ],
+            [
+              "Farid"
+            ],
+            [
+              "Grace"
+            ],
+            [
+              "Hugo"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Ivy"
+            ],
+            [
+              "Jon"
+            ],
+            [
+              "Kim"
+            ],
+            [
+              "Leo"
+            ],
+            [
+              "Mia"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE VIEW names AS SELECT name FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE VIEW names AS SELECT salary FROM employees;",
+        "why": "Selects the wrong column"
+      },
+      {
+        "sql": "CREATE TABLE names AS SELECT id FROM employees;",
+        "why": "Creates a table of ids"
+      }
+    ]
+  },
+  {
+    "id": "s53-02",
+    "skill": 53,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      25
+    ],
+    "title": "Hide a join",
+    "prompt": "Create a view named order_lines showing order_id, the product's name as product, and quantity.",
+    "dataset": "shop",
+    "hints": [
+      "Save the join under one name."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT order_id, product, quantity FROM order_lines ORDER BY order_id, product;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "order_id",
+            "product",
+            "quantity"
+          ],
+          "rows": [
+            [
+              1,
+              "Notebook",
+              3
+            ],
+            [
+              1,
+              "Pen",
+              2
+            ],
+            [
+              2,
+              "Mug",
+              1
+            ],
+            [
+              3,
+              "Kettle",
+              1
+            ],
+            [
+              4,
+              "Lamp",
+              2
+            ],
+            [
+              4,
+              "Notebook",
+              1
+            ],
+            [
+              5,
+              "Mug",
+              2
+            ],
+            [
+              6,
+              "Kettle",
+              1
+            ],
+            [
+              6,
+              "Pen",
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "order_id",
+            "product",
+            "quantity"
+          ],
+          "rows": [
+            [
+              11,
+              "Cup",
+              3
+            ],
+            [
+              11,
+              "Stool",
+              1
+            ],
+            [
+              12,
+              "Ink",
+              2
+            ],
+            [
+              13,
+              "Cup",
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE VIEW order_lines AS SELECT i.order_id, p.name AS product, i.quantity FROM order_items i JOIN products p ON p.id = i.product_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE VIEW order_lines AS SELECT i.order_id, i.product_id AS product, i.quantity FROM order_items i;",
+        "why": "Shows ids, not names"
+      },
+      {
+        "sql": "CREATE VIEW order_lines AS SELECT i.order_id, p.name AS product FROM order_items i JOIN products p ON p.id = i.product_id;",
+        "why": "Leaves out quantity"
+      }
+    ]
+  },
+  {
+    "id": "s53-03",
+    "skill": 53,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      20,
+      44
+    ],
+    "title": "A report as a view",
+    "prompt": "Create a view named dept_report with each department's name as department, its staff count as staff, and its employees' names in order, joined with commas, as team. Include empty departments.",
+    "dataset": "staff",
+    "hints": [
+      "LEFT JOIN, COUNT a right-table column, and use GROUP_CONCAT."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT department, staff, team FROM dept_report ORDER BY department;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "department",
+            "staff",
+            "team"
+          ],
+          "rows": [
+            [
+              "Engineering",
+              3,
+              "Asha,Ben,Chloe"
+            ],
+            [
+              "Legal",
+              0,
+              null
+            ],
+            [
+              "Sales",
+              3,
+              "Dev,Elena,Farid"
+            ],
+            [
+              "Support",
+              1,
+              "Grace"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "department",
+            "staff",
+            "team"
+          ],
+          "rows": [
+            [
+              "Design",
+              2,
+              "Ivy,Jon"
+            ],
+            [
+              "Finance",
+              2,
+              "Kim,Mia"
+            ],
+            [
+              "Ops",
+              0,
+              null
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE VIEW dept_report AS SELECT d.name AS department, COUNT(e.id) AS staff, GROUP_CONCAT(e.name ORDER BY e.name) AS team FROM departments d LEFT JOIN employees e ON e.department_id = d.id GROUP BY d.id, d.name;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE VIEW dept_report AS SELECT d.name AS department, COUNT(e.id) AS staff, GROUP_CONCAT(e.name ORDER BY e.name) AS team FROM departments d JOIN employees e ON e.department_id = d.id GROUP BY d.id, d.name;",
+        "why": "Drops empty departments"
+      },
+      {
+        "sql": "CREATE VIEW dept_report AS SELECT d.name AS department, COUNT(*) AS staff, GROUP_CONCAT(e.name ORDER BY e.name) AS team FROM departments d LEFT JOIN employees e ON e.department_id = d.id GROUP BY d.id, d.name;",
+        "why": "COUNT(*) shows 1 for empty"
+      }
+    ]
+  },
+  {
+    "id": "s53-04",
+    "skill": 53,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      42,
+      43
+    ],
+    "title": "Views with windows",
+    "prompt": "Create a view named session_stats with id, the change in minutes from that user's previous session by id as change, and that user's running total by id as running.",
+    "dataset": "app",
+    "hints": [
+      "LAG and a cumulative SUM inside the view."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, change, running FROM session_stats ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "change",
+            "running"
+          ],
+          "rows": [
+            [
+              1,
+              null,
+              10
+            ],
+            [
+              2,
+              15,
+              35
+            ],
+            [
+              3,
+              -20,
+              40
+            ],
+            [
+              4,
+              null,
+              40
+            ],
+            [
+              5,
+              -25,
+              55
+            ],
+            [
+              6,
+              null,
+              20
+            ],
+            [
+              7,
+              0,
+              40
+            ],
+            [
+              8,
+              null,
+              30
+            ],
+            [
+              9,
+              -18,
+              42
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "id",
+            "change",
+            "running"
+          ],
+          "rows": [
+            [
+              11,
+              null,
+              50
+            ],
+            [
+              12,
+              0,
+              100
+            ],
+            [
+              13,
+              -43,
+              107
+            ],
+            [
+              14,
+              null,
+              33
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE VIEW session_stats AS SELECT id, minutes - LAG(minutes) OVER (PARTITION BY user_id ORDER BY id) AS change, SUM(minutes) OVER (PARTITION BY user_id ORDER BY id) AS running FROM sessions;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE VIEW session_stats AS SELECT id, minutes AS change, SUM(minutes) OVER (PARTITION BY user_id ORDER BY id) AS running FROM sessions;",
+        "why": "Doesn't subtract"
+      },
+      {
+        "sql": "CREATE VIEW session_stats AS SELECT id, minutes - LAG(minutes) OVER (ORDER BY id) AS change, SUM(minutes) OVER (ORDER BY id) AS running FROM sessions;",
+        "why": "Mixes users"
+      }
+    ]
+  },
+  {
+    "id": "s53-05",
+    "skill": 53,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      37
+    ],
+    "title": "Views stay current",
+    "prompt": "Create a view named top_paid selecting the name of the highest earners, then change Asha's salary to 200000 afterwards. The view reflects the change without being recreated.",
+    "dataset": "staff",
+    "hints": [
+      "A view stores the query, not the rows."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT name FROM top_paid ORDER BY name;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Asha"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "UPDATE employees SET salary = 150000 WHERE id = 2;",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Asha"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE VIEW top_paid AS SELECT name FROM employees WHERE salary = (SELECT MAX(salary) FROM employees); UPDATE employees SET salary = 200000 WHERE name = 'Asha';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE TABLE top_paid AS SELECT name FROM employees WHERE salary = (SELECT MAX(salary) FROM employees); UPDATE employees SET salary = 200000 WHERE name = 'Asha';",
+        "why": "A table keeps old rows, so it doesn't update"
+      },
+      {
+        "sql": "CREATE VIEW top_paid AS SELECT name FROM employees WHERE salary = (SELECT MIN(salary) FROM employees); UPDATE employees SET salary = 200000 WHERE name = 'Asha';",
+        "why": "Uses the lowest"
+      }
+    ]
+  },
+  {
+    "id": "s53-06",
+    "skill": 53,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [
+      25
+    ],
+    "title": "Fix the view",
+    "prompt": "This should create a view named cheap_books of books under 15, but it fails. Fix it.",
+    "dataset": "bookshop",
+    "starterSql": "CREATE VIEW cheap_books\nSELECT title FROM books WHERE price < 15;",
+    "hints": [
+      "CREATE VIEW needs AS before the query."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT title FROM cheap_books ORDER BY title;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title"
+          ],
+          "rows": [
+            [
+              "Paper Lanterns"
+            ],
+            [
+              "The Last Ferry"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": {
+          "columns": [
+            "title"
+          ],
+          "rows": [
+            [
+              "North Light"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE VIEW cheap_books AS SELECT title FROM books WHERE price < 15;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE VIEW cheap_books AS SELECT title FROM books;",
+        "why": "Doesn't filter"
+      },
+      {
+        "sql": "CREATE VIEW cheap_books AS SELECT title FROM books WHERE price > 15;",
+        "why": "Finds the expensive ones"
+      }
+    ]
+  }
+]

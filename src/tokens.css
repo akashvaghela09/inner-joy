@@ -20,7 +20,6 @@
   --primary-hover: #116329;
   --bar-track: #e6eaef;
   --bar-done: #1a7f37;
-  --bar-available: #c8d1da;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 }
@@ -48,7 +47,6 @@
     --primary-hover: #1a7f37;
     --bar-track: #21262d;
     --bar-done: #2ea043;
-    --bar-available: #3a414a;
   }
 }
 

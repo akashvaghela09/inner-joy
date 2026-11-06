@@ -1,0 +1,591 @@
+[
+  {
+    "id": "st09-r01",
+    "kind": "review",
+    "stage": 9,
+    "skills": [
+      47
+    ],
+    "recalls": [],
+    "title": "Tidy the regions",
+    "prompt": "Change the region of every North trail to Northern.",
+    "dataset": "trail-club",
+    "hints": [
+      "A filtered UPDATE."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name, region, length_km, elevation_m FROM trails ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Trail Club",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "region",
+            "length_km",
+            "elevation_m"
+          ],
+          "rows": [
+            [
+              1,
+              "Cedar Loop",
+              "Northern",
+              8.5,
+              320
+            ],
+            [
+              2,
+              "Fox Ridge",
+              "East",
+              14,
+              870
+            ],
+            [
+              3,
+              "Mill Stream",
+              "South",
+              5.2,
+              90
+            ],
+            [
+              4,
+              "Stone Pass",
+              "Northern",
+              21.3,
+              1450
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM trails; INSERT INTO trails VALUES (7, 'Birch Walk', 'West', 3.1, 40), (8, 'High Moor', 'East', 12.6, 610), (9, 'Crag Top', 'North', 6.0, 900);",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "region",
+            "length_km",
+            "elevation_m"
+          ],
+          "rows": [
+            [
+              7,
+              "Birch Walk",
+              "West",
+              3.1,
+              40
+            ],
+            [
+              8,
+              "High Moor",
+              "East",
+              12.6,
+              610
+            ],
+            [
+              9,
+              "Crag Top",
+              "Northern",
+              6,
+              900
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "UPDATE trails SET region = 'Northern' WHERE region = 'North';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "UPDATE trails SET region = 'Northern';",
+        "why": "Changes every trail"
+      },
+      {
+        "sql": "UPDATE trails SET region = 'North' WHERE region = 'Northern';",
+        "why": "Reverses the change"
+      }
+    ]
+  },
+  {
+    "id": "st09-r02",
+    "kind": "review",
+    "stage": 9,
+    "skills": [
+      46,
+      48
+    ],
+    "recalls": [],
+    "title": "Remove and add",
+    "prompt": "Delete books over 25, then add a book with id 41, title Slim Volume, author Sol Ruiz, genre Poetry, price 8, pages 60, year 2024.",
+    "dataset": "bookshop",
+    "hints": [
+      "Two statements."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, title, author, genre, price, pages, year FROM books ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "title",
+            "author",
+            "genre",
+            "price",
+            "pages",
+            "year"
+          ],
+          "rows": [
+            [
+              1,
+              "The Salt Road",
+              "Mina Rao",
+              "History",
+              18.5,
+              320,
+              2019
+            ],
+            [
+              2,
+              "Quiet Engines",
+              "Tom Okafor",
+              "Science",
+              24,
+              412,
+              2021
+            ],
+            [
+              3,
+              "Paper Lanterns",
+              "Mina Rao",
+              "Fiction",
+              12,
+              250,
+              2016
+            ],
+            [
+              4,
+              "River of Glass",
+              "Lena Park",
+              "Fiction",
+              15.5,
+              298,
+              2022
+            ],
+            [
+              6,
+              "The Last Ferry",
+              "Ivan Cole",
+              "Mystery",
+              9,
+              210,
+              2014
+            ],
+            [
+              41,
+              "Slim Volume",
+              "Sol Ruiz",
+              "Poetry",
+              8,
+              60,
+              2024
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": {
+          "columns": [
+            "id",
+            "title",
+            "author",
+            "genre",
+            "price",
+            "pages",
+            "year"
+          ],
+          "rows": [
+            [
+              10,
+              "Copper Moon",
+              "Ada Hill",
+              "Fantasy",
+              20,
+              100,
+              2020
+            ],
+            [
+              11,
+              "North Light",
+              "Raj Dev",
+              "Travel",
+              7.5,
+              180,
+              2015
+            ],
+            [
+              12,
+              "Sky Atlas",
+              "Ada Hill",
+              "Science",
+              25,
+              300,
+              2023
+            ],
+            [
+              41,
+              "Slim Volume",
+              "Sol Ruiz",
+              "Poetry",
+              8,
+              60,
+              2024
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "DELETE FROM books WHERE price > 25; INSERT INTO books (id, title, author, genre, price, pages, year) VALUES (41, 'Slim Volume', 'Sol Ruiz', 'Poetry', 8, 60, 2024);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "DELETE FROM books WHERE price > 25;",
+        "why": "Doesn't add the book"
+      },
+      {
+        "sql": "INSERT INTO books (id, title, author, genre, price, pages, year) VALUES (41, 'Slim Volume', 'Sol Ruiz', 'Poetry', 8, 60, 2024);",
+        "why": "Doesn't delete"
+      }
+    ]
+  },
+  {
+    "id": "st09-r03",
+    "kind": "review",
+    "stage": 9,
+    "skills": [
+      47,
+      49
+    ],
+    "recalls": [],
+    "title": "Mark as shipped",
+    "prompt": "Set pending orders to shipped, inside a transaction you commit.",
+    "dataset": "shop",
+    "hints": [
+      "BEGIN, UPDATE, COMMIT."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, customer_id, status FROM orders ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "customer_id",
+            "status"
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "shipped"
+            ],
+            [
+              2,
+              2,
+              "shipped"
+            ],
+            [
+              3,
+              1,
+              "cancelled"
+            ],
+            [
+              4,
+              3,
+              "shipped"
+            ],
+            [
+              5,
+              4,
+              "shipped"
+            ],
+            [
+              6,
+              3,
+              "shipped"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "customer_id",
+            "status"
+          ],
+          "rows": [
+            [
+              11,
+              7,
+              "shipped"
+            ],
+            [
+              12,
+              8,
+              "shipped"
+            ],
+            [
+              13,
+              7,
+              "cancelled"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "BEGIN; UPDATE orders SET status = 'shipped' WHERE status = 'pending'; COMMIT;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "BEGIN; UPDATE orders SET status = 'shipped' WHERE status = 'pending'; ROLLBACK;",
+        "why": "Undoes it"
+      },
+      {
+        "sql": "BEGIN; UPDATE orders SET status = 'shipped'; COMMIT;",
+        "why": "Changes every order"
+      }
+    ]
+  },
+  {
+    "id": "st09-r04",
+    "kind": "review",
+    "stage": 9,
+    "skills": [
+      47
+    ],
+    "recalls": [],
+    "title": "Discount a category",
+    "prompt": "Lower Kitchen product prices by 10%, without changing other categories.",
+    "dataset": "shop",
+    "hints": [
+      "A calculation in SET."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name, category, price FROM products ORDER BY id;",
+      "ordered": true,
+      "columnNames": true,
+      "decimals": 2
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "category",
+            "price"
+          ],
+          "rows": [
+            [
+              1,
+              "Notebook",
+              "Stationery",
+              4
+            ],
+            [
+              2,
+              "Pen",
+              "Stationery",
+              1.5
+            ],
+            [
+              3,
+              "Mug",
+              "Kitchen",
+              8.1
+            ],
+            [
+              4,
+              "Kettle",
+              "Kitchen",
+              31.5
+            ],
+            [
+              5,
+              "Lamp",
+              "Home",
+              25
+            ],
+            [
+              6,
+              "Rug",
+              "Home",
+              60
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "category",
+            "price"
+          ],
+          "rows": [
+            [
+              7,
+              "Stool",
+              "Home",
+              40
+            ],
+            [
+              8,
+              "Cup",
+              "Kitchen",
+              8.1
+            ],
+            [
+              9,
+              "Ink",
+              "Stationery",
+              12.5
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "UPDATE products SET price = price * 0.9 WHERE category = 'Kitchen';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "UPDATE products SET price = 0.9 WHERE category = 'Kitchen';",
+        "why": "Replaces the price"
+      },
+      {
+        "sql": "UPDATE products SET price = price * 0.9;",
+        "why": "Changes every product"
+      }
+    ]
+  },
+  {
+    "id": "st09-r05",
+    "kind": "review",
+    "stage": 9,
+    "skills": [
+      48,
+      34
+    ],
+    "recalls": [],
+    "title": "Remove the empty",
+    "prompt": "Delete departments with no employees.",
+    "dataset": "staff",
+    "hints": [
+      "Use a subquery."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, name FROM departments ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              1,
+              "Engineering"
+            ],
+            [
+              2,
+              "Sales"
+            ],
+            [
+              3,
+              "Support"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              5,
+              "Design"
+            ],
+            [
+              6,
+              "Finance"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "DELETE FROM departments WHERE id NOT IN (SELECT department_id FROM employees WHERE department_id IS NOT NULL);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "DELETE FROM departments WHERE id NOT IN (SELECT department_id FROM employees);",
+        "why": "A NULL in the list means nothing gets deleted"
+      },
+      {
+        "sql": "DELETE FROM departments;",
+        "why": "Deletes every department"
+      }
+    ]
+  }
+]

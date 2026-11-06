@@ -597,7 +597,7 @@
     "stepType": "fixBug",
     "required": false,
     "recalls": [],
-    "title": "Fix the filter",
+    "title": "Fix the ranking filter",
     "prompt": "This should show each department's highest-paid employee's name, but a window function can't go in WHERE. Fix it. Ties all count, and ignore employees with no department.",
     "dataset": "staff",
     "starterSql": "SELECT name\nFROM employees\nWHERE RANK() OVER (PARTITION BY department_id ORDER BY salary DESC) = 1;",

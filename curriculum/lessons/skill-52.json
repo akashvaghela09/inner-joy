@@ -1,0 +1,15 @@
+{
+  "skill": 52,
+  "summary": "Normalisation means splitting data into tables so each fact is stored once.",
+  "points": [
+    "Repeated values, such as a customer's city on every order, can drift out of step.",
+    "Give each kind of thing its own table with a primary key.",
+    "Link tables with foreign keys rather than copying values.",
+    "A many-to-many relationship gets its own linking table, like enrolments."
+  ],
+  "example": {
+    "dataset": "shop",
+    "sql": "SELECT DISTINCT o.customer_id, c.name, c.city\nFROM orders o\nJOIN customers c ON c.id = o.customer_id;",
+    "explanation": "Orders store only customer_id. The name and city live in one place, so one update fixes them everywhere."
+  }
+}

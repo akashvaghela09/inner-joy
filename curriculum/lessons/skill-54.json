@@ -1,0 +1,15 @@
+{
+  "skill": 54,
+  "summary": "An index helps SQLite find rows without reading the whole table, like the index at the back of a book.",
+  "points": [
+    "CREATE INDEX name ON table (column) builds one.",
+    "EXPLAIN QUERY PLAN shows how SQLite will run a query. SCAN reads everything, and SEARCH uses an index.",
+    "Indexes speed up reads but slow writes slightly and use space.",
+    "A composite index on (a, b) helps filters on a, or on a and b together, but not on b alone."
+  ],
+  "example": {
+    "dataset": "shop",
+    "sql": "CREATE INDEX idx_orders_customer ON orders (customer_id);\n\nEXPLAIN QUERY PLAN\nSELECT * FROM orders WHERE customer_id = 1;",
+    "explanation": "The plan now says SEARCH, using the index instead of scanning every order."
+  }
+}

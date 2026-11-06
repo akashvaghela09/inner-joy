@@ -79,15 +79,6 @@
   font-weight: 600;
 }
 
-.stepUnwritten {
-  border-style: dashed;
-  color: var(--text-muted);
-}
-
-.stepUnwritten:hover {
-  background: transparent;
-}
-
 .stripDivider {
   flex: none;
   width: 1px;

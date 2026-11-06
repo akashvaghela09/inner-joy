@@ -112,7 +112,6 @@ export function ChapterPage({ stage }: { stage: Stage }) {
   const { completed } = useProgress();
   const progress = stageProgress(stage, completed);
   const written = stage.groups.filter((group) => group.slots.length > 0);
-  const comingSoon = stage.groups.filter((group) => group.slots.length === 0 && group.kind === "skill");
   const assignments = written.flatMap((group) => group.slots.map((slot) => slot.assignment));
   const target =
     assignments.find((assignment) => isRequired(assignment) && !completed.has(assignment.id)) ??
@@ -141,31 +140,16 @@ export function ChapterPage({ stage }: { stage: Stage }) {
           <span className={styles.progressName}>Chapter progress</span>
           <span className={ui.muted}>
             {progress.done} of {progress.total} required
-            {progress.available > 0 && ` · ${progress.available} available now`}
           </span>
         </p>
         <ProgressBar progress={progress} name={`Chapter ${stage.id} progress`} size="large" />
       </section>
 
-      {written.length === 0 && <p className={styles.emptyNote}>The assignments for this chapter aren't written yet.</p>}
 
       {written.map((group) => (
         <GroupSection key={group.id} group={group} />
       ))}
 
-      {comingSoon.length > 0 && (
-        <section>
-          <h2 className={styles.comingSoonHeading}>Coming soon</h2>
-          <ul>
-            {comingSoon.map((group) => (
-              <li key={group.id} className={styles.comingSoonRow}>
-                {group.title}
-                <span className={styles.comingSoonOutcome}>{group.outcome}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
 
       <VerifySkills stage={stage} />
     </div>

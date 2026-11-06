@@ -1,0 +1,494 @@
+[
+  {
+    "id": "s51-01",
+    "skill": 51,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [
+      3
+    ],
+    "title": "Primary key",
+    "prompt": "Create a table named plans with id INTEGER PRIMARY KEY and name TEXT. Replace the ___.",
+    "dataset": "app",
+    "starterSql": "CREATE TABLE plans (id INTEGER ___, name TEXT);",
+    "hints": [
+      "PRIMARY KEY follows the type."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT name, type, \"notnull\", pk FROM pragma_table_info('plans') ORDER BY cid;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "type",
+            "notnull",
+            "pk"
+          ],
+          "rows": [
+            [
+              "id",
+              "INTEGER",
+              0,
+              1
+            ],
+            [
+              "name",
+              "TEXT",
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "INSERT INTO users VALUES (50, 'x', NULL, '2024-01-01');",
+        "expected": {
+          "columns": [
+            "name",
+            "type",
+            "notnull",
+            "pk"
+          ],
+          "rows": [
+            [
+              "id",
+              "INTEGER",
+              0,
+              1
+            ],
+            [
+              "name",
+              "TEXT",
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE TABLE plans (id INTEGER PRIMARY KEY, name TEXT);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE TABLE plans (id INTEGER, name TEXT);",
+        "why": "No primary key"
+      },
+      {
+        "sql": "CREATE TABLE plans (id INTEGER, name TEXT PRIMARY KEY);",
+        "why": "Puts the key on name"
+      }
+    ]
+  },
+  {
+    "id": "s51-02",
+    "skill": 51,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      9
+    ],
+    "title": "Required values",
+    "prompt": "Create a table named plans with id INTEGER PRIMARY KEY and code TEXT NOT NULL.",
+    "dataset": "app",
+    "hints": [
+      "NOT NULL follows the type."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT name, type, \"notnull\", pk FROM pragma_table_info('plans') ORDER BY cid;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "type",
+            "notnull",
+            "pk"
+          ],
+          "rows": [
+            [
+              "id",
+              "INTEGER",
+              0,
+              1
+            ],
+            [
+              "code",
+              "TEXT",
+              1,
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "INSERT INTO users VALUES (50, 'x', NULL, '2024-01-01');",
+        "expected": {
+          "columns": [
+            "name",
+            "type",
+            "notnull",
+            "pk"
+          ],
+          "rows": [
+            [
+              "id",
+              "INTEGER",
+              0,
+              1
+            ],
+            [
+              "code",
+              "TEXT",
+              1,
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE TABLE plans (id INTEGER PRIMARY KEY, code TEXT NOT NULL);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE TABLE plans (id INTEGER PRIMARY KEY, code TEXT);",
+        "why": "Allows missing codes"
+      },
+      {
+        "sql": "CREATE TABLE plans (id INTEGER NOT NULL, code TEXT);",
+        "why": "Puts NOT NULL on the wrong column"
+      }
+    ]
+  },
+  {
+    "id": "s51-03",
+    "skill": 51,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      3
+    ],
+    "title": "No repeats",
+    "prompt": "Create a table named plans with id INTEGER PRIMARY KEY and a code TEXT column that must be UNIQUE. The check inserts nothing, and reads whether a unique index exists on code.",
+    "dataset": "app",
+    "hints": [
+      "UNIQUE follows the type."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT i.\"unique\" AS is_unique, c.name FROM pragma_index_list('plans') i, pragma_index_info(i.name) c;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "is_unique",
+            "name"
+          ],
+          "rows": [
+            [
+              1,
+              "code"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "INSERT INTO users VALUES (50, 'x', NULL, '2024-01-01');",
+        "expected": {
+          "columns": [
+            "is_unique",
+            "name"
+          ],
+          "rows": [
+            [
+              1,
+              "code"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE TABLE plans (id INTEGER PRIMARY KEY, code TEXT UNIQUE);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE TABLE plans (id INTEGER PRIMARY KEY, code TEXT);",
+        "why": "Allows repeats"
+      },
+      {
+        "sql": "CREATE TABLE plans (id INTEGER PRIMARY KEY, name TEXT UNIQUE);",
+        "why": "Uses the wrong column"
+      }
+    ]
+  },
+  {
+    "id": "s51-04",
+    "skill": 51,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      3
+    ],
+    "title": "Link two tables",
+    "prompt": "Create a table named logins with id INTEGER PRIMARY KEY and user_id INTEGER that has a FOREIGN KEY to users(id).",
+    "dataset": "app",
+    "hints": [
+      "user_id INTEGER REFERENCES users(id), or a FOREIGN KEY clause."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT \"table\", \"from\", \"to\" FROM pragma_foreign_key_list('logins');",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "table",
+            "from",
+            "to"
+          ],
+          "rows": [
+            [
+              "users",
+              "user_id",
+              "id"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "INSERT INTO users VALUES (50, 'x', NULL, '2024-01-01');",
+        "expected": {
+          "columns": [
+            "table",
+            "from",
+            "to"
+          ],
+          "rows": [
+            [
+              "users",
+              "user_id",
+              "id"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE TABLE logins (id INTEGER PRIMARY KEY, user_id INTEGER REFERENCES users(id));",
+      "CREATE TABLE logins (id INTEGER PRIMARY KEY, user_id INTEGER, FOREIGN KEY (user_id) REFERENCES users(id));"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE TABLE logins (id INTEGER PRIMARY KEY, user_id INTEGER);",
+        "why": "No foreign key"
+      },
+      {
+        "sql": "CREATE TABLE logins (id INTEGER PRIMARY KEY, user_id INTEGER REFERENCES sessions(id));",
+        "why": "Links to the wrong table"
+      }
+    ]
+  },
+  {
+    "id": "s51-05",
+    "skill": 51,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      45,
+      46
+    ],
+    "title": "A rule on values",
+    "prompt": "Create a table named plans with id INTEGER PRIMARY KEY and code TEXT, where a CHECK uses GLOB so codes must start with a capital letter. Then add a valid row, id 1 with code GOLD, and use INSERT OR IGNORE for an invalid one, id 2 with code gold. Only the valid row should stay.",
+    "dataset": "app",
+    "hints": [
+      "INSERT OR IGNORE skips a row that breaks a rule."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT p.id, p.code, (SELECT COUNT(*) FROM users) AS users FROM plans p ORDER BY p.id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "code",
+            "users"
+          ],
+          "rows": [
+            [
+              1,
+              "GOLD",
+              5
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "id",
+            "code",
+            "users"
+          ],
+          "rows": [
+            [
+              1,
+              "GOLD",
+              3
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE TABLE plans (id INTEGER PRIMARY KEY, code TEXT CHECK (code GLOB '[A-Z]*')); INSERT INTO plans VALUES (1, 'GOLD'); INSERT OR IGNORE INTO plans VALUES (2, 'gold');"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE TABLE plans (id INTEGER PRIMARY KEY, code TEXT); INSERT INTO plans VALUES (1, 'GOLD'); INSERT OR IGNORE INTO plans VALUES (2, 'gold');",
+        "why": "No rule, so the bad row stays"
+      },
+      {
+        "sql": "CREATE TABLE plans (id INTEGER PRIMARY KEY, code TEXT CHECK (code GLOB '[A-Z]*')); INSERT OR IGNORE INTO plans VALUES (2, 'gold');",
+        "why": "Leaves out the valid row"
+      }
+    ]
+  },
+  {
+    "id": "s51-06",
+    "skill": 51,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [
+      49
+    ],
+    "title": "Fix the constraint order",
+    "prompt": "This should create a table named teams with id INTEGER PRIMARY KEY and name TEXT NOT NULL UNIQUE, but the constraint has a typo. Fix it.",
+    "dataset": "app",
+    "starterSql": "CREATE TABLE teams (id INTEGER PRIMARY KEY, name TEXT NOTNULL UNIQUE;",
+    "hints": [
+      "Read the error message."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT name, type, \"notnull\", pk FROM pragma_table_info('teams') ORDER BY cid;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "type",
+            "notnull",
+            "pk"
+          ],
+          "rows": [
+            [
+              "id",
+              "INTEGER",
+              0,
+              1
+            ],
+            [
+              "name",
+              "TEXT",
+              1,
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "INSERT INTO users VALUES (50, 'x', NULL, '2024-01-01');",
+        "expected": {
+          "columns": [
+            "name",
+            "type",
+            "notnull",
+            "pk"
+          ],
+          "rows": [
+            [
+              "id",
+              "INTEGER",
+              0,
+              1
+            ],
+            [
+              "name",
+              "TEXT",
+              1,
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE TABLE teams (id INTEGER PRIMARY KEY, name TEXT NOT NULL UNIQUE);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE TABLE teams (id INTEGER PRIMARY KEY, name TEXT);",
+        "why": "Removes the rules"
+      },
+      {
+        "sql": "CREATE TABLE teams (id INTEGER PRIMARY KEY, name TEXT UNIQUE);",
+        "why": "Allows missing names"
+      }
+    ]
+  }
+]

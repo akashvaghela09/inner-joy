@@ -1,0 +1,456 @@
+[
+  {
+    "id": "st10-r01",
+    "kind": "review",
+    "stage": 10,
+    "skills": [
+      50,
+      47
+    ],
+    "recalls": [],
+    "title": "Add and fill a column",
+    "prompt": "Add a column named rating of type INTEGER to trails, and set it to 5 for every trail in the North region.",
+    "dataset": "trail-club",
+    "hints": [
+      "ALTER, then UPDATE."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT id, rating FROM trails ORDER BY id;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Trail Club",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "rating"
+          ],
+          "rows": [
+            [
+              1,
+              5
+            ],
+            [
+              2,
+              null
+            ],
+            [
+              3,
+              null
+            ],
+            [
+              4,
+              5
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM trails; INSERT INTO trails VALUES (7, 'Birch Walk', 'West', 3.1, 40), (8, 'High Moor', 'East', 12.6, 610), (9, 'Crag Top', 'North', 6.0, 900);",
+        "expected": {
+          "columns": [
+            "id",
+            "rating"
+          ],
+          "rows": [
+            [
+              7,
+              null
+            ],
+            [
+              8,
+              null
+            ],
+            [
+              9,
+              5
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "ALTER TABLE trails ADD COLUMN rating INTEGER; UPDATE trails SET rating = 5 WHERE region = 'North';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "ALTER TABLE trails ADD COLUMN rating INTEGER;",
+        "why": "Doesn't fill it"
+      },
+      {
+        "sql": "ALTER TABLE trails ADD COLUMN rating INTEGER; UPDATE trails SET rating = 5;",
+        "why": "Fills every trail"
+      }
+    ]
+  },
+  {
+    "id": "st10-r02",
+    "kind": "review",
+    "stage": 10,
+    "skills": [
+      51
+    ],
+    "recalls": [],
+    "title": "Safe table",
+    "prompt": "Create a table named badges with id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id), and title TEXT NOT NULL.",
+    "dataset": "app",
+    "hints": [
+      "Combine constraints."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT i.name, i.\"notnull\", i.pk, (SELECT COUNT(*) FROM pragma_foreign_key_list('badges')) AS foreign_keys FROM pragma_table_info('badges') i ORDER BY i.cid;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "notnull",
+            "pk",
+            "foreign_keys"
+          ],
+          "rows": [
+            [
+              "id",
+              0,
+              1,
+              1
+            ],
+            [
+              "user_id",
+              1,
+              0,
+              1
+            ],
+            [
+              "title",
+              1,
+              0,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "INSERT INTO users VALUES (50, 'x', NULL, '2024-01-01');",
+        "expected": {
+          "columns": [
+            "name",
+            "notnull",
+            "pk",
+            "foreign_keys"
+          ],
+          "rows": [
+            [
+              "id",
+              0,
+              1,
+              1
+            ],
+            [
+              "user_id",
+              1,
+              0,
+              1
+            ],
+            [
+              "title",
+              1,
+              0,
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE TABLE badges (id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id), title TEXT NOT NULL);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE TABLE badges (id INTEGER PRIMARY KEY, user_id INTEGER REFERENCES users(id), title TEXT NOT NULL);",
+        "why": "Allows a missing user"
+      },
+      {
+        "sql": "CREATE TABLE badges (id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, title TEXT NOT NULL);",
+        "why": "No foreign key"
+      }
+    ]
+  },
+  {
+    "id": "st10-r03",
+    "kind": "review",
+    "stage": 10,
+    "skills": [
+      53,
+      26
+    ],
+    "recalls": [],
+    "title": "Report as a view",
+    "prompt": "Create a view named customer_orders with each customer's name and their order count as orders, including customers with none.",
+    "dataset": "shop",
+    "hints": [
+      "A LEFT JOIN inside a view."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT name, orders FROM customer_orders ORDER BY name;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "orders"
+          ],
+          "rows": [
+            [
+              "Hana",
+              2
+            ],
+            [
+              "Luis",
+              1
+            ],
+            [
+              "Marco",
+              1
+            ],
+            [
+              "Noor",
+              0
+            ],
+            [
+              "Priya",
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "orders"
+          ],
+          "rows": [
+            [
+              "Ravi",
+              2
+            ],
+            [
+              "Sara",
+              1
+            ],
+            [
+              "Tom",
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE VIEW customer_orders AS SELECT c.name, COUNT(o.id) AS orders FROM customers c LEFT JOIN orders o ON o.customer_id = c.id GROUP BY c.id, c.name;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE VIEW customer_orders AS SELECT c.name, COUNT(o.id) AS orders FROM customers c JOIN orders o ON o.customer_id = c.id GROUP BY c.id, c.name;",
+        "why": "Drops customers with none"
+      },
+      {
+        "sql": "CREATE VIEW customer_orders AS SELECT c.name, COUNT(*) AS orders FROM customers c LEFT JOIN orders o ON o.customer_id = c.id GROUP BY c.id, c.name;",
+        "why": "COUNT(*) shows 1 for none"
+      }
+    ]
+  },
+  {
+    "id": "st10-r04",
+    "kind": "review",
+    "stage": 10,
+    "skills": [
+      54
+    ],
+    "recalls": [],
+    "title": "Index the lookups",
+    "prompt": "Add an index named idx_items_order on order_items (order_id) and another named idx_items_product on order_items (product_id).",
+    "dataset": "shop",
+    "hints": [
+      "Two statements."
+    ],
+    "check": {
+      "mode": "table",
+      "sql": "SELECT i.name, c.name AS column_name FROM pragma_index_list('order_items') i, pragma_index_info(i.name) c ORDER BY i.name;",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "column_name"
+          ],
+          "rows": [
+            [
+              "idx_items_order",
+              "order_id"
+            ],
+            [
+              "idx_items_product",
+              "product_id"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "INSERT INTO customers VALUES (50, 'x', 'y', NULL, '2024-01-01');",
+        "expected": {
+          "columns": [
+            "name",
+            "column_name"
+          ],
+          "rows": [
+            [
+              "idx_items_order",
+              "order_id"
+            ],
+            [
+              "idx_items_product",
+              "product_id"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "CREATE INDEX idx_items_order ON order_items (order_id); CREATE INDEX idx_items_product ON order_items (product_id);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "CREATE INDEX idx_items_order ON order_items (order_id);",
+        "why": "Adds only one"
+      },
+      {
+        "sql": "CREATE INDEX idx_items_order ON order_items (order_id, product_id);",
+        "why": "A single combined index"
+      }
+    ]
+  },
+  {
+    "id": "st10-r05",
+    "kind": "review",
+    "stage": 10,
+    "skills": [
+      55
+    ],
+    "recalls": [],
+    "title": "Invite depth",
+    "prompt": "Show each username reachable from users with no referrer, and their invite depth as depth, with those users at 0.",
+    "dataset": "app",
+    "hints": [
+      "A recursive CTE on referrer_id."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "username",
+            "depth"
+          ],
+          "rows": [
+            [
+              "nova",
+              0
+            ],
+            [
+              "raven",
+              0
+            ],
+            [
+              "orbit",
+              1
+            ],
+            [
+              "pixel",
+              1
+            ],
+            [
+              "quark",
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "username",
+            "depth"
+          ],
+          "rows": [
+            [
+              "sable",
+              0
+            ],
+            [
+              "tulip",
+              1
+            ],
+            [
+              "umber",
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "WITH RECURSIVE t AS (SELECT id, username, 0 AS depth FROM users WHERE referrer_id IS NULL UNION ALL SELECT u.id, u.username, t.depth + 1 FROM users u JOIN t ON u.referrer_id = t.id) SELECT username, depth FROM t;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT username, 0 AS depth FROM users;",
+        "why": "Doesn't walk the links"
+      },
+      {
+        "sql": "WITH RECURSIVE t AS (SELECT id, username, 0 AS depth FROM users WHERE referrer_id IS NULL UNION ALL SELECT u.id, u.username, t.depth FROM users u JOIN t ON u.referrer_id = t.id) SELECT username, depth FROM t;",
+        "why": "Doesn't increase the depth"
+      }
+    ]
+  }
+]
