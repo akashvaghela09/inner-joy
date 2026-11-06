@@ -1,0 +1,15 @@
+{
+  "skill": 35,
+  "summary": "A subquery in FROM acts like a temporary table, so you can query a result you've already calculated.",
+  "points": [
+    "Write FROM (SELECT ...) alias. Give it an alias if you want to refer to it.",
+    "It's useful when you need to aggregate an aggregate, such as an average of totals.",
+    "It's also a way to filter on a calculated column.",
+    "You can join it to other tables."
+  ],
+  "example": {
+    "dataset": "shop",
+    "sql": "SELECT ROUND(AVG(order_units), 2) AS avg_units\nFROM (SELECT order_id, SUM(quantity) AS order_units\n      FROM order_items\n      GROUP BY order_id);",
+    "explanation": "The inner query gives one total per order, and the outer query averages those totals."
+  }
+}

@@ -1,0 +1,602 @@
+[
+  {
+    "id": "s34-01",
+    "skill": 34,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [
+      8
+    ],
+    "title": "Customers with orders",
+    "prompt": "Show the name of customers who've placed an order, using IN. Replace the ___.",
+    "dataset": "shop",
+    "starterSql": "SELECT name\nFROM customers\nWHERE id IN (___);",
+    "hints": [
+      "The subquery lists customer_id from orders."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Priya"
+            ],
+            [
+              "Marco"
+            ],
+            [
+              "Hana"
+            ],
+            [
+              "Luis"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Ravi"
+            ],
+            [
+              "Sara"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM customers WHERE id IN (SELECT customer_id FROM orders);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM customers WHERE id NOT IN (SELECT customer_id FROM orders);",
+        "why": "Finds those without"
+      },
+      {
+        "sql": "SELECT name FROM customers WHERE id IN (SELECT id FROM orders);",
+        "why": "Uses the order's id"
+      }
+    ]
+  },
+  {
+    "id": "s34-02",
+    "skill": 34,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      8
+    ],
+    "title": "Products sold",
+    "prompt": "Show the name of products that appear in order_items, using IN.",
+    "dataset": "shop",
+    "hints": [
+      "List product_id from order_items."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Notebook"
+            ],
+            [
+              "Pen"
+            ],
+            [
+              "Mug"
+            ],
+            [
+              "Kettle"
+            ],
+            [
+              "Lamp"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO products VALUES (10, 'Vase', 'Home', 5.0, 2.0);",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Stool"
+            ],
+            [
+              "Cup"
+            ],
+            [
+              "Ink"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM products WHERE id IN (SELECT product_id FROM order_items);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM products WHERE id NOT IN (SELECT product_id FROM order_items);",
+        "why": "Finds unsold products"
+      },
+      {
+        "sql": "SELECT name FROM products;",
+        "why": "Shows every product"
+      }
+    ]
+  },
+  {
+    "id": "s34-03",
+    "skill": 34,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [],
+    "title": "Using EXISTS",
+    "prompt": "Show the name of customers who've placed at least one order, using EXISTS.",
+    "dataset": "shop",
+    "hints": [
+      "The subquery refers to the outer customer."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Priya"
+            ],
+            [
+              "Marco"
+            ],
+            [
+              "Hana"
+            ],
+            [
+              "Luis"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Ravi"
+            ],
+            [
+              "Sara"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name FROM customers c WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.id);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name FROM customers c WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.id);",
+        "why": "Finds those without"
+      },
+      {
+        "sql": "SELECT c.name FROM customers c WHERE EXISTS (SELECT 1 FROM orders o);",
+        "why": "Not connected to the customer, so it's always true"
+      }
+    ]
+  },
+  {
+    "id": "s34-04",
+    "skill": 34,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      28
+    ],
+    "title": "Never enrolled",
+    "prompt": "Show the name of students with no enrolments, using NOT EXISTS.",
+    "dataset": "school",
+    "hints": [
+      "NOT EXISTS is true when the subquery finds nothing."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Esi"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Hao"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT s.name FROM students s WHERE NOT EXISTS (SELECT 1 FROM enrolments e WHERE e.student_id = s.id);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT s.name FROM students s WHERE EXISTS (SELECT 1 FROM enrolments e WHERE e.student_id = s.id);",
+        "why": "Finds enrolled students"
+      },
+      {
+        "sql": "SELECT s.name FROM students s WHERE NOT EXISTS (SELECT 1 FROM enrolments e);",
+        "why": "Not connected to the student"
+      }
+    ]
+  },
+  {
+    "id": "s34-05",
+    "skill": 34,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      9
+    ],
+    "title": "The NOT IN trap",
+    "prompt": "Show the name of employees who don't manage anyone. manager_id contains NULLs, which would make a plain NOT IN return nothing.",
+    "dataset": "staff",
+    "hints": [
+      "Filter NULLs inside the subquery."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Ben"
+            ],
+            [
+              "Chloe"
+            ],
+            [
+              "Elena"
+            ],
+            [
+              "Farid"
+            ],
+            [
+              "Grace"
+            ],
+            [
+              "Hugo"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Jon"
+            ],
+            [
+              "Leo"
+            ],
+            [
+              "Mia"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM employees WHERE id NOT IN (SELECT manager_id FROM employees WHERE manager_id IS NOT NULL);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM employees WHERE id NOT IN (SELECT manager_id FROM employees);",
+        "why": "A NULL in the list makes every row unknown"
+      },
+      {
+        "sql": "SELECT name FROM employees WHERE id IN (SELECT manager_id FROM employees WHERE manager_id IS NOT NULL);",
+        "why": "Finds the managers"
+      }
+    ]
+  },
+  {
+    "id": "s34-06",
+    "skill": 34,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [
+      9
+    ],
+    "title": "Fix the empty result",
+    "prompt": "This should find employees with no valid manager, but returns too little. Show their names. Fix it: an employee has no valid manager when manager_id isn't any employee's id, and NULL counts as none.",
+    "dataset": "staff",
+    "starterSql": "SELECT name\nFROM employees\nWHERE manager_id NOT IN (SELECT id FROM employees);",
+    "hints": [
+      "Handle NULL explicitly."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Asha"
+            ],
+            [
+              "Hugo"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Ivy"
+            ],
+            [
+              "Leo"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM employees WHERE manager_id IS NULL OR manager_id NOT IN (SELECT id FROM employees);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM employees WHERE manager_id NOT IN (SELECT id FROM employees);",
+        "why": "Skips NULL manager_id"
+      },
+      {
+        "sql": "SELECT name FROM employees WHERE manager_id IS NULL;",
+        "why": "Misses departed managers"
+      }
+    ]
+  },
+  {
+    "id": "s34-07",
+    "skill": 34,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      8
+    ],
+    "title": "Bought a kitchen product",
+    "prompt": "Show the name of customers who've bought any Kitchen product.",
+    "dataset": "shop",
+    "hints": [
+      "Nest subqueries, or join inside one."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Priya"
+            ],
+            [
+              "Marco"
+            ],
+            [
+              "Hana"
+            ],
+            [
+              "Luis"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); UPDATE products SET category = 'Home' WHERE id = 8;",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": []
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM customers WHERE id IN (SELECT o.customer_id FROM orders o JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id WHERE p.category = 'Kitchen');"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM customers WHERE id IN (SELECT o.customer_id FROM orders o);",
+        "why": "Ignores the category"
+      },
+      {
+        "sql": "SELECT name FROM customers WHERE id NOT IN (SELECT o.customer_id FROM orders o JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id WHERE p.category = 'Kitchen');",
+        "why": "Finds those who haven't"
+      }
+    ]
+  },
+  {
+    "id": "s34-08",
+    "skill": 34,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      28
+    ],
+    "title": "Never shipped to",
+    "prompt": "Show the name of customers with no shipped order, using NOT EXISTS. Customers with no orders count too.",
+    "dataset": "shop",
+    "hints": [
+      "Add the status inside the subquery."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Luis"
+            ],
+            [
+              "Noor"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Sara"
+            ],
+            [
+              "Tom"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name FROM customers c WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.id AND o.status = 'shipped');"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name FROM customers c WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.id);",
+        "why": "Finds only customers with no orders"
+      },
+      {
+        "sql": "SELECT c.name FROM customers c WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.id AND o.status <> 'shipped');",
+        "why": "Keeps some with shipped orders"
+      }
+    ]
+  }
+]

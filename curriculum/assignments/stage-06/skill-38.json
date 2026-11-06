@@ -1,0 +1,802 @@
+[
+  {
+    "id": "s38-01",
+    "skill": 38,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "Stack two lists",
+    "prompt": "Show one list of names: customer names followed by product names. Keep any duplicates, using UNION ALL. Replace the ___.",
+    "dataset": "shop",
+    "starterSql": "SELECT name FROM customers\n___\nSELECT name FROM products;",
+    "hints": [
+      "Both queries must have one column."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Priya"
+            ],
+            [
+              "Marco"
+            ],
+            [
+              "Hana"
+            ],
+            [
+              "Luis"
+            ],
+            [
+              "Noor"
+            ],
+            [
+              "Notebook"
+            ],
+            [
+              "Pen"
+            ],
+            [
+              "Mug"
+            ],
+            [
+              "Kettle"
+            ],
+            [
+              "Lamp"
+            ],
+            [
+              "Rug"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Ravi"
+            ],
+            [
+              "Sara"
+            ],
+            [
+              "Tom"
+            ],
+            [
+              "Stool"
+            ],
+            [
+              "Cup"
+            ],
+            [
+              "Ink"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM customers UNION ALL SELECT name FROM products;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM customers;",
+        "why": "Leaves out products"
+      },
+      {
+        "sql": "SELECT name FROM customers UNION ALL SELECT category FROM products;",
+        "why": "Uses the wrong column"
+      }
+    ]
+  },
+  {
+    "id": "s38-02",
+    "skill": 38,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      10
+    ],
+    "title": "Remove duplicates",
+    "prompt": "Show every different city and category in a single column named value, removing duplicates, using UNION.",
+    "dataset": "shop",
+    "hints": [
+      "UNION removes duplicates automatically."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "value"
+          ],
+          "rows": [
+            [
+              "Home"
+            ],
+            [
+              "Kitchen"
+            ],
+            [
+              "Pune"
+            ],
+            [
+              "Rome"
+            ],
+            [
+              "Stationery"
+            ],
+            [
+              "Tokyo"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "value"
+          ],
+          "rows": [
+            [
+              "Home"
+            ],
+            [
+              "Kitchen"
+            ],
+            [
+              "Lima"
+            ],
+            [
+              "Oslo"
+            ],
+            [
+              "Stationery"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT city AS value FROM customers UNION SELECT category FROM products;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT city AS value FROM customers UNION ALL SELECT category FROM products;",
+        "why": "Keeps duplicates"
+      },
+      {
+        "sql": "SELECT city AS value FROM customers;",
+        "why": "Leaves out categories"
+      }
+    ]
+  },
+  {
+    "id": "s38-03",
+    "skill": 38,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      11
+    ],
+    "title": "Label the rows",
+    "prompt": "Show each name with a column kind: Customer for customers and Product for products. Sort by kind, then name.",
+    "dataset": "shop",
+    "hints": [
+      "Add a fixed text column to each branch."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "kind"
+          ],
+          "rows": [
+            [
+              "Hana",
+              "Customer"
+            ],
+            [
+              "Luis",
+              "Customer"
+            ],
+            [
+              "Marco",
+              "Customer"
+            ],
+            [
+              "Noor",
+              "Customer"
+            ],
+            [
+              "Priya",
+              "Customer"
+            ],
+            [
+              "Kettle",
+              "Product"
+            ],
+            [
+              "Lamp",
+              "Product"
+            ],
+            [
+              "Mug",
+              "Product"
+            ],
+            [
+              "Notebook",
+              "Product"
+            ],
+            [
+              "Pen",
+              "Product"
+            ],
+            [
+              "Rug",
+              "Product"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "kind"
+          ],
+          "rows": [
+            [
+              "Ravi",
+              "Customer"
+            ],
+            [
+              "Sara",
+              "Customer"
+            ],
+            [
+              "Tom",
+              "Customer"
+            ],
+            [
+              "Cup",
+              "Product"
+            ],
+            [
+              "Ink",
+              "Product"
+            ],
+            [
+              "Stool",
+              "Product"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, 'Customer' AS kind FROM customers UNION ALL SELECT name, 'Product' FROM products ORDER BY kind, name;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, 'Customer' AS kind FROM customers UNION ALL SELECT name, 'Customer' FROM products ORDER BY kind, name;",
+        "why": "Mislabels products"
+      },
+      {
+        "sql": "SELECT name, 'Customer' AS kind FROM customers UNION ALL SELECT name, 'Product' FROM products ORDER BY name;",
+        "why": "Doesn't sort by kind"
+      }
+    ]
+  },
+  {
+    "id": "s38-04",
+    "skill": 38,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      10
+    ],
+    "title": "Both sides count",
+    "prompt": "Show one column, user_id, listing every id found in either users.id or users.referrer_id. Remove NULLs and duplicates.",
+    "dataset": "app",
+    "hints": [
+      "UNION removes duplicates, and filter NULLs."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "user_id"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ],
+            [
+              4
+            ],
+            [
+              5
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "user_id"
+          ],
+          "rows": [
+            [
+              7
+            ],
+            [
+              8
+            ],
+            [
+              9
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id AS user_id FROM users UNION SELECT referrer_id FROM users WHERE referrer_id IS NOT NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id AS user_id FROM users UNION ALL SELECT referrer_id FROM users WHERE referrer_id IS NOT NULL;",
+        "why": "Keeps duplicates"
+      },
+      {
+        "sql": "SELECT id AS user_id FROM users UNION SELECT referrer_id FROM users;",
+        "why": "Keeps NULL"
+      }
+    ]
+  },
+  {
+    "id": "s38-05",
+    "skill": 38,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      17
+    ],
+    "title": "Fixed categories",
+    "prompt": "Using UNION ALL, show exactly three rows in a column named band: Low, Mid, and High. Beside each, show as staff how many employees earn under 50000, from 50000 to 90000, and over 90000.",
+    "dataset": "staff",
+    "hints": [
+      "Each branch counts its own band."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "band",
+            "staff"
+          ],
+          "rows": [
+            [
+              "Low",
+              2
+            ],
+            [
+              "Mid",
+              3
+            ],
+            [
+              "High",
+              3
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET salary = 80000 WHERE id = 11; UPDATE employees SET salary = 90000 WHERE id = 12;",
+        "expected": {
+          "columns": [
+            "band",
+            "staff"
+          ],
+          "rows": [
+            [
+              "Low",
+              1
+            ],
+            [
+              "Mid",
+              4
+            ],
+            [
+              "High",
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT 'Low' AS band, COUNT(*) AS staff FROM employees WHERE salary < 50000 UNION ALL SELECT 'Mid', COUNT(*) FROM employees WHERE salary BETWEEN 50000 AND 90000 UNION ALL SELECT 'High', COUNT(*) FROM employees WHERE salary > 90000;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT CASE WHEN salary < 50000 THEN 'Low' WHEN salary <= 90000 THEN 'Mid' ELSE 'High' END AS band, COUNT(*) AS staff FROM employees GROUP BY band;",
+        "why": "An empty band disappears"
+      },
+      {
+        "sql": "SELECT 'Low' AS band, COUNT(*) AS staff FROM employees WHERE salary < 50000 UNION ALL SELECT 'Mid', COUNT(*) FROM employees WHERE salary > 50000 AND salary < 90000 UNION ALL SELECT 'High', COUNT(*) FROM employees WHERE salary > 90000;",
+        "why": "Misses the exact limits"
+      }
+    ]
+  },
+  {
+    "id": "s38-06",
+    "skill": 38,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the branches",
+    "prompt": "This should list customer names and then product names, with a label, but the branches have different column counts. Fix it so both have name and kind.",
+    "dataset": "shop",
+    "starterSql": "SELECT name, 'C' AS kind FROM customers\nUNION ALL\nSELECT name FROM products;",
+    "hints": [
+      "Each branch needs the same number of columns."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "kind"
+          ],
+          "rows": [
+            [
+              "Priya",
+              "C"
+            ],
+            [
+              "Marco",
+              "C"
+            ],
+            [
+              "Hana",
+              "C"
+            ],
+            [
+              "Luis",
+              "C"
+            ],
+            [
+              "Noor",
+              "C"
+            ],
+            [
+              "Notebook",
+              "P"
+            ],
+            [
+              "Pen",
+              "P"
+            ],
+            [
+              "Mug",
+              "P"
+            ],
+            [
+              "Kettle",
+              "P"
+            ],
+            [
+              "Lamp",
+              "P"
+            ],
+            [
+              "Rug",
+              "P"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "kind"
+          ],
+          "rows": [
+            [
+              "Ravi",
+              "C"
+            ],
+            [
+              "Sara",
+              "C"
+            ],
+            [
+              "Tom",
+              "C"
+            ],
+            [
+              "Stool",
+              "P"
+            ],
+            [
+              "Cup",
+              "P"
+            ],
+            [
+              "Ink",
+              "P"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, 'C' AS kind FROM customers UNION ALL SELECT name, 'P' FROM products;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM customers UNION ALL SELECT name FROM products;",
+        "why": "Removes the label"
+      },
+      {
+        "sql": "SELECT name, 'C' AS kind FROM customers;",
+        "why": "Leaves out products"
+      }
+    ]
+  },
+  {
+    "id": "s38-07",
+    "skill": 38,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      11
+    ],
+    "title": "Sorted branches",
+    "prompt": "Show the single longest session's minutes and the single shortest session's minutes, as two rows, longest first, in a column named minutes.",
+    "dataset": "app",
+    "hints": [
+      "Wrap each sorted branch in a FROM subquery, as SQLite has no brackets around branches."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "minutes"
+          ],
+          "rows": [
+            [
+              40
+            ],
+            [
+              5
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "minutes"
+          ],
+          "rows": [
+            [
+              50
+            ],
+            [
+              7
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT minutes FROM (SELECT minutes FROM sessions ORDER BY minutes DESC LIMIT 1) UNION ALL SELECT minutes FROM (SELECT minutes FROM sessions ORDER BY minutes LIMIT 1);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT MAX(minutes) AS minutes FROM sessions;",
+        "why": "Leaves out the shortest"
+      },
+      {
+        "sql": "SELECT minutes FROM (SELECT minutes FROM sessions ORDER BY minutes LIMIT 1) UNION ALL SELECT minutes FROM (SELECT minutes FROM sessions ORDER BY minutes DESC LIMIT 1);",
+        "why": "Puts the shortest first"
+      }
+    ]
+  },
+  {
+    "id": "s38-08",
+    "skill": 38,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      17
+    ],
+    "title": "Combined totals",
+    "prompt": "Show each student_id and the number of graded enrolments plus the number of ungraded enrolments, as a stacked list with kind (Graded or Pending) and total. Skip zeros.",
+    "dataset": "school",
+    "hints": [
+      "Each branch filters and groups."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "student_id",
+            "kind",
+            "total"
+          ],
+          "rows": [
+            [
+              1,
+              "Graded",
+              2
+            ],
+            [
+              2,
+              "Graded",
+              2
+            ],
+            [
+              3,
+              "Graded",
+              1
+            ],
+            [
+              4,
+              "Graded",
+              3
+            ],
+            [
+              3,
+              "Pending",
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "student_id",
+            "kind",
+            "total"
+          ],
+          "rows": [
+            [
+              6,
+              "Graded",
+              2
+            ],
+            [
+              7,
+              "Graded",
+              1
+            ],
+            [
+              7,
+              "Pending",
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT student_id, 'Graded' AS kind, COUNT(*) AS total FROM enrolments WHERE grade IS NOT NULL GROUP BY student_id UNION ALL SELECT student_id, 'Pending', COUNT(*) FROM enrolments WHERE grade IS NULL GROUP BY student_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT student_id, 'Graded' AS kind, COUNT(*) AS total FROM enrolments GROUP BY student_id;",
+        "why": "Mixes both kinds"
+      },
+      {
+        "sql": "SELECT student_id, 'Graded' AS kind, COUNT(*) AS total FROM enrolments WHERE grade IS NOT NULL GROUP BY student_id;",
+        "why": "Leaves out Pending"
+      }
+    ]
+  }
+]

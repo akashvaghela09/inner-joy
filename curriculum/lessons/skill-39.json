@@ -1,0 +1,15 @@
+{
+  "skill": 39,
+  "summary": "INTERSECT and EXCEPT compare two results as sets.",
+  "points": [
+    "INTERSECT keeps rows found in both results.",
+    "EXCEPT keeps rows from the first result that aren't in the second.",
+    "Both remove duplicates and need matching columns.",
+    "Unlike NOT IN, EXCEPT treats NULLs as equal, so it isn't caught out by them."
+  ],
+  "example": {
+    "dataset": "shop",
+    "sql": "SELECT id FROM customers\nEXCEPT\nSELECT customer_id FROM orders;",
+    "explanation": "This finds customer ids that never appear in orders, a neat alternative to a join."
+  }
+}

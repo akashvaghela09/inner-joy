@@ -1,0 +1,15 @@
+{
+  "skill": 37,
+  "summary": "A CTE names a step of your query with WITH, so complex logic reads from top to bottom.",
+  "points": [
+    "WITH name AS (SELECT ...) defines a step, and the main query uses it like a table.",
+    "Add more steps with commas, and later steps can use earlier ones.",
+    "A CTE exists only for that one query.",
+    "They're usually easier to read than nested subqueries."
+  ],
+  "example": {
+    "dataset": "shop",
+    "sql": "WITH order_totals AS (\n  SELECT order_id, SUM(quantity) AS units\n  FROM order_items\n  GROUP BY order_id\n)\nSELECT o.customer_id, SUM(t.units) AS units\nFROM orders o\nJOIN order_totals t ON t.order_id = o.id\nGROUP BY o.customer_id;",
+    "explanation": "Totalling per order comes first, then the main query adds those totals per customer."
+  }
+}

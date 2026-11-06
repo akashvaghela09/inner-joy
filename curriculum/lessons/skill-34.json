@@ -1,0 +1,15 @@
+{
+  "skill": 34,
+  "summary": "A subquery can provide a list to filter with. IN, NOT IN, and EXISTS are the main tools.",
+  "points": [
+    "WHERE id IN (SELECT ...) keeps rows found in the list.",
+    "NOT IN returns nothing if the list contains a NULL, because every comparison becomes unknown.",
+    "Protect NOT IN by filtering NULLs inside the subquery.",
+    "EXISTS checks whether a subquery finds any row, and NULLs don't affect it."
+  ],
+  "example": {
+    "dataset": "staff",
+    "sql": "SELECT name\nFROM employees\nWHERE id NOT IN (SELECT manager_id FROM employees WHERE manager_id IS NOT NULL);",
+    "explanation": "This finds employees who manage no one. Without the IS NOT NULL filter, it would return nothing."
+  }
+}

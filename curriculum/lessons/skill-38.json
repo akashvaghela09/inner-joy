@@ -1,0 +1,15 @@
+{
+  "skill": 38,
+  "summary": "UNION stacks the results of two queries, one on top of the other.",
+  "points": [
+    "Both queries must return the same number of columns in a matching order.",
+    "UNION removes duplicate rows, and UNION ALL keeps them.",
+    "Column names come from the first query.",
+    "In SQLite, ORDER BY goes once at the very end, and you can't put brackets around each branch."
+  ],
+  "example": {
+    "dataset": "shop",
+    "sql": "SELECT name, 'Customer' AS kind FROM customers\nUNION ALL\nSELECT name, 'Product' FROM products\nORDER BY kind, name;",
+    "explanation": "This combines two lists into one, with a label showing where each row came from."
+  }
+}

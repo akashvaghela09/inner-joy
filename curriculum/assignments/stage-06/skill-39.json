@@ -1,0 +1,539 @@
+[
+  {
+    "id": "s39-01",
+    "skill": 39,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [],
+    "title": "In both",
+    "prompt": "Show the customer ids that appear in both customers and orders, using INTERSECT. Replace the ___.",
+    "dataset": "shop",
+    "starterSql": "SELECT id FROM customers\n___\nSELECT customer_id FROM orders;",
+    "hints": [
+      "INTERSECT keeps rows found in both."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ],
+            [
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              7
+            ],
+            [
+              8
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id FROM customers INTERSECT SELECT customer_id FROM orders;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id FROM customers EXCEPT SELECT customer_id FROM orders;",
+        "why": "Keeps those in only the first"
+      },
+      {
+        "sql": "SELECT id FROM customers UNION SELECT customer_id FROM orders;",
+        "why": "Keeps everything"
+      }
+    ]
+  },
+  {
+    "id": "s39-02",
+    "skill": 39,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      28
+    ],
+    "title": "Only in the first",
+    "prompt": "Show customer ids that have never placed an order, using EXCEPT.",
+    "dataset": "shop",
+    "hints": [
+      "EXCEPT removes rows found in the second result."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              5
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              9
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id FROM customers EXCEPT SELECT customer_id FROM orders;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id FROM customers INTERSECT SELECT customer_id FROM orders;",
+        "why": "Keeps those in both"
+      },
+      {
+        "sql": "SELECT customer_id FROM orders EXCEPT SELECT id FROM customers;",
+        "why": "Reverses the direction"
+      }
+    ]
+  },
+  {
+    "id": "s39-03",
+    "skill": 39,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      38
+    ],
+    "title": "Order matters",
+    "prompt": "Show product ids that sold but aren't in the products table, using EXCEPT. Usually there are none, but check anyway.",
+    "dataset": "shop",
+    "hints": [
+      "Start from the sold list."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "product_id"
+          ],
+          "rows": []
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO order_items VALUES (11, 99, 1, NULL);",
+        "expected": {
+          "columns": [
+            "product_id"
+          ],
+          "rows": [
+            [
+              99
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT product_id FROM order_items EXCEPT SELECT id FROM products;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id FROM products EXCEPT SELECT product_id FROM order_items;",
+        "why": "Finds unsold products"
+      },
+      {
+        "sql": "SELECT product_id FROM order_items INTERSECT SELECT id FROM products;",
+        "why": "Finds valid sales"
+      }
+    ]
+  },
+  {
+    "id": "s39-04",
+    "skill": 39,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      38
+    ],
+    "title": "Taken Maths and Science",
+    "prompt": "Show student_ids who've enrolled in course 1 and also in course 3, using INTERSECT.",
+    "dataset": "school",
+    "hints": [
+      "One branch per course."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "student_id"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring'); UPDATE enrolments SET course_id = 1 WHERE id = 11; UPDATE enrolments SET course_id = 3 WHERE id = 12;",
+        "expected": {
+          "columns": [
+            "student_id"
+          ],
+          "rows": [
+            [
+              6
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT student_id FROM enrolments WHERE course_id = 1 INTERSECT SELECT student_id FROM enrolments WHERE course_id = 3;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT student_id FROM enrolments WHERE course_id = 1 UNION SELECT student_id FROM enrolments WHERE course_id = 3;",
+        "why": "Accepts either course"
+      },
+      {
+        "sql": "SELECT student_id FROM enrolments WHERE course_id = 1 AND course_id = 3;",
+        "why": "One row can't be both"
+      }
+    ]
+  },
+  {
+    "id": "s39-05",
+    "skill": 39,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      10
+    ],
+    "title": "NULLs and sets",
+    "prompt": "Show the different manager_id values that aren't an employee id, using EXCEPT. NULL appears as one row, because EXCEPT treats NULLs as equal.",
+    "dataset": "staff",
+    "hints": [
+      "List manager_id first."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "manager_id"
+          ],
+          "rows": [
+            [
+              null
+            ],
+            [
+              99
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "manager_id"
+          ],
+          "rows": [
+            [
+              null
+            ],
+            [
+              77
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT manager_id FROM employees EXCEPT SELECT id FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id FROM employees EXCEPT SELECT manager_id FROM employees;",
+        "why": "Reverses the direction"
+      },
+      {
+        "sql": "SELECT manager_id FROM employees WHERE manager_id NOT IN (SELECT id FROM employees);",
+        "why": "Drops NULL"
+      }
+    ]
+  },
+  {
+    "id": "s39-06",
+    "skill": 39,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the columns",
+    "prompt": "This should find customer ids with no order, but the branches have different column counts. Fix it.",
+    "dataset": "shop",
+    "starterSql": "SELECT id FROM customers\nEXCEPT\nSELECT customer_id, id FROM orders;",
+    "hints": [
+      "Each branch needs one column."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              5
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              9
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id FROM customers EXCEPT SELECT customer_id FROM orders;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id FROM customers;",
+        "why": "Doesn't remove anyone"
+      },
+      {
+        "sql": "SELECT id FROM customers INTERSECT SELECT customer_id FROM orders;",
+        "why": "Keeps those with orders"
+      }
+    ]
+  },
+  {
+    "id": "s39-07",
+    "skill": 39,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      38
+    ],
+    "title": "Web but not iOS",
+    "prompt": "Show the user_id of users who've used web but never ios.",
+    "dataset": "app",
+    "hints": [
+      "EXCEPT with two filtered branches."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "user_id"
+          ],
+          "rows": [
+            [
+              3
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android'); INSERT INTO sessions VALUES (15, 8, '2024-03-03', 9, 'web');",
+        "expected": {
+          "columns": [
+            "user_id"
+          ],
+          "rows": [
+            [
+              8
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT user_id FROM sessions WHERE device = 'web' EXCEPT SELECT user_id FROM sessions WHERE device = 'ios';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT user_id FROM sessions WHERE device = 'web' INTERSECT SELECT user_id FROM sessions WHERE device = 'ios';",
+        "why": "Finds users of both"
+      },
+      {
+        "sql": "SELECT user_id FROM sessions WHERE device = 'web';",
+        "why": "Doesn't remove iOS users"
+      }
+    ]
+  },
+  {
+    "id": "s39-08",
+    "skill": 39,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      28
+    ],
+    "title": "Bought Kitchen, never Home",
+    "prompt": "Show the name of customers who bought a Kitchen product but never a Home product.",
+    "dataset": "shop",
+    "hints": [
+      "Use EXCEPT in a subquery, then look up names."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Priya"
+            ],
+            [
+              "Marco"
+            ],
+            [
+              "Luis"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); UPDATE order_items SET product_id = 7 WHERE order_id = 12;",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": []
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM customers WHERE id IN (SELECT o.customer_id FROM orders o JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id WHERE p.category = 'Kitchen' EXCEPT SELECT o.customer_id FROM orders o JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id WHERE p.category = 'Home');"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM customers WHERE id IN (SELECT o.customer_id FROM orders o JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id WHERE p.category = 'Kitchen');",
+        "why": "Doesn't remove Home buyers"
+      },
+      {
+        "sql": "SELECT name FROM customers WHERE id IN (SELECT o.customer_id FROM orders o JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id WHERE p.category = 'Home');",
+        "why": "Finds Home buyers"
+      }
+    ]
+  }
+]

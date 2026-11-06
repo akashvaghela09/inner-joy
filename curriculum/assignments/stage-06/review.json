@@ -1,0 +1,1138 @@
+[
+  {
+    "id": "st06-r01",
+    "kind": "review",
+    "stage": 6,
+    "skills": [
+      33,
+      11
+    ],
+    "recalls": [],
+    "title": "Below the average",
+    "prompt": "Show the name of employees earning below the overall average, A to Z.",
+    "dataset": "staff",
+    "hints": [
+      "Calculate one value, then compare."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Dev"
+            ],
+            [
+              "Elena"
+            ],
+            [
+              "Farid"
+            ],
+            [
+              "Grace"
+            ],
+            [
+              "Hugo"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Leo"
+            ],
+            [
+              "Mia"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM employees WHERE salary < (SELECT AVG(salary) FROM employees) ORDER BY name;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM employees WHERE salary > (SELECT AVG(salary) FROM employees) ORDER BY name;",
+        "why": "Finds those above"
+      },
+      {
+        "sql": "SELECT name FROM employees ORDER BY name;",
+        "why": "Doesn't filter"
+      }
+    ]
+  },
+  {
+    "id": "st06-r02",
+    "kind": "review",
+    "stage": 6,
+    "skills": [
+      34
+    ],
+    "recalls": [],
+    "title": "Customers without a Kitchen buy",
+    "prompt": "Show the name of customers who've never bought a Kitchen product.",
+    "dataset": "shop",
+    "hints": [
+      "Careful with customers who have no orders."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Noor"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Sara"
+            ],
+            [
+              "Tom"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM customers WHERE id NOT IN (SELECT o.customer_id FROM orders o JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id WHERE p.category = 'Kitchen');"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM customers WHERE id IN (SELECT o.customer_id FROM orders o JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id WHERE p.category = 'Kitchen');",
+        "why": "Finds buyers"
+      },
+      {
+        "sql": "SELECT name FROM customers;",
+        "why": "Keeps everyone"
+      }
+    ]
+  },
+  {
+    "id": "st06-r03",
+    "kind": "review",
+    "stage": 6,
+    "skills": [
+      35
+    ],
+    "recalls": [],
+    "title": "Course average spread",
+    "prompt": "Show the highest course average minus the lowest course average, rounded to 1 decimal, as spread.",
+    "dataset": "school",
+    "hints": [
+      "Aggregate the aggregates."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "spread"
+          ],
+          "rows": [
+            [
+              8
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "spread"
+          ],
+          "rows": [
+            [
+              35
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT ROUND(MAX(average) - MIN(average), 1) AS spread FROM (SELECT AVG(grade) AS average FROM enrolments GROUP BY course_id);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT ROUND(MAX(grade) - MIN(grade), 1) AS spread FROM enrolments;",
+        "why": "Compares single grades"
+      },
+      {
+        "sql": "SELECT ROUND(MAX(average), 1) AS spread FROM (SELECT AVG(grade) AS average FROM enrolments GROUP BY course_id);",
+        "why": "Doesn't subtract"
+      }
+    ]
+  },
+  {
+    "id": "st06-r04",
+    "kind": "review",
+    "stage": 6,
+    "skills": [
+      36
+    ],
+    "recalls": [],
+    "title": "Hottest in its city",
+    "prompt": "Show the id of each city's hottest reading, including ties.",
+    "dataset": "weather",
+    "hints": [
+      "Compare each reading with its own city."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              4
+            ],
+            [
+              6
+            ],
+            [
+              7
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              13
+            ],
+            [
+              16
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT r.id FROM readings r WHERE r.temp_c = (SELECT MAX(x.temp_c) FROM readings x WHERE x.city = r.city);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT r.id FROM readings r WHERE r.temp_c = (SELECT MAX(x.temp_c) FROM readings x);",
+        "why": "Finds only the overall hottest"
+      },
+      {
+        "sql": "SELECT city, MAX(id) AS id FROM readings GROUP BY city;",
+        "why": "Finds the latest id"
+      }
+    ]
+  },
+  {
+    "id": "st06-r05",
+    "kind": "review",
+    "stage": 6,
+    "skills": [
+      37,
+      25
+    ],
+    "recalls": [],
+    "title": "Spend ranking",
+    "prompt": "Using a CTE of revenue per customer_id (price times quantity), show the id and name of the top-spending customer.",
+    "dataset": "shop",
+    "hints": [
+      "Name the step, join, sort, and limit."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              3,
+              "Hana"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              7,
+              "Ravi"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "WITH r AS (SELECT o.customer_id, SUM(p.price * i.quantity) AS revenue FROM orders o JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id GROUP BY o.customer_id) SELECT c.id, c.name FROM r JOIN customers c ON c.id = r.customer_id ORDER BY r.revenue DESC LIMIT 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "WITH r AS (SELECT o.customer_id, SUM(p.price * i.quantity) AS revenue FROM orders o JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id GROUP BY o.customer_id) SELECT c.id, c.name FROM r JOIN customers c ON c.id = r.customer_id ORDER BY r.revenue LIMIT 1;",
+        "why": "Finds the lowest"
+      },
+      {
+        "sql": "SELECT c.id, c.name FROM customers c LIMIT 1;",
+        "why": "Doesn't calculate"
+      }
+    ]
+  },
+  {
+    "id": "st06-r06",
+    "kind": "review",
+    "stage": 6,
+    "skills": [
+      38,
+      9
+    ],
+    "recalls": [],
+    "title": "All contact points",
+    "prompt": "Show every known email and phone in one column named contact, removing duplicates.",
+    "dataset": "contacts",
+    "hints": [
+      "Stack two columns, and skip NULLs."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "contact"
+          ],
+          "rows": [
+            [
+              "1edsger@club.test"
+            ],
+            [
+              "555-0101"
+            ],
+            [
+              "555-0102"
+            ],
+            [
+              "555-0105"
+            ],
+            [
+              "555-0106"
+            ],
+            [
+              "5550104"
+            ],
+            [
+              "ada@club.test"
+            ],
+            [
+              "alan@other.test"
+            ],
+            [
+              "grace.h@club.test"
+            ],
+            [
+              "kj_99@club.test"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3');",
+        "expected": {
+          "columns": [
+            "contact"
+          ],
+          "rows": [
+            [
+              "555-0111"
+            ],
+            [
+              "555-0112"
+            ],
+            [
+              "5550114"
+            ],
+            [
+              "bob@CLUB.test"
+            ],
+            [
+              "ken.t@club.test"
+            ],
+            [
+              "mary-j@club.test"
+            ],
+            [
+              "rosa@club-test"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT email AS contact FROM contacts WHERE email IS NOT NULL UNION SELECT phone FROM contacts WHERE phone IS NOT NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT email AS contact FROM contacts UNION SELECT phone FROM contacts;",
+        "why": "Keeps NULL"
+      },
+      {
+        "sql": "SELECT email AS contact FROM contacts WHERE email IS NOT NULL;",
+        "why": "Leaves out phones"
+      }
+    ]
+  },
+  {
+    "id": "st06-r07",
+    "kind": "review",
+    "stage": 6,
+    "skills": [
+      39,
+      9
+    ],
+    "recalls": [],
+    "title": "Enrolled but ungraded",
+    "prompt": "Show the student_ids with an enrolment but never a grade, using a set operation.",
+    "dataset": "school",
+    "hints": [
+      "Students with any grade get removed."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "student_id"
+          ],
+          "rows": []
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring'); INSERT INTO enrolments VALUES (15, 8, 6, NULL, '2024-spring');",
+        "expected": {
+          "columns": [
+            "student_id"
+          ],
+          "rows": [
+            [
+              8
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT student_id FROM enrolments EXCEPT SELECT student_id FROM enrolments WHERE grade IS NOT NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT student_id FROM enrolments WHERE grade IS NULL;",
+        "why": "Keeps students with other grades"
+      },
+      {
+        "sql": "SELECT student_id FROM enrolments INTERSECT SELECT student_id FROM enrolments WHERE grade IS NOT NULL;",
+        "why": "Finds those with grades"
+      }
+    ]
+  },
+  {
+    "id": "st06-r08",
+    "kind": "review",
+    "stage": 6,
+    "skills": [
+      35,
+      37
+    ],
+    "recalls": [],
+    "title": "Above-average users",
+    "prompt": "Show the username of users whose total minutes exceed the average per-user total.",
+    "dataset": "app",
+    "hints": [
+      "Compare a total with an average of totals."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "username"
+          ],
+          "rows": [
+            [
+              "orbit"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "username"
+          ],
+          "rows": [
+            [
+              "sable"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "WITH t AS (SELECT user_id, SUM(minutes) AS total FROM sessions GROUP BY user_id) SELECT u.username FROM users u JOIN t ON t.user_id = u.id WHERE t.total > (SELECT AVG(total) FROM t);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "WITH t AS (SELECT user_id, SUM(minutes) AS total FROM sessions GROUP BY user_id) SELECT u.username FROM users u JOIN t ON t.user_id = u.id;",
+        "why": "Doesn't compare"
+      },
+      {
+        "sql": "SELECT u.username FROM users u JOIN sessions s ON s.user_id = u.id WHERE s.minutes > (SELECT AVG(minutes) FROM sessions);",
+        "why": "Compares single sessions"
+      }
+    ]
+  },
+  {
+    "id": "st06-r09",
+    "kind": "review",
+    "stage": 6,
+    "skills": [
+      33,
+      34
+    ],
+    "recalls": [],
+    "title": "Unsold share",
+    "prompt": "Show the percentage of products never sold, rounded to 1 decimal, as unsold_pct.",
+    "dataset": "shop",
+    "hints": [
+      "Count with a subquery, divided by all products."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "unsold_pct"
+          ],
+          "rows": [
+            [
+              16.7
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO products VALUES (10, 'Vase', 'Home', 5.0, 2.0);",
+        "expected": {
+          "columns": [
+            "unsold_pct"
+          ],
+          "rows": [
+            [
+              25
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT ROUND((SELECT COUNT(*) FROM products WHERE id NOT IN (SELECT product_id FROM order_items)) * 100.0 / (SELECT COUNT(*) FROM products), 1) AS unsold_pct;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT ROUND((SELECT COUNT(*) FROM products WHERE id IN (SELECT product_id FROM order_items)) * 100.0 / (SELECT COUNT(*) FROM products), 1) AS unsold_pct;",
+        "why": "Finds the sold share"
+      },
+      {
+        "sql": "SELECT (SELECT COUNT(*) FROM products WHERE id NOT IN (SELECT product_id FROM order_items)) AS unsold_pct;",
+        "why": "A count isn't a percentage"
+      }
+    ]
+  },
+  {
+    "id": "st06-r10",
+    "kind": "review",
+    "stage": 6,
+    "skills": [
+      36
+    ],
+    "recalls": [],
+    "title": "Newest per department",
+    "prompt": "Show the department_id and name of the most recent hire in each department. Ignore employees with no department.",
+    "dataset": "staff",
+    "hints": [
+      "Compare with the department's latest date."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "department_id",
+            "name"
+          ],
+          "rows": [
+            [
+              1,
+              "Chloe"
+            ],
+            [
+              2,
+              "Farid"
+            ],
+            [
+              3,
+              "Grace"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "department_id",
+            "name"
+          ],
+          "rows": [
+            [
+              5,
+              "Jon"
+            ],
+            [
+              6,
+              "Kim"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT e.department_id, e.name FROM employees e WHERE e.hire_date = (SELECT MAX(x.hire_date) FROM employees x WHERE x.department_id = e.department_id);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT e.department_id, e.name FROM employees e WHERE e.hire_date = (SELECT MAX(x.hire_date) FROM employees x);",
+        "why": "Finds only the latest overall"
+      },
+      {
+        "sql": "SELECT e.department_id, e.name FROM employees e WHERE e.hire_date = (SELECT MIN(x.hire_date) FROM employees x WHERE x.department_id = e.department_id);",
+        "why": "Finds the earliest"
+      }
+    ]
+  },
+  {
+    "id": "st06-r11",
+    "kind": "review",
+    "stage": 6,
+    "skills": [
+      34,
+      38
+    ],
+    "recalls": [],
+    "title": "Two kinds of customer",
+    "prompt": "Show each customer's name and a segment: Buyer if they appear in orders, otherwise Browser, by stacking two queries.",
+    "dataset": "shop",
+    "hints": [
+      "Use UNION ALL with IN and NOT IN."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "segment"
+          ],
+          "rows": [
+            [
+              "Priya",
+              "Buyer"
+            ],
+            [
+              "Marco",
+              "Buyer"
+            ],
+            [
+              "Hana",
+              "Buyer"
+            ],
+            [
+              "Luis",
+              "Buyer"
+            ],
+            [
+              "Noor",
+              "Browser"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "segment"
+          ],
+          "rows": [
+            [
+              "Ravi",
+              "Buyer"
+            ],
+            [
+              "Sara",
+              "Buyer"
+            ],
+            [
+              "Tom",
+              "Browser"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, 'Buyer' AS segment FROM customers WHERE id IN (SELECT customer_id FROM orders) UNION ALL SELECT name, 'Browser' FROM customers WHERE id NOT IN (SELECT customer_id FROM orders);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, 'Buyer' AS segment FROM customers;",
+        "why": "Labels everyone Buyer"
+      },
+      {
+        "sql": "SELECT name, 'Buyer' AS segment FROM customers WHERE id IN (SELECT customer_id FROM orders);",
+        "why": "Leaves out Browser"
+      }
+    ]
+  },
+  {
+    "id": "st06-r12",
+    "kind": "review",
+    "stage": 6,
+    "skills": [
+      36,
+      37
+    ],
+    "recalls": [],
+    "title": "Students above their year",
+    "prompt": "Show the name of students whose average grade is above the average of their year group.",
+    "dataset": "school",
+    "hints": [
+      "A correlated subquery over a CTE."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Anya"
+            ],
+            [
+              "Dmitri"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring'); INSERT INTO students VALUES (10, 'Iris', 10); INSERT INTO enrolments VALUES (15, 8, 5, 50, '2024-spring'), (16, 10, 5, 65, '2024-spring');",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Gia"
+            ],
+            [
+              "Iris"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "WITH a AS (SELECT s.id, s.name, s.year_group, AVG(e.grade) AS average FROM students s JOIN enrolments e ON e.student_id = s.id GROUP BY s.id, s.name, s.year_group) SELECT a.name FROM a WHERE a.average > (SELECT AVG(x.average) FROM a x WHERE x.year_group = a.year_group);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "WITH a AS (SELECT s.id, s.name, s.year_group, AVG(e.grade) AS average FROM students s JOIN enrolments e ON e.student_id = s.id GROUP BY s.id, s.name, s.year_group) SELECT a.name FROM a WHERE a.average > (SELECT AVG(x.average) FROM a x);",
+        "why": "Uses the overall average"
+      },
+      {
+        "sql": "SELECT name FROM students;",
+        "why": "Shows everyone"
+      }
+    ]
+  },
+  {
+    "id": "st06-r13",
+    "kind": "review",
+    "stage": 6,
+    "skills": [
+      39,
+      34
+    ],
+    "recalls": [],
+    "title": "Inviters who play",
+    "prompt": "Show the username of users who've invited someone and also have a session, using INTERSECT on ids and a lookup.",
+    "dataset": "app",
+    "hints": [
+      "Intersect in a subquery."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "username"
+          ],
+          "rows": [
+            [
+              "nova"
+            ],
+            [
+              "orbit"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android'); DELETE FROM sessions WHERE user_id = 7; UPDATE users SET referrer_id = 8 WHERE id = 9;",
+        "expected": {
+          "columns": [
+            "username"
+          ],
+          "rows": [
+            [
+              "tulip"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT username FROM users WHERE id IN (SELECT referrer_id FROM users INTERSECT SELECT user_id FROM sessions);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT username FROM users WHERE id IN (SELECT referrer_id FROM users);",
+        "why": "Ignores sessions"
+      },
+      {
+        "sql": "SELECT username FROM users WHERE id IN (SELECT user_id FROM sessions);",
+        "why": "Ignores invites"
+      }
+    ]
+  },
+  {
+    "id": "st06-r14",
+    "kind": "review",
+    "stage": 6,
+    "skills": [
+      36,
+      12
+    ],
+    "recalls": [],
+    "title": "Salary gap to the top",
+    "prompt": "Show each employee's name and how far they are below the highest salary in their department as gap. Ignore employees with no department.",
+    "dataset": "staff",
+    "hints": [
+      "A correlated subquery in SELECT."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "gap"
+          ],
+          "rows": [
+            [
+              "Asha",
+              0
+            ],
+            [
+              "Ben",
+              25000
+            ],
+            [
+              "Chloe",
+              25000
+            ],
+            [
+              "Dev",
+              0
+            ],
+            [
+              "Elena",
+              8000
+            ],
+            [
+              "Farid",
+              12000
+            ],
+            [
+              "Grace",
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "gap"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              0
+            ],
+            [
+              "Jon",
+              20000
+            ],
+            [
+              "Kim",
+              0
+            ],
+            [
+              "Mia",
+              15000
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT e.name, (SELECT MAX(x.salary) FROM employees x WHERE x.department_id = e.department_id) - e.salary AS gap FROM employees e WHERE e.department_id IS NOT NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT e.name, (SELECT MAX(x.salary) FROM employees x) - e.salary AS gap FROM employees e WHERE e.department_id IS NOT NULL;",
+        "why": "Uses the company's top salary"
+      },
+      {
+        "sql": "SELECT e.name, e.salary AS gap FROM employees e WHERE e.department_id IS NOT NULL;",
+        "why": "Doesn't subtract"
+      }
+    ]
+  },
+  {
+    "id": "st06-r15",
+    "kind": "review",
+    "stage": 6,
+    "skills": [
+      33,
+      25
+    ],
+    "recalls": [],
+    "title": "Biggest order's customer",
+    "prompt": "Show the name of the customer who placed the order with the most total units. Break ties with the lowest order id.",
+    "dataset": "shop",
+    "hints": [
+      "Find the order first, then walk to the customer."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Priya"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO order_items VALUES (12, 8, 3, NULL);",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Sara"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT c.name FROM customers c JOIN orders o ON o.customer_id = c.id WHERE o.id = (SELECT order_id FROM order_items GROUP BY order_id ORDER BY SUM(quantity) DESC, order_id LIMIT 1);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT c.name FROM customers c JOIN orders o ON o.customer_id = c.id WHERE o.id = (SELECT order_id FROM order_items ORDER BY quantity DESC LIMIT 1);",
+        "why": "Uses the largest row, not order total"
+      },
+      {
+        "sql": "SELECT c.name FROM customers c LIMIT 1;",
+        "why": "Doesn't calculate"
+      }
+    ]
+  }
+]

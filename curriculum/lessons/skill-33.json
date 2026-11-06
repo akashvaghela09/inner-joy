@@ -1,0 +1,15 @@
+{
+  "skill": 33,
+  "summary": "A subquery is a query inside another query. A scalar subquery returns one single value, so it can go anywhere a value can.",
+  "points": [
+    "Write it in brackets: WHERE salary > (SELECT AVG(salary) FROM employees).",
+    "It runs first, and its result is used in the outer query.",
+    "It's handy in SELECT too, for showing an overall figure on each row.",
+    "If it finds no rows, it returns NULL, which is useful when a problem asks for NULL."
+  ],
+  "example": {
+    "dataset": "staff",
+    "sql": "SELECT name, salary\nFROM employees\nWHERE salary > (SELECT AVG(salary) FROM employees);",
+    "explanation": "The subquery calculates the average once, and the outer query keeps people above it."
+  }
+}

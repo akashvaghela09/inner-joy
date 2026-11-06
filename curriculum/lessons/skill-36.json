@@ -1,0 +1,15 @@
+{
+  "skill": 36,
+  "summary": "A correlated subquery refers to the current row of the outer query, so it runs once for each row.",
+  "points": [
+    "It connects through a table alias: WHERE e.salary > (SELECT AVG(salary) FROM employees x WHERE x.department_id = e.department_id).",
+    "Use it to compare each row with its own group.",
+    "EXISTS is usually correlated.",
+    "It can run slowly on very large tables, as it repeats per row."
+  ],
+  "example": {
+    "dataset": "staff",
+    "sql": "SELECT e.name, e.salary\nFROM employees e\nWHERE e.salary > (\n  SELECT AVG(x.salary) FROM employees x WHERE x.department_id = e.department_id\n);",
+    "explanation": "Each employee is compared with the average of their own department."
+  }
+}

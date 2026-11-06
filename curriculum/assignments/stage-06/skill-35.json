@@ -1,0 +1,566 @@
+[
+  {
+    "id": "s35-01",
+    "skill": 35,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [
+      20
+    ],
+    "title": "Filter a total",
+    "prompt": "Using a subquery in FROM, show the order_id and units of orders with more than 3 total units. Replace the ___.",
+    "dataset": "shop",
+    "starterSql": "SELECT order_id, units\nFROM (___)\nWHERE units > 3;",
+    "hints": [
+      "The outer query can use the inner query's columns."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "order_id",
+            "units"
+          ],
+          "rows": [
+            [
+              1,
+              5
+            ],
+            [
+              6,
+              5
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "order_id",
+            "units"
+          ],
+          "rows": [
+            [
+              11,
+              4
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT order_id, units FROM (SELECT order_id, SUM(quantity) AS units FROM order_items GROUP BY order_id) WHERE units > 3;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT order_id, units FROM (SELECT order_id, SUM(quantity) AS units FROM order_items GROUP BY order_id);",
+        "why": "Doesn't filter"
+      },
+      {
+        "sql": "SELECT order_id, quantity AS units FROM order_items WHERE quantity > 3;",
+        "why": "Checks single rows"
+      }
+    ]
+  },
+  {
+    "id": "s35-02",
+    "skill": 35,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      20
+    ],
+    "title": "Average of averages",
+    "prompt": "Show the average of each department's average salary, rounded to 2 decimals, as avg_of_avgs. Ignore employees with no department.",
+    "dataset": "staff",
+    "hints": [
+      "Average inside, average again outside."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "avg_of_avgs"
+          ],
+          "rows": [
+            [
+              71555.56
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "avg_of_avgs"
+          ],
+          "rows": [
+            [
+              71250
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT ROUND(AVG(avg_salary), 2) AS avg_of_avgs FROM (SELECT AVG(salary) AS avg_salary FROM employees WHERE department_id IS NOT NULL GROUP BY department_id);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT ROUND(AVG(salary), 2) AS avg_of_avgs FROM employees WHERE department_id IS NOT NULL;",
+        "why": "Averages employees, not departments"
+      },
+      {
+        "sql": "SELECT ROUND(AVG(avg_salary), 2) AS avg_of_avgs FROM (SELECT AVG(salary) AS avg_salary FROM employees GROUP BY department_id);",
+        "why": "Includes the NULL group"
+      }
+    ]
+  },
+  {
+    "id": "s35-03",
+    "skill": 35,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      21
+    ],
+    "title": "Biggest customer",
+    "prompt": "Show the customer_id with the most orders and that count as orders. Break ties with the lowest customer_id.",
+    "dataset": "shop",
+    "hints": [
+      "Sort the grouped result."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "customer_id",
+            "orders"
+          ],
+          "rows": [
+            [
+              1,
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "customer_id",
+            "orders"
+          ],
+          "rows": [
+            [
+              7,
+              2
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT customer_id, orders FROM (SELECT customer_id, COUNT(*) AS orders FROM orders GROUP BY customer_id) ORDER BY orders DESC, customer_id LIMIT 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT customer_id, orders FROM (SELECT customer_id, COUNT(*) AS orders FROM orders GROUP BY customer_id) ORDER BY orders, customer_id LIMIT 1;",
+        "why": "Finds the fewest"
+      },
+      {
+        "sql": "SELECT customer_id, COUNT(*) AS orders FROM orders;",
+        "why": "Doesn't group"
+      }
+    ]
+  },
+  {
+    "id": "s35-04",
+    "skill": 35,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      20
+    ],
+    "title": "Joined summary",
+    "prompt": "Show each student's name and average grade as average, rounded to 1 decimal, by joining students to a subquery of averages.",
+    "dataset": "school",
+    "hints": [
+      "Join on the subquery's student_id."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "average"
+          ],
+          "rows": [
+            [
+              "Anya",
+              86.5
+            ],
+            [
+              "Bilal",
+              63
+            ],
+            [
+              "Cara",
+              67
+            ],
+            [
+              "Dmitri",
+              84.3
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "name",
+            "average"
+          ],
+          "rows": [
+            [
+              "Femi",
+              60
+            ],
+            [
+              "Gia",
+              95
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT s.name, a.average FROM students s JOIN (SELECT student_id, ROUND(AVG(grade), 1) AS average FROM enrolments GROUP BY student_id) a ON a.student_id = s.id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT s.name, a.average FROM students s JOIN (SELECT student_id, ROUND(AVG(grade), 1) AS average FROM enrolments GROUP BY student_id) a ON a.student_id = s.year_group;",
+        "why": "Joins on the wrong column"
+      },
+      {
+        "sql": "SELECT s.name, ROUND(MAX(e.grade), 1) AS average FROM students s JOIN enrolments e ON e.student_id = s.id GROUP BY s.id, s.name;",
+        "why": "Uses the highest grade"
+      }
+    ]
+  },
+  {
+    "id": "s35-05",
+    "skill": 35,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      21
+    ],
+    "title": "Empty intermediate result",
+    "prompt": "Show how many orders have more than 100 units as big_orders. There are none in the sample, so the answer should be 0.",
+    "dataset": "shop",
+    "hints": [
+      "COUNT over an empty subquery is 0."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "big_orders"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); UPDATE order_items SET quantity = 150 WHERE order_id = 12;",
+        "expected": {
+          "columns": [
+            "big_orders"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT COUNT(*) AS big_orders FROM (SELECT order_id FROM order_items GROUP BY order_id HAVING SUM(quantity) > 100);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT order_id AS big_orders FROM order_items GROUP BY order_id HAVING SUM(quantity) > 100;",
+        "why": "Returns no rows"
+      },
+      {
+        "sql": "SELECT COUNT(*) AS big_orders FROM order_items;",
+        "why": "Counts every row"
+      }
+    ]
+  },
+  {
+    "id": "s35-06",
+    "skill": 35,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the nested total",
+    "prompt": "This should show the largest single order's units as most_units, but SQLite can't nest aggregates. Use a subquery in FROM. Fix it.",
+    "dataset": "shop",
+    "starterSql": "SELECT MAX(SUM(quantity)) AS most_units\nFROM order_items\nGROUP BY order_id;",
+    "hints": [
+      "Total per order inside, then MAX outside."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "most_units"
+          ],
+          "rows": [
+            [
+              5
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "most_units"
+          ],
+          "rows": [
+            [
+              4
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT MAX(units) AS most_units FROM (SELECT SUM(quantity) AS units FROM order_items GROUP BY order_id);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT MAX(quantity) AS most_units FROM order_items;",
+        "why": "Finds the largest row"
+      },
+      {
+        "sql": "SELECT SUM(quantity) AS most_units FROM order_items;",
+        "why": "Adds everything"
+      }
+    ]
+  },
+  {
+    "id": "s35-07",
+    "skill": 35,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      21
+    ],
+    "title": "Days per user",
+    "prompt": "Show how many users had sessions on at least 2 different days, as regulars.",
+    "dataset": "app",
+    "hints": [
+      "Group first, then count the groups."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "regulars"
+          ],
+          "rows": [
+            [
+              3
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "regulars"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT COUNT(*) AS regulars FROM (SELECT user_id FROM sessions GROUP BY user_id HAVING COUNT(DISTINCT session_date) >= 2);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT COUNT(*) AS regulars FROM (SELECT user_id FROM sessions GROUP BY user_id HAVING COUNT(*) >= 2);",
+        "why": "Two sessions could be on one day"
+      },
+      {
+        "sql": "SELECT COUNT(DISTINCT user_id) AS regulars FROM sessions;",
+        "why": "Counts every active user"
+      }
+    ]
+  },
+  {
+    "id": "s35-08",
+    "skill": 35,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      22
+    ],
+    "title": "Share of pending",
+    "prompt": "Show each customer_id and their percentage of pending orders as pending_pct, rounded to 1 decimal, for customers above 0%, highest first.",
+    "dataset": "shop",
+    "hints": [
+      "Calculate inside, filter outside."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "customer_id",
+            "pending_pct"
+          ],
+          "rows": [
+            [
+              4,
+              100
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO orders VALUES (14, 7, '2024-04-01', 'pending'), (15, 9, '2024-04-02', 'pending');",
+        "expected": {
+          "columns": [
+            "customer_id",
+            "pending_pct"
+          ],
+          "rows": [
+            [
+              8,
+              100
+            ],
+            [
+              9,
+              100
+            ],
+            [
+              7,
+              33.3
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT customer_id, pending_pct FROM (SELECT customer_id, ROUND(SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 1) AS pending_pct FROM orders GROUP BY customer_id) WHERE pending_pct > 0 ORDER BY pending_pct DESC;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT customer_id, ROUND(SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 1) AS pending_pct FROM orders GROUP BY customer_id ORDER BY pending_pct DESC;",
+        "why": "Doesn't filter"
+      },
+      {
+        "sql": "SELECT customer_id, pending_pct FROM (SELECT customer_id, ROUND(SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 1) AS pending_pct FROM orders GROUP BY customer_id) WHERE pending_pct > 0 ORDER BY pending_pct;",
+        "why": "Sorts lowest first"
+      }
+    ]
+  }
+]

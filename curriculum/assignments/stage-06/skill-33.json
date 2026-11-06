@@ -1,0 +1,636 @@
+[
+  {
+    "id": "s33-01",
+    "skill": 33,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [
+      19
+    ],
+    "title": "Above average",
+    "prompt": "Show the name and salary of employees earning more than the average salary. Replace the ___ with a subquery.",
+    "dataset": "staff",
+    "starterSql": "SELECT name, salary\nFROM employees\nWHERE salary > ___;",
+    "hints": [
+      "AVG(salary) goes in brackets."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "salary"
+          ],
+          "rows": [
+            [
+              "Asha",
+              120000
+            ],
+            [
+              "Ben",
+              95000
+            ],
+            [
+              "Chloe",
+              95000
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "salary"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              90000
+            ],
+            [
+              "Jon",
+              70000
+            ],
+            [
+              "Kim",
+              70000
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, salary FROM employees WHERE salary > (SELECT AVG(salary) FROM employees);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, salary FROM employees WHERE salary > AVG(salary);",
+        "why": "An aggregate can't go directly in WHERE"
+      },
+      {
+        "sql": "SELECT name, salary FROM employees WHERE salary < (SELECT AVG(salary) FROM employees);",
+        "why": "Finds those below"
+      }
+    ]
+  },
+  {
+    "id": "s33-02",
+    "skill": 33,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      19
+    ],
+    "title": "Most expensive book",
+    "prompt": "Show the title of the book with the highest price, using a subquery.",
+    "dataset": "bookshop",
+    "hints": [
+      "Find MAX(price), then match it."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Bookshop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title"
+          ],
+          "rows": [
+            [
+              "Small Planets"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM books; INSERT INTO books VALUES (10, 'Copper Moon', 'Ada Hill', 'Fantasy', 20.0, 100, 2020), (11, 'North Light', 'Raj Dev', 'Travel', 7.5, 180, 2015), (12, 'Sky Atlas', 'Ada Hill', 'Science', 25.0, 300, 2023);",
+        "expected": {
+          "columns": [
+            "title"
+          ],
+          "rows": [
+            [
+              "Sky Atlas"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT title FROM books WHERE price = (SELECT MAX(price) FROM books);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT title FROM books WHERE price = (SELECT MIN(price) FROM books);",
+        "why": "Finds the cheapest"
+      },
+      {
+        "sql": "SELECT title FROM books;",
+        "why": "Shows every book"
+      }
+    ]
+  },
+  {
+    "id": "s33-03",
+    "skill": 33,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      12,
+      13
+    ],
+    "title": "Difference from average",
+    "prompt": "Show each employee's name and salary minus the overall average, rounded to 2 decimals, as difference.",
+    "dataset": "staff",
+    "hints": [
+      "A subquery can go in SELECT."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "difference"
+          ],
+          "rows": [
+            [
+              "Asha",
+              46375
+            ],
+            [
+              "Ben",
+              21375
+            ],
+            [
+              "Chloe",
+              21375
+            ],
+            [
+              "Dev",
+              -3625
+            ],
+            [
+              "Elena",
+              -11625
+            ],
+            [
+              "Farid",
+              -15625
+            ],
+            [
+              "Grace",
+              -25625
+            ],
+            [
+              "Hugo",
+              -32625
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "difference"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              27000
+            ],
+            [
+              "Jon",
+              7000
+            ],
+            [
+              "Kim",
+              7000
+            ],
+            [
+              "Leo",
+              -33000
+            ],
+            [
+              "Mia",
+              -8000
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, ROUND(salary - (SELECT AVG(salary) FROM employees), 2) AS difference FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, salary AS difference FROM employees;",
+        "why": "Doesn't subtract"
+      },
+      {
+        "sql": "SELECT name, ROUND((SELECT AVG(salary) FROM employees) - salary, 2) AS difference FROM employees;",
+        "why": "Subtracts the wrong way round"
+      }
+    ]
+  },
+  {
+    "id": "s33-04",
+    "skill": 33,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      12,
+      13
+    ],
+    "title": "Share of products",
+    "prompt": "Show each category and its share of all products as a percentage, rounded to 1 decimal, as share.",
+    "dataset": "shop",
+    "hints": [
+      "Divide by a subquery counting all products."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "category",
+            "share"
+          ],
+          "rows": [
+            [
+              "Home",
+              33.3
+            ],
+            [
+              "Kitchen",
+              33.3
+            ],
+            [
+              "Stationery",
+              33.3
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO products VALUES (10, 'Vase', 'Home', 5.0, 2.0);",
+        "expected": {
+          "columns": [
+            "category",
+            "share"
+          ],
+          "rows": [
+            [
+              "Home",
+              50
+            ],
+            [
+              "Kitchen",
+              25
+            ],
+            [
+              "Stationery",
+              25
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT category, ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM products), 1) AS share FROM products GROUP BY category;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT category, ROUND(COUNT(*) * 100 / (SELECT COUNT(*) FROM products), 1) AS share FROM products GROUP BY category;",
+        "why": "Integer division loses decimals"
+      },
+      {
+        "sql": "SELECT category, COUNT(*) AS share FROM products GROUP BY category;",
+        "why": "A count isn't a share"
+      }
+    ]
+  },
+  {
+    "id": "s33-05",
+    "skill": 33,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      19
+    ],
+    "title": "When there's no answer",
+    "prompt": "Show the highest salary below 30000 as salary. When none exists, the result should be one row containing NULL.",
+    "dataset": "staff",
+    "hints": [
+      "A scalar subquery returns NULL when it finds nothing, but MAX alone does too."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "salary"
+          ],
+          "rows": [
+            [
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET salary = 29000 WHERE id = 14; UPDATE employees SET salary = 20000 WHERE id = 15;",
+        "expected": {
+          "columns": [
+            "salary"
+          ],
+          "rows": [
+            [
+              29000
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT MAX(salary) AS salary FROM employees WHERE salary < 30000;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT salary FROM employees WHERE salary < 30000 ORDER BY salary DESC LIMIT 1;",
+        "why": "Returns no rows instead of NULL"
+      },
+      {
+        "sql": "SELECT MIN(salary) AS salary FROM employees WHERE salary < 30000;",
+        "why": "Finds the lowest"
+      }
+    ]
+  },
+  {
+    "id": "s33-06",
+    "skill": 33,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the comparison",
+    "prompt": "This should show employees earning the top salary, but it fails because the subquery returns a whole column. Fix it.",
+    "dataset": "staff",
+    "starterSql": "SELECT name\nFROM employees\nWHERE salary = (SELECT salary FROM employees WHERE);",
+    "hints": [
+      "= needs a single value, so use MAX."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Asha"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Ivy"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM employees WHERE salary = (SELECT MAX(salary) FROM employees);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM employees WHERE salary IN (SELECT salary FROM employees);",
+        "why": "Keeps everyone"
+      },
+      {
+        "sql": "SELECT name FROM employees WHERE salary > (SELECT MAX(salary) FROM employees);",
+        "why": "Nothing beats the maximum"
+      }
+    ]
+  },
+  {
+    "id": "s33-07",
+    "skill": 33,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      19
+    ],
+    "title": "Above average session",
+    "prompt": "Show the id and minutes of sessions longer than the average session.",
+    "dataset": "app",
+    "hints": [
+      "Compare with the overall average."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "minutes"
+          ],
+          "rows": [
+            [
+              2,
+              25
+            ],
+            [
+              4,
+              40
+            ],
+            [
+              6,
+              20
+            ],
+            [
+              7,
+              20
+            ],
+            [
+              8,
+              30
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "id",
+            "minutes"
+          ],
+          "rows": [
+            [
+              11,
+              50
+            ],
+            [
+              12,
+              50
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, minutes FROM sessions WHERE minutes > (SELECT AVG(minutes) FROM sessions);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, minutes FROM sessions WHERE minutes >= (SELECT MAX(minutes) FROM sessions);",
+        "why": "Finds only the longest"
+      },
+      {
+        "sql": "SELECT id, minutes FROM sessions WHERE minutes < (SELECT AVG(minutes) FROM sessions);",
+        "why": "Finds shorter ones"
+      }
+    ]
+  },
+  {
+    "id": "s33-08",
+    "skill": 33,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      19
+    ],
+    "title": "Second-highest salary",
+    "prompt": "Show the second-highest different salary as salary. If there isn't one, return one row containing NULL.",
+    "dataset": "staff",
+    "hints": [
+      "Wrap a query with OFFSET in a scalar subquery."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "salary"
+          ],
+          "rows": [
+            [
+              95000
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "UPDATE employees SET salary = 50000;",
+        "expected": {
+          "columns": [
+            "salary"
+          ],
+          "rows": [
+            [
+              null
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT (SELECT DISTINCT salary FROM employees ORDER BY salary DESC LIMIT 1 OFFSET 1) AS salary;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT DISTINCT salary FROM employees ORDER BY salary DESC LIMIT 1 OFFSET 1;",
+        "why": "Returns no row instead of NULL"
+      },
+      {
+        "sql": "SELECT (SELECT salary FROM employees ORDER BY salary DESC LIMIT 1 OFFSET 1) AS salary;",
+        "why": "Ties can repeat the top salary"
+      }
+    ]
+  }
+]

@@ -1,0 +1,631 @@
+[
+  {
+    "id": "s36-01",
+    "skill": 36,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [
+      19
+    ],
+    "title": "Above their department",
+    "prompt": "Show the name of employees earning more than their own department's average. Replace the ___.",
+    "dataset": "staff",
+    "starterSql": "SELECT e.name\nFROM employees e\nWHERE e.salary > (SELECT AVG(x.salary) FROM employees x WHERE ___);",
+    "hints": [
+      "Link the inner query with x.department_id = e.department_id."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Asha"
+            ],
+            [
+              "Dev"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Ivy"
+            ],
+            [
+              "Kim"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT e.name FROM employees e WHERE e.salary > (SELECT AVG(x.salary) FROM employees x WHERE x.department_id = e.department_id);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT e.name FROM employees e WHERE e.salary > (SELECT AVG(x.salary) FROM employees x);",
+        "why": "Uses the company average"
+      },
+      {
+        "sql": "SELECT e.name FROM employees e WHERE e.salary < (SELECT AVG(x.salary) FROM employees x WHERE x.department_id = e.department_id);",
+        "why": "Finds those below"
+      }
+    ]
+  },
+  {
+    "id": "s36-02",
+    "skill": 36,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      19
+    ],
+    "title": "Top price per category",
+    "prompt": "Show the name and price of the most expensive product in each category.",
+    "dataset": "shop",
+    "hints": [
+      "Compare with MAX within the same category."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "price"
+          ],
+          "rows": [
+            [
+              "Notebook",
+              4
+            ],
+            [
+              "Kettle",
+              35
+            ],
+            [
+              "Rug",
+              60
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "price"
+          ],
+          "rows": [
+            [
+              "Stool",
+              40
+            ],
+            [
+              "Cup",
+              9
+            ],
+            [
+              "Ink",
+              12.5
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT p.name, p.price FROM products p WHERE p.price = (SELECT MAX(x.price) FROM products x WHERE x.category = p.category);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT p.name, p.price FROM products p WHERE p.price = (SELECT MAX(x.price) FROM products x);",
+        "why": "Finds only the overall top"
+      },
+      {
+        "sql": "SELECT p.name, p.price FROM products p WHERE p.price = (SELECT MIN(x.price) FROM products x WHERE x.category = p.category);",
+        "why": "Finds the cheapest"
+      }
+    ]
+  },
+  {
+    "id": "s36-03",
+    "skill": 36,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      19
+    ],
+    "title": "Latest order per customer",
+    "prompt": "Show each customer_id and order_date for that customer's most recent order.",
+    "dataset": "shop",
+    "hints": [
+      "Compare each order with that customer's MAX date."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "customer_id",
+            "order_date"
+          ],
+          "rows": [
+            [
+              2,
+              "2024-01-17"
+            ],
+            [
+              1,
+              "2024-02-03"
+            ],
+            [
+              4,
+              "2024-03-02"
+            ],
+            [
+              3,
+              "2024-03-15"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "customer_id",
+            "order_date"
+          ],
+          "rows": [
+            [
+              8,
+              "2024-03-01"
+            ],
+            [
+              7,
+              "2024-03-31"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT o.customer_id, o.order_date FROM orders o WHERE o.order_date = (SELECT MAX(x.order_date) FROM orders x WHERE x.customer_id = o.customer_id);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT o.customer_id, o.order_date FROM orders o WHERE o.order_date = (SELECT MAX(x.order_date) FROM orders x);",
+        "why": "Finds only the overall latest"
+      },
+      {
+        "sql": "SELECT o.customer_id, o.order_date FROM orders o WHERE o.order_date = (SELECT MIN(x.order_date) FROM orders x WHERE x.customer_id = o.customer_id);",
+        "why": "Finds the first order"
+      }
+    ]
+  },
+  {
+    "id": "s36-04",
+    "skill": 36,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      19
+    ],
+    "title": "Best in course",
+    "prompt": "Show the student_id and grade of the top grade in each course, including ties.",
+    "dataset": "school",
+    "hints": [
+      "Compare each grade with the course's MAX."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "student_id",
+            "grade"
+          ],
+          "rows": [
+            [
+              1,
+              91
+            ],
+            [
+              4,
+              91
+            ],
+            [
+              4,
+              74
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "student_id",
+            "grade"
+          ],
+          "rows": [
+            [
+              6,
+              60
+            ],
+            [
+              6,
+              60
+            ],
+            [
+              7,
+              95
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT e.student_id, e.grade FROM enrolments e WHERE e.grade = (SELECT MAX(x.grade) FROM enrolments x WHERE x.course_id = e.course_id);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT e.student_id, e.grade FROM enrolments e WHERE e.grade = (SELECT MAX(x.grade) FROM enrolments x);",
+        "why": "Finds only the overall top"
+      },
+      {
+        "sql": "SELECT student_id, MAX(grade) AS grade FROM enrolments GROUP BY student_id;",
+        "why": "Finds each student's top"
+      }
+    ]
+  },
+  {
+    "id": "s36-05",
+    "skill": 36,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      6
+    ],
+    "title": "The first reading",
+    "prompt": "Show the city and temp_c of each city's earliest reading.",
+    "dataset": "weather",
+    "hints": [
+      "Compare the date with that city's MIN date."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "city",
+            "temp_c"
+          ],
+          "rows": [
+            [
+              "Oslo",
+              2
+            ],
+            [
+              "Lima",
+              24
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL); UPDATE readings SET reading_date = '2024-07-29' WHERE id = 14;",
+        "expected": {
+          "columns": [
+            "city",
+            "temp_c"
+          ],
+          "rows": [
+            [
+              "Cairo",
+              38
+            ],
+            [
+              "Quito",
+              15
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT r.city, r.temp_c FROM readings r WHERE r.reading_date = (SELECT MIN(x.reading_date) FROM readings x WHERE x.city = r.city);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT r.city, r.temp_c FROM readings r WHERE r.reading_date = (SELECT MIN(x.reading_date) FROM readings x);",
+        "why": "Uses one date for every city"
+      },
+      {
+        "sql": "SELECT r.city, MIN(r.temp_c) AS temp_c FROM readings r GROUP BY r.city;",
+        "why": "Finds the lowest temperature"
+      }
+    ]
+  },
+  {
+    "id": "s36-06",
+    "skill": 36,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [
+      6
+    ],
+    "title": "Fix the link",
+    "prompt": "This should show employees earning the top salary in their own department, but it isn't linked to the outer row, so it finds only one. Fix it.",
+    "dataset": "staff",
+    "starterSql": "SELECT e.name\nFROM employees e\nWHERE e.salary = (SELECT MAX(x.salary) FROM employees x);",
+    "hints": [
+      "Add the department condition inside."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Asha"
+            ],
+            [
+              "Dev"
+            ],
+            [
+              "Grace"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Ivy"
+            ],
+            [
+              "Kim"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT e.name FROM employees e WHERE e.salary = (SELECT MAX(x.salary) FROM employees x WHERE x.department_id = e.department_id);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT e.name FROM employees e WHERE e.salary = (SELECT MAX(x.salary) FROM employees x);",
+        "why": "Still isn't linked"
+      },
+      {
+        "sql": "SELECT e.name FROM employees e WHERE e.salary = (SELECT MIN(x.salary) FROM employees x WHERE x.department_id = e.department_id);",
+        "why": "Finds the lowest"
+      }
+    ]
+  },
+  {
+    "id": "s36-07",
+    "skill": 36,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      30
+    ],
+    "title": "Earlier hire exists",
+    "prompt": "Show the name of employees for whom someone in the same department was hired earlier.",
+    "dataset": "staff",
+    "hints": [
+      "EXISTS with two linking conditions."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Ben"
+            ],
+            [
+              "Chloe"
+            ],
+            [
+              "Elena"
+            ],
+            [
+              "Farid"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Jon"
+            ],
+            [
+              "Kim"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT e.name FROM employees e WHERE EXISTS (SELECT 1 FROM employees x WHERE x.department_id = e.department_id AND x.hire_date < e.hire_date);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT e.name FROM employees e WHERE EXISTS (SELECT 1 FROM employees x WHERE x.hire_date < e.hire_date);",
+        "why": "Compares across departments"
+      },
+      {
+        "sql": "SELECT e.name FROM employees e WHERE NOT EXISTS (SELECT 1 FROM employees x WHERE x.department_id = e.department_id AND x.hire_date < e.hire_date);",
+        "why": "Finds the earliest in each"
+      }
+    ]
+  },
+  {
+    "id": "s36-08",
+    "skill": 36,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      19
+    ],
+    "title": "Above-average orders per customer",
+    "prompt": "Show the customer_id and order id as order_id of orders with more units than that customer's average order.",
+    "dataset": "shop",
+    "hints": [
+      "Compute order totals with a subquery, used on both sides."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "customer_id",
+            "order_id"
+          ],
+          "rows": [
+            [
+              1,
+              1
+            ],
+            [
+              3,
+              6
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "customer_id",
+            "order_id"
+          ],
+          "rows": [
+            [
+              7,
+              11
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT t.customer_id, t.order_id FROM (SELECT o.customer_id, i.order_id, SUM(i.quantity) AS units FROM orders o JOIN order_items i ON i.order_id = o.id GROUP BY o.customer_id, i.order_id) t WHERE t.units > (SELECT AVG(y.units) FROM (SELECT o.customer_id, i.order_id, SUM(i.quantity) AS units FROM orders o JOIN order_items i ON i.order_id = o.id GROUP BY o.customer_id, i.order_id) y WHERE y.customer_id = t.customer_id);"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT t.customer_id, t.order_id FROM (SELECT o.customer_id, i.order_id, SUM(i.quantity) AS units FROM orders o JOIN order_items i ON i.order_id = o.id GROUP BY o.customer_id, i.order_id) t;",
+        "why": "Doesn't filter"
+      },
+      {
+        "sql": "SELECT t.customer_id, t.order_id FROM (SELECT o.customer_id, i.order_id, SUM(i.quantity) AS units FROM orders o JOIN order_items i ON i.order_id = o.id GROUP BY o.customer_id, i.order_id) t WHERE t.units > (SELECT AVG(quantity) FROM order_items);",
+        "why": "Uses the overall average"
+      }
+    ]
+  }
+]
