@@ -160,6 +160,8 @@ const STEP_LABELS: Record<string, string> = {
   fixBug: "Fix the bug",
   requirementChange: "Requirement change",
   apply: "Apply",
+  scenario: "Scenario",
+  challenge: "Challenge",
 };
 
 export function typeLabel(assignment: Assignment): string {

@@ -1,0 +1,15 @@
+{
+  "skill": 41,
+  "summary": "Ranking functions number rows in an order you choose, and differ in how they handle ties.",
+  "points": [
+    "ROW_NUMBER gives every row a different number, even when tied.",
+    "RANK gives ties the same number, then skips: 1, 1, 3.",
+    "DENSE_RANK gives ties the same number without gaps: 1, 1, 2.",
+    "Top N per group means ranking with PARTITION BY, then filtering in an outer query."
+  ],
+  "example": {
+    "dataset": "staff",
+    "sql": "SELECT name, salary,\n  ROW_NUMBER() OVER (ORDER BY salary DESC) AS row_num,\n  RANK() OVER (ORDER BY salary DESC) AS rnk,\n  DENSE_RANK() OVER (ORDER BY salary DESC) AS dense\nFROM employees;",
+    "explanation": "Ben and Chloe tie on salary, so the three columns show the difference clearly."
+  }
+}

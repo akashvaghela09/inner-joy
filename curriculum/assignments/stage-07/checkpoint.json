@@ -1,0 +1,342 @@
+[
+  {
+    "id": "st07-c01",
+    "kind": "checkpoint",
+    "stage": 7,
+    "skills": [
+      42,
+      10
+    ],
+    "sourceProblem": 33,
+    "recalls": [],
+    "title": "Three same readings",
+    "prompt": "Show the different temp_c values that appear in at least 3 consecutive readings, ordering all readings by id.",
+    "dataset": "weather",
+    "hints": [
+      "Compare with the two previous rows."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "temp_c"
+          ],
+          "rows": []
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "UPDATE readings SET temp_c = 9 WHERE id IN (2, 3, 4); UPDATE readings SET temp_c = 5 WHERE id IN (1, 6, 8);",
+        "expected": {
+          "columns": [
+            "temp_c"
+          ],
+          "rows": [
+            [
+              9
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT DISTINCT temp_c FROM (SELECT temp_c, LAG(temp_c, 1) OVER (ORDER BY id) AS p1, LAG(temp_c, 2) OVER (ORDER BY id) AS p2 FROM readings) WHERE temp_c = p1 AND temp_c = p2;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT DISTINCT temp_c FROM (SELECT temp_c, LAG(temp_c, 1) OVER (ORDER BY id) AS p1 FROM readings) WHERE temp_c = p1;",
+        "why": "Needs only two in a row"
+      },
+      {
+        "sql": "SELECT temp_c FROM readings GROUP BY temp_c HAVING COUNT(*) >= 3;",
+        "why": "Doesn't require them to be consecutive"
+      }
+    ]
+  },
+  {
+    "id": "st07-c02",
+    "kind": "checkpoint",
+    "stage": 7,
+    "skills": [
+      43,
+      11
+    ],
+    "sourceProblem": 35,
+    "recalls": [],
+    "title": "Stock limit",
+    "prompt": "Order items are packed by order_id, then product_id. A box holds 5 units. Show the order_id and product_id of the last item that fits in the box without going over.",
+    "dataset": "shop",
+    "hints": [
+      "A running SUM with a unique order."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "order_id",
+            "product_id"
+          ],
+          "rows": [
+            [
+              1,
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "order_id",
+            "product_id"
+          ],
+          "rows": [
+            [
+              11,
+              8
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT order_id, product_id FROM (SELECT order_id, product_id, SUM(quantity) OVER (ORDER BY order_id, product_id) AS packed FROM order_items) WHERE packed <= 5 ORDER BY packed DESC, order_id DESC, product_id DESC LIMIT 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT order_id, product_id FROM order_items WHERE quantity <= 5 ORDER BY order_id DESC, product_id DESC LIMIT 1;",
+        "why": "Checks single rows"
+      },
+      {
+        "sql": "SELECT order_id, product_id FROM (SELECT order_id, product_id, SUM(quantity) OVER (ORDER BY order_id, product_id) AS packed FROM order_items) WHERE packed <= 5 ORDER BY packed, order_id, product_id LIMIT 1;",
+        "why": "Finds the first"
+      }
+    ]
+  },
+  {
+    "id": "st07-c03",
+    "kind": "checkpoint",
+    "stage": 7,
+    "skills": [
+      43,
+      37
+    ],
+    "sourceProblem": 40,
+    "recalls": [],
+    "title": "Three-day average minutes",
+    "prompt": "First total minutes per date. Then show each session_date, its 3-calendar-day total as total, and that total divided by 3, rounded to 2 decimals, as average. Skip the first 2 calendar days after the earliest date.",
+    "dataset": "app",
+    "hints": [
+      "Filter dates at least 2 days after the first."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "session_date",
+            "total",
+            "average"
+          ],
+          "rows": [
+            [
+              "2024-01-03",
+              80,
+              26.67
+            ],
+            [
+              "2024-01-04",
+              90,
+              30
+            ],
+            [
+              "2024-01-05",
+              100,
+              33.33
+            ],
+            [
+              "2024-01-10",
+              42,
+              14
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "session_date",
+            "total",
+            "average"
+          ],
+          "rows": [
+            [
+              "2024-03-01",
+              107,
+              35.67
+            ],
+            [
+              "2024-03-02",
+              90,
+              30
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "WITH d AS (SELECT session_date, SUM(minutes) AS day_total FROM sessions GROUP BY session_date) SELECT session_date, total, ROUND(total / 3.0, 2) AS average FROM (SELECT session_date, SUM(day_total) OVER (ORDER BY julianday(session_date) RANGE BETWEEN 2 PRECEDING AND CURRENT ROW) AS total FROM d) WHERE julianday(session_date) >= (SELECT MIN(julianday(session_date)) + 2 FROM d) ORDER BY session_date;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "WITH d AS (SELECT session_date, SUM(minutes) AS day_total FROM sessions GROUP BY session_date) SELECT session_date, SUM(day_total) OVER (ORDER BY julianday(session_date) RANGE BETWEEN 2 PRECEDING AND CURRENT ROW) AS total, 0 AS average FROM d ORDER BY session_date;",
+        "why": "Doesn't skip or average"
+      },
+      {
+        "sql": "SELECT session_date, SUM(minutes) AS total, ROUND(SUM(minutes) / 3.0, 2) AS average FROM sessions GROUP BY session_date ORDER BY session_date;",
+        "why": "Doesn't use a window"
+      }
+    ]
+  },
+  {
+    "id": "st07-c04",
+    "kind": "checkpoint",
+    "stage": 7,
+    "skills": [
+      41,
+      32
+    ],
+    "sourceProblem": 43,
+    "recalls": [],
+    "title": "Top scorers per course",
+    "prompt": "Show the course title, student name, and grade for students with one of the top 2 different grades in each course. Ties all count, and ungraded enrolments don't.",
+    "dataset": "school",
+    "hints": [
+      "DENSE_RANK per course, then filter."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "title",
+            "name",
+            "grade"
+          ],
+          "rows": [
+            [
+              "Algebra",
+              "Dmitri",
+              91
+            ],
+            [
+              "Algebra",
+              "Anya",
+              82
+            ],
+            [
+              "Geometry",
+              "Dmitri",
+              74
+            ],
+            [
+              "Biology",
+              "Anya",
+              91
+            ],
+            [
+              "Biology",
+              "Dmitri",
+              88
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring'); INSERT INTO enrolments VALUES (15, 7, 5, 60, '2024-autumn'), (16, 8, 5, 50, '2024-autumn');",
+        "expected": {
+          "columns": [
+            "title",
+            "name",
+            "grade"
+          ],
+          "rows": [
+            [
+              "Chemistry",
+              "Femi",
+              60
+            ],
+            [
+              "Chemistry",
+              "Femi",
+              60
+            ],
+            [
+              "Chemistry",
+              "Gia",
+              60
+            ],
+            [
+              "Chemistry",
+              "Hao",
+              50
+            ],
+            [
+              "Drama",
+              "Gia",
+              95
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT title, name, grade FROM (SELECT c.title, s.name, e.grade, DENSE_RANK() OVER (PARTITION BY c.id ORDER BY e.grade DESC) AS r FROM enrolments e JOIN courses c ON c.id = e.course_id JOIN students s ON s.id = e.student_id WHERE e.grade IS NOT NULL) WHERE r <= 2;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT title, name, grade FROM (SELECT c.title, s.name, e.grade, ROW_NUMBER() OVER (PARTITION BY c.id ORDER BY e.grade DESC) AS r FROM enrolments e JOIN courses c ON c.id = e.course_id JOIN students s ON s.id = e.student_id WHERE e.grade IS NOT NULL) WHERE r <= 2;",
+        "why": "Drops ties"
+      },
+      {
+        "sql": "SELECT title, name, grade FROM (SELECT c.title, s.name, e.grade, RANK() OVER (PARTITION BY c.id ORDER BY e.grade DESC) AS r FROM enrolments e JOIN courses c ON c.id = e.course_id JOIN students s ON s.id = e.student_id WHERE e.grade IS NOT NULL) WHERE r <= 2;",
+        "why": "A tie for first skips the second level"
+      }
+    ]
+  }
+]

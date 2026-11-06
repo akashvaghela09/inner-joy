@@ -1,0 +1,210 @@
+[
+  {
+    "id": "st08-c01",
+    "kind": "checkpoint",
+    "stage": 8,
+    "skills": [
+      44,
+      32
+    ],
+    "sourceProblem": 48,
+    "recalls": [],
+    "title": "Sold by date",
+    "prompt": "Show each order_date, the number of different products sold as products, and their names in alphabetical order with no repeats as names, sorted by date.",
+    "dataset": "shop",
+    "hints": [
+      "Join, then use DISTINCT in both."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "order_date",
+            "products",
+            "names"
+          ],
+          "rows": [
+            [
+              "2024-01-05",
+              2,
+              "Notebook,Pen"
+            ],
+            [
+              "2024-01-17",
+              1,
+              "Mug"
+            ],
+            [
+              "2024-02-03",
+              1,
+              "Kettle"
+            ],
+            [
+              "2024-02-20",
+              2,
+              "Lamp,Notebook"
+            ],
+            [
+              "2024-03-02",
+              1,
+              "Mug"
+            ],
+            [
+              "2024-03-15",
+              2,
+              "Kettle,Pen"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO orders VALUES (14, 8, '2024-02-28', 'shipped'); INSERT INTO order_items VALUES (14, 8, 1, NULL), (14, 7, 1, NULL);",
+        "expected": {
+          "columns": [
+            "order_date",
+            "products",
+            "names"
+          ],
+          "rows": [
+            [
+              "2024-02-28",
+              2,
+              "Cup,Stool"
+            ],
+            [
+              "2024-03-01",
+              1,
+              "Ink"
+            ],
+            [
+              "2024-03-31",
+              1,
+              "Cup"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT o.order_date, COUNT(DISTINCT p.name) AS products, GROUP_CONCAT(DISTINCT p.name ORDER BY p.name) AS names FROM orders o JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id GROUP BY o.order_date ORDER BY o.order_date;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT o.order_date, COUNT(p.name) AS products, GROUP_CONCAT(p.name ORDER BY p.name) AS names FROM orders o JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id GROUP BY o.order_date ORDER BY o.order_date;",
+        "why": "Keeps repeats"
+      },
+      {
+        "sql": "SELECT o.order_date, COUNT(DISTINCT p.name) AS products, GROUP_CONCAT(DISTINCT p.name) AS names FROM orders o JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id GROUP BY o.order_date ORDER BY o.order_date;",
+        "why": "Doesn't sort the names"
+      }
+    ]
+  },
+  {
+    "id": "st08-c02",
+    "kind": "checkpoint",
+    "stage": 8,
+    "skills": [
+      45,
+      6
+    ],
+    "sourceProblem": 50,
+    "recalls": [],
+    "title": "Valid work emails",
+    "prompt": "A valid email starts with a letter, then has only letters, digits, underscores, dots, or dashes, then ends with exactly @acme.test in lowercase. Show the id, name, and email of employees with one.",
+    "dataset": "staff",
+    "hints": [
+      "Anchor both ends, and escape the dot."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "email"
+          ],
+          "rows": [
+            [
+              1,
+              "Asha",
+              "asha@acme.test"
+            ],
+            [
+              2,
+              "Ben",
+              "ben@acme.test"
+            ],
+            [
+              4,
+              "Dev",
+              "dev@acme.test"
+            ],
+            [
+              5,
+              "Elena",
+              "elena@acme.test"
+            ],
+            [
+              6,
+              "Farid",
+              "farid@acme.test"
+            ],
+            [
+              8,
+              "Hugo",
+              "hugo@acme.test"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET email = '9kim@acme.test' WHERE id = 13; UPDATE employees SET email = 'mia@ACME.test' WHERE id = 15; UPDATE employees SET email = 'leo@acmeXtest' WHERE id = 14;",
+        "expected": {
+          "columns": [
+            "id",
+            "name",
+            "email"
+          ],
+          "rows": [
+            [
+              11,
+              "Ivy",
+              "ivy@acme.test"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, name, email FROM employees WHERE email REGEXP '^[a-zA-Z][a-zA-Z0-9_.-]*@acme\\.test$';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, name, email FROM employees WHERE email REGEXP '@acme\\.test$';",
+        "why": "Allows any start"
+      },
+      {
+        "sql": "SELECT id, name, email FROM employees WHERE email LIKE '%@acme.test';",
+        "why": "LIKE ignores capitals and allows any start"
+      }
+    ]
+  }
+]

@@ -1,0 +1,1096 @@
+[
+  {
+    "id": "s43-01",
+    "skill": 43,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [
+      40
+    ],
+    "title": "Running total",
+    "prompt": "Show each session's id, minutes, and a running total of minutes in order of session_date then id, as running. Replace the ___.",
+    "dataset": "app",
+    "starterSql": "SELECT id, minutes,\n  SUM(minutes) OVER (ORDER BY ___) AS running\nFROM sessions;",
+    "hints": [
+      "SUM with ORDER BY is cumulative."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "minutes",
+            "running"
+          ],
+          "rows": [
+            [
+              1,
+              10,
+              10
+            ],
+            [
+              2,
+              25,
+              35
+            ],
+            [
+              3,
+              5,
+              40
+            ],
+            [
+              4,
+              40,
+              80
+            ],
+            [
+              6,
+              20,
+              100
+            ],
+            [
+              5,
+              15,
+              115
+            ],
+            [
+              7,
+              20,
+              135
+            ],
+            [
+              8,
+              30,
+              165
+            ],
+            [
+              9,
+              12,
+              177
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "id",
+            "minutes",
+            "running"
+          ],
+          "rows": [
+            [
+              11,
+              50,
+              50
+            ],
+            [
+              12,
+              50,
+              100
+            ],
+            [
+              13,
+              7,
+              107
+            ],
+            [
+              14,
+              33,
+              140
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, minutes, SUM(minutes) OVER (ORDER BY session_date, id) AS running FROM sessions;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, minutes, SUM(minutes) OVER () AS running FROM sessions;",
+        "why": "Shows the grand total"
+      },
+      {
+        "sql": "SELECT id, minutes, minutes AS running FROM sessions;",
+        "why": "Doesn't add up"
+      }
+    ]
+  },
+  {
+    "id": "s43-02",
+    "skill": 43,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      40
+    ],
+    "title": "Per-user running total",
+    "prompt": "Show each session's id and the running total of minutes for that user, by date then id, as running.",
+    "dataset": "app",
+    "hints": [
+      "Add PARTITION BY user_id."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "running"
+          ],
+          "rows": [
+            [
+              1,
+              10
+            ],
+            [
+              2,
+              35
+            ],
+            [
+              3,
+              40
+            ],
+            [
+              4,
+              40
+            ],
+            [
+              5,
+              55
+            ],
+            [
+              6,
+              20
+            ],
+            [
+              7,
+              40
+            ],
+            [
+              8,
+              30
+            ],
+            [
+              9,
+              42
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "id",
+            "running"
+          ],
+          "rows": [
+            [
+              11,
+              50
+            ],
+            [
+              12,
+              100
+            ],
+            [
+              13,
+              107
+            ],
+            [
+              14,
+              33
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, SUM(minutes) OVER (PARTITION BY user_id ORDER BY session_date, id) AS running FROM sessions;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, SUM(minutes) OVER (ORDER BY session_date, id) AS running FROM sessions;",
+        "why": "Doesn't restart per user"
+      },
+      {
+        "sql": "SELECT id, SUM(minutes) OVER (PARTITION BY user_id) AS running FROM sessions;",
+        "why": "Shows each user's final total"
+      }
+    ]
+  },
+  {
+    "id": "s43-03",
+    "skill": 43,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      13
+    ],
+    "title": "Three-reading average",
+    "prompt": "Show each reading's id and the average temperature of it and the 2 previous readings in its city, rounded to 1 decimal, as moving_avg.",
+    "dataset": "weather",
+    "hints": [
+      "ROWS BETWEEN 2 PRECEDING AND CURRENT ROW."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "moving_avg"
+          ],
+          "rows": [
+            [
+              5,
+              24
+            ],
+            [
+              6,
+              25
+            ],
+            [
+              7,
+              25.3
+            ],
+            [
+              8,
+              25.7
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              4.7
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "moving_avg"
+          ],
+          "rows": [
+            [
+              11,
+              38
+            ],
+            [
+              12,
+              39
+            ],
+            [
+              13,
+              39.7
+            ],
+            [
+              14,
+              15
+            ],
+            [
+              15,
+              14.5
+            ],
+            [
+              16,
+              15.7
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, ROUND(AVG(temp_c) OVER (PARTITION BY city ORDER BY reading_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 1) AS moving_avg FROM readings;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, ROUND(AVG(temp_c) OVER (PARTITION BY city ORDER BY reading_date), 1) AS moving_avg FROM readings;",
+        "why": "Averages everything so far"
+      },
+      {
+        "sql": "SELECT id, ROUND(AVG(temp_c) OVER (PARTITION BY city ORDER BY reading_date ROWS BETWEEN 1 PRECEDING AND CURRENT ROW), 1) AS moving_avg FROM readings;",
+        "why": "Uses only two rows"
+      }
+    ]
+  },
+  {
+    "id": "s43-04",
+    "skill": 43,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      16
+    ],
+    "title": "Cumulative orders",
+    "prompt": "Show each order's id, order_date, and the count of orders up to and including it, by date then id, as total_so_far.",
+    "dataset": "shop",
+    "hints": [
+      "COUNT can be cumulative."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "order_date",
+            "total_so_far"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-01-05",
+              1
+            ],
+            [
+              2,
+              "2024-01-17",
+              2
+            ],
+            [
+              3,
+              "2024-02-03",
+              3
+            ],
+            [
+              4,
+              "2024-02-20",
+              4
+            ],
+            [
+              5,
+              "2024-03-02",
+              5
+            ],
+            [
+              6,
+              "2024-03-15",
+              6
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "order_date",
+            "total_so_far"
+          ],
+          "rows": [
+            [
+              11,
+              "2024-02-28",
+              1
+            ],
+            [
+              12,
+              "2024-03-01",
+              2
+            ],
+            [
+              13,
+              "2024-03-31",
+              3
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, order_date, COUNT(*) OVER (ORDER BY order_date, id) AS total_so_far FROM orders;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, order_date, COUNT(*) OVER () AS total_so_far FROM orders;",
+        "why": "Counts every order"
+      },
+      {
+        "sql": "SELECT id, order_date, ROW_NUMBER() OVER (ORDER BY order_date DESC, id) AS total_so_far FROM orders;",
+        "why": "Counts backwards"
+      }
+    ]
+  },
+  {
+    "id": "s43-05",
+    "skill": 43,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      40
+    ],
+    "title": "Fewer rows than the frame",
+    "prompt": "Show each reading's id and the sum of temperature for it and the 3 previous readings in its city, as sum_temp. Early rows use whatever exists.",
+    "dataset": "weather",
+    "hints": [
+      "A frame just uses fewer rows when there aren't enough."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "sum_temp"
+          ],
+          "rows": [
+            [
+              5,
+              24
+            ],
+            [
+              6,
+              50
+            ],
+            [
+              7,
+              76
+            ],
+            [
+              8,
+              101
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              3,
+              9
+            ],
+            [
+              4,
+              16
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "sum_temp"
+          ],
+          "rows": [
+            [
+              11,
+              38
+            ],
+            [
+              12,
+              78
+            ],
+            [
+              13,
+              119
+            ],
+            [
+              14,
+              15
+            ],
+            [
+              15,
+              29
+            ],
+            [
+              16,
+              47
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, SUM(temp_c) OVER (PARTITION BY city ORDER BY reading_date ROWS BETWEEN 3 PRECEDING AND CURRENT ROW) AS sum_temp FROM readings;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, SUM(temp_c) OVER (ORDER BY reading_date ROWS BETWEEN 3 PRECEDING AND CURRENT ROW) AS sum_temp FROM readings;",
+        "why": "Mixes cities"
+      },
+      {
+        "sql": "SELECT id, SUM(temp_c) OVER (PARTITION BY city ORDER BY reading_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS sum_temp FROM readings;",
+        "why": "Uses too few rows"
+      }
+    ]
+  },
+  {
+    "id": "s43-06",
+    "skill": 43,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the tied dates",
+    "prompt": "This running total gives the same value to sessions on one date, because ties share a default frame. Show id and running, adding id to the order. Fix it.",
+    "dataset": "app",
+    "starterSql": "SELECT id,\n  SUM(minutes) OVER (ORDER BY session_date) AS running\nFROM sessions;",
+    "hints": [
+      "A unique order makes the total step row by row."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "running"
+          ],
+          "rows": [
+            [
+              1,
+              10
+            ],
+            [
+              2,
+              35
+            ],
+            [
+              3,
+              40
+            ],
+            [
+              4,
+              80
+            ],
+            [
+              6,
+              100
+            ],
+            [
+              5,
+              115
+            ],
+            [
+              7,
+              135
+            ],
+            [
+              8,
+              165
+            ],
+            [
+              9,
+              177
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android'); INSERT INTO sessions VALUES (15, 9, '2024-03-02', 9, 'web');",
+        "expected": {
+          "columns": [
+            "id",
+            "running"
+          ],
+          "rows": [
+            [
+              11,
+              50
+            ],
+            [
+              12,
+              100
+            ],
+            [
+              13,
+              107
+            ],
+            [
+              14,
+              140
+            ],
+            [
+              15,
+              149
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, SUM(minutes) OVER (ORDER BY session_date, id) AS running FROM sessions;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, SUM(minutes) OVER () AS running FROM sessions;",
+        "why": "Shows the grand total"
+      },
+      {
+        "sql": "SELECT id, SUM(minutes) OVER (ORDER BY id DESC) AS running FROM sessions;",
+        "why": "Adds backwards"
+      }
+    ]
+  },
+  {
+    "id": "s43-07",
+    "skill": 43,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      16
+    ],
+    "title": "Date-based window",
+    "prompt": "Dates can have gaps. Show each reading's id and the sum of temperature over the current and previous 2 calendar days for its city, as three_day_sum.",
+    "dataset": "weather",
+    "hints": [
+      "RANGE on julianday works with date gaps."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "three_day_sum"
+          ],
+          "rows": [
+            [
+              5,
+              24
+            ],
+            [
+              6,
+              50
+            ],
+            [
+              7,
+              76
+            ],
+            [
+              8,
+              77
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              3,
+              9
+            ],
+            [
+              4,
+              10
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "three_day_sum"
+          ],
+          "rows": [
+            [
+              11,
+              38
+            ],
+            [
+              12,
+              78
+            ],
+            [
+              13,
+              119
+            ],
+            [
+              14,
+              15
+            ],
+            [
+              15,
+              29
+            ],
+            [
+              16,
+              32
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, SUM(temp_c) OVER (PARTITION BY city ORDER BY julianday(reading_date) RANGE BETWEEN 2 PRECEDING AND CURRENT ROW) AS three_day_sum FROM readings;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, SUM(temp_c) OVER (PARTITION BY city ORDER BY julianday(reading_date) ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS three_day_sum FROM readings;",
+        "why": "ROWS ignores date gaps"
+      },
+      {
+        "sql": "SELECT id, SUM(temp_c) OVER (PARTITION BY city ORDER BY julianday(reading_date) RANGE BETWEEN 3 PRECEDING AND CURRENT ROW) AS three_day_sum FROM readings;",
+        "why": "Covers four days"
+      }
+    ]
+  },
+  {
+    "id": "s43-08",
+    "skill": 43,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      35
+    ],
+    "title": "Bus-style limit",
+    "prompt": "Sessions run in id order. Show the id of the last session whose running total of minutes is at most 60.",
+    "dataset": "app",
+    "hints": [
+      "Calculate the running total, filter, and take the largest id."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              3
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android'); UPDATE sessions SET minutes = 25 WHERE id IN (11, 12); UPDATE sessions SET minutes = 40 WHERE id = 14;",
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              13
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id FROM (SELECT id, SUM(minutes) OVER (ORDER BY id) AS running FROM sessions) WHERE running <= 60 ORDER BY id DESC LIMIT 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id FROM (SELECT id, SUM(minutes) OVER (ORDER BY id) AS running FROM sessions) WHERE running <= 60 ORDER BY id LIMIT 1;",
+        "why": "Finds the first"
+      },
+      {
+        "sql": "SELECT id FROM sessions WHERE minutes <= 60 ORDER BY id DESC LIMIT 1;",
+        "why": "Checks single sessions"
+      }
+    ]
+  },
+  {
+    "id": "s43-09",
+    "skill": 43,
+    "step": 9,
+    "stepType": "scenario",
+    "required": false,
+    "recalls": [
+      13,
+      35
+    ],
+    "title": "Moving daily total",
+    "prompt": "Dates can repeat or have gaps. First total minutes per date, then show each session_date and its 3-calendar-day moving average, as moving_avg. That's the total for the date and the 2 days before it, divided by 3 and rounded to 2 decimals. Sort by date.",
+    "dataset": "app",
+    "hints": [
+      "Total per day in a CTE, then use RANGE and divide by 3.0."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "session_date",
+            "moving_avg"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              3.33
+            ],
+            [
+              "2024-01-02",
+              11.67
+            ],
+            [
+              "2024-01-03",
+              26.67
+            ],
+            [
+              "2024-01-04",
+              30
+            ],
+            [
+              "2024-01-05",
+              33.33
+            ],
+            [
+              "2024-01-10",
+              14
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "session_date",
+            "moving_avg"
+          ],
+          "rows": [
+            [
+              "2024-02-28",
+              16.67
+            ],
+            [
+              "2024-02-29",
+              33.33
+            ],
+            [
+              "2024-03-01",
+              35.67
+            ],
+            [
+              "2024-03-02",
+              30
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "WITH d AS (SELECT session_date, SUM(minutes) AS total FROM sessions GROUP BY session_date) SELECT session_date, ROUND(SUM(total) OVER (ORDER BY julianday(session_date) RANGE BETWEEN 2 PRECEDING AND CURRENT ROW) / 3.0, 2) AS moving_avg FROM d ORDER BY session_date;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "WITH d AS (SELECT session_date, SUM(minutes) AS total FROM sessions GROUP BY session_date) SELECT session_date, ROUND(AVG(total) OVER (ORDER BY julianday(session_date) ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS moving_avg FROM d ORDER BY session_date;",
+        "why": "Divides by rows, not 3 days"
+      },
+      {
+        "sql": "SELECT session_date, ROUND(AVG(minutes) OVER (ORDER BY session_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS moving_avg FROM sessions ORDER BY session_date;",
+        "why": "Doesn't total per day first"
+      }
+    ]
+  },
+  {
+    "id": "s43-10",
+    "skill": 43,
+    "step": 10,
+    "stepType": "challenge",
+    "required": false,
+    "recalls": [
+      12,
+      35
+    ],
+    "title": "Running revenue",
+    "prompt": "Show each order's id, its revenue (price times quantity) as revenue, and the running total by order id as running.",
+    "dataset": "shop",
+    "hints": [
+      "Total per order first, then a window over it."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true,
+      "decimals": 2
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "revenue",
+            "running"
+          ],
+          "rows": [
+            [
+              1,
+              15,
+              15
+            ],
+            [
+              2,
+              9,
+              24
+            ],
+            [
+              3,
+              35,
+              59
+            ],
+            [
+              4,
+              54,
+              113
+            ],
+            [
+              5,
+              18,
+              131
+            ],
+            [
+              6,
+              41,
+              172
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "revenue",
+            "running"
+          ],
+          "rows": [
+            [
+              11,
+              67,
+              67
+            ],
+            [
+              12,
+              25,
+              92
+            ],
+            [
+              13,
+              9,
+              101
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "WITH r AS (SELECT i.order_id AS id, SUM(p.price * i.quantity) AS revenue FROM order_items i JOIN products p ON p.id = i.product_id GROUP BY i.order_id) SELECT id, revenue, SUM(revenue) OVER (ORDER BY id) AS running FROM r;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT i.order_id AS id, p.price * i.quantity AS revenue, SUM(p.price * i.quantity) OVER (ORDER BY i.order_id) AS running FROM order_items i JOIN products p ON p.id = i.product_id;",
+        "why": "Doesn't total per order"
+      },
+      {
+        "sql": "WITH r AS (SELECT i.order_id AS id, SUM(p.price * i.quantity) AS revenue FROM order_items i JOIN products p ON p.id = i.product_id GROUP BY i.order_id) SELECT id, revenue, revenue AS running FROM r;",
+        "why": "Doesn't add up"
+      }
+    ]
+  }
+]

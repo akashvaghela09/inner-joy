@@ -1,0 +1,913 @@
+[
+  {
+    "id": "st07-r01",
+    "kind": "review",
+    "stage": 7,
+    "skills": [
+      41
+    ],
+    "recalls": [],
+    "title": "Highest paid per department",
+    "prompt": "Show each department_id, employee name, and salary of the top earner in each department. Ties all count. Ignore employees with no department.",
+    "dataset": "staff",
+    "hints": [
+      "Rank, then filter."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "department_id",
+            "name",
+            "salary"
+          ],
+          "rows": [
+            [
+              1,
+              "Asha",
+              120000
+            ],
+            [
+              2,
+              "Dev",
+              70000
+            ],
+            [
+              3,
+              "Grace",
+              48000
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET salary = 90000 WHERE id = 12;",
+        "expected": {
+          "columns": [
+            "department_id",
+            "name",
+            "salary"
+          ],
+          "rows": [
+            [
+              5,
+              "Ivy",
+              90000
+            ],
+            [
+              5,
+              "Jon",
+              90000
+            ],
+            [
+              6,
+              "Kim",
+              70000
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT department_id, name, salary FROM (SELECT department_id, name, salary, RANK() OVER (PARTITION BY department_id ORDER BY salary DESC) AS r FROM employees WHERE department_id IS NOT NULL) WHERE r = 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT department_id, name, salary FROM (SELECT department_id, name, salary, ROW_NUMBER() OVER (PARTITION BY department_id ORDER BY salary DESC) AS r FROM employees WHERE department_id IS NOT NULL) WHERE r = 1;",
+        "why": "Drops ties"
+      },
+      {
+        "sql": "SELECT department_id, name, MAX(salary) AS salary FROM employees WHERE department_id IS NOT NULL GROUP BY department_id;",
+        "why": "A plain GROUP BY can't keep ties"
+      }
+    ]
+  },
+  {
+    "id": "st07-r02",
+    "kind": "review",
+    "stage": 7,
+    "skills": [
+      40,
+      13
+    ],
+    "recalls": [],
+    "title": "Share of category revenue",
+    "prompt": "Show each product's name and its price as a percentage of its category's total price, rounded to 1 decimal, as share.",
+    "dataset": "shop",
+    "hints": [
+      "A window SUM per category."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "share"
+          ],
+          "rows": [
+            [
+              "Lamp",
+              29.4
+            ],
+            [
+              "Rug",
+              70.6
+            ],
+            [
+              "Mug",
+              20.5
+            ],
+            [
+              "Kettle",
+              79.5
+            ],
+            [
+              "Notebook",
+              72.7
+            ],
+            [
+              "Pen",
+              27.3
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "share"
+          ],
+          "rows": [
+            [
+              "Stool",
+              100
+            ],
+            [
+              "Cup",
+              100
+            ],
+            [
+              "Ink",
+              100
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, ROUND(price * 100.0 / SUM(price) OVER (PARTITION BY category), 1) AS share FROM products;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, ROUND(price * 100.0 / SUM(price) OVER (), 1) AS share FROM products;",
+        "why": "Uses the overall total"
+      },
+      {
+        "sql": "SELECT name, price AS share FROM products;",
+        "why": "Doesn't calculate"
+      }
+    ]
+  },
+  {
+    "id": "st07-r03",
+    "kind": "review",
+    "stage": 7,
+    "skills": [
+      42
+    ],
+    "recalls": [],
+    "title": "Coldest change",
+    "prompt": "Show the id of the reading with the largest drop from the previous reading in its city. Break ties with the lowest id.",
+    "dataset": "weather",
+    "hints": [
+      "Calculate changes, then sort."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              3
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              15
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id FROM (SELECT id, temp_c - LAG(temp_c) OVER (PARTITION BY city ORDER BY reading_date) AS change FROM readings) WHERE change IS NOT NULL ORDER BY change, id LIMIT 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id FROM (SELECT id, temp_c - LAG(temp_c) OVER (PARTITION BY city ORDER BY reading_date) AS change FROM readings) WHERE change IS NOT NULL ORDER BY change DESC, id LIMIT 1;",
+        "why": "Finds the largest rise"
+      },
+      {
+        "sql": "SELECT id FROM readings ORDER BY temp_c LIMIT 1;",
+        "why": "Finds the coldest"
+      }
+    ]
+  },
+  {
+    "id": "st07-r04",
+    "kind": "review",
+    "stage": 7,
+    "skills": [
+      43,
+      41
+    ],
+    "recalls": [],
+    "title": "Cumulative enrolments",
+    "prompt": "Show each enrolment's id and the running count of enrolments per student, by id, as attempt.",
+    "dataset": "school",
+    "hints": [
+      "This numbers each student's enrolments."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "attempt"
+          ],
+          "rows": [
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              6,
+              2
+            ],
+            [
+              7,
+              1
+            ],
+            [
+              8,
+              2
+            ],
+            [
+              9,
+              3
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "id",
+            "attempt"
+          ],
+          "rows": [
+            [
+              11,
+              1
+            ],
+            [
+              12,
+              2
+            ],
+            [
+              13,
+              1
+            ],
+            [
+              14,
+              2
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, COUNT(*) OVER (PARTITION BY student_id ORDER BY id) AS attempt FROM enrolments;",
+      "SELECT id, ROW_NUMBER() OVER (PARTITION BY student_id ORDER BY id) AS attempt FROM enrolments;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, COUNT(*) OVER (ORDER BY id) AS attempt FROM enrolments;",
+        "why": "Doesn't restart per student"
+      },
+      {
+        "sql": "SELECT id, COUNT(*) OVER (PARTITION BY student_id) AS attempt FROM enrolments;",
+        "why": "Shows the final count"
+      }
+    ]
+  },
+  {
+    "id": "st07-r05",
+    "kind": "review",
+    "stage": 7,
+    "skills": [
+      41
+    ],
+    "recalls": [],
+    "title": "First session per user",
+    "prompt": "Show each user_id and the device of their first session, using id order.",
+    "dataset": "app",
+    "hints": [
+      "Number the rows, then keep the first."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "user_id",
+            "device"
+          ],
+          "rows": [
+            [
+              1,
+              "ios"
+            ],
+            [
+              2,
+              "android"
+            ],
+            [
+              3,
+              "web"
+            ],
+            [
+              4,
+              "ios"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "user_id",
+            "device"
+          ],
+          "rows": [
+            [
+              7,
+              "web"
+            ],
+            [
+              8,
+              "android"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT user_id, device FROM (SELECT user_id, device, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY id) AS n FROM sessions) WHERE n = 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT user_id, device FROM (SELECT user_id, device, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY id DESC) AS n FROM sessions) WHERE n = 1;",
+        "why": "Finds the last session"
+      },
+      {
+        "sql": "SELECT user_id, device FROM sessions;",
+        "why": "Keeps every session"
+      }
+    ]
+  },
+  {
+    "id": "st07-r06",
+    "kind": "review",
+    "stage": 7,
+    "skills": [
+      40,
+      13
+    ],
+    "recalls": [],
+    "title": "Salary percent of top",
+    "prompt": "Show each employee's name and their salary as a percentage of the company's highest, rounded to 1 decimal, as pct_of_top.",
+    "dataset": "staff",
+    "hints": [
+      "MAX over the whole result."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "pct_of_top"
+          ],
+          "rows": [
+            [
+              "Asha",
+              100
+            ],
+            [
+              "Ben",
+              79.2
+            ],
+            [
+              "Chloe",
+              79.2
+            ],
+            [
+              "Dev",
+              58.3
+            ],
+            [
+              "Elena",
+              51.7
+            ],
+            [
+              "Farid",
+              48.3
+            ],
+            [
+              "Grace",
+              40
+            ],
+            [
+              "Hugo",
+              34.2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "pct_of_top"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              100
+            ],
+            [
+              "Jon",
+              77.8
+            ],
+            [
+              "Kim",
+              77.8
+            ],
+            [
+              "Leo",
+              33.3
+            ],
+            [
+              "Mia",
+              61.1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, ROUND(salary * 100.0 / MAX(salary) OVER (), 1) AS pct_of_top FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, ROUND(salary * 100.0 / MAX(salary) OVER (PARTITION BY department_id), 1) AS pct_of_top FROM employees;",
+        "why": "Uses each department's top"
+      },
+      {
+        "sql": "SELECT name, ROUND(salary * 100 / MAX(salary) OVER (), 1) AS pct_of_top FROM employees;",
+        "why": "Integer division loses decimals"
+      }
+    ]
+  },
+  {
+    "id": "st07-r07",
+    "kind": "review",
+    "stage": 7,
+    "skills": [
+      42
+    ],
+    "recalls": [],
+    "title": "Biggest rise in price order",
+    "prompt": "List products by price, cheapest first. Show each name and how much more it costs than the product before it, as step. The first shows NULL.",
+    "dataset": "shop",
+    "hints": [
+      "LAG over the price order."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": true,
+      "columnNames": true,
+      "decimals": 2
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "step"
+          ],
+          "rows": [
+            [
+              "Pen",
+              null
+            ],
+            [
+              "Notebook",
+              2.5
+            ],
+            [
+              "Mug",
+              5
+            ],
+            [
+              "Lamp",
+              16
+            ],
+            [
+              "Kettle",
+              10
+            ],
+            [
+              "Rug",
+              25
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "name",
+            "step"
+          ],
+          "rows": [
+            [
+              "Cup",
+              null
+            ],
+            [
+              "Ink",
+              3.5
+            ],
+            [
+              "Stool",
+              27.5
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, price - LAG(price) OVER (ORDER BY price, id) AS step FROM products ORDER BY price, id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, LAG(price) OVER (ORDER BY price, id) - price AS step FROM products ORDER BY price, id;",
+        "why": "Subtracts the wrong way round"
+      },
+      {
+        "sql": "SELECT name, price AS step FROM products ORDER BY price, id;",
+        "why": "Doesn't subtract"
+      }
+    ]
+  },
+  {
+    "id": "st07-r08",
+    "kind": "review",
+    "stage": 7,
+    "skills": [
+      43
+    ],
+    "recalls": [],
+    "title": "Running rain",
+    "prompt": "Show each reading's id and that city's running total rainfall by date, as total_rain. Missing rainfall counts as nothing.",
+    "dataset": "weather",
+    "hints": [
+      "SUM ignores NULLs."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "total_rain"
+          ],
+          "rows": [
+            [
+              5,
+              0
+            ],
+            [
+              6,
+              0
+            ],
+            [
+              7,
+              4
+            ],
+            [
+              8,
+              5
+            ],
+            [
+              1,
+              1.5
+            ],
+            [
+              2,
+              1.5
+            ],
+            [
+              3,
+              1.5
+            ],
+            [
+              4,
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "total_rain"
+          ],
+          "rows": [
+            [
+              11,
+              0
+            ],
+            [
+              12,
+              0
+            ],
+            [
+              13,
+              0.5
+            ],
+            [
+              14,
+              3
+            ],
+            [
+              15,
+              6
+            ],
+            [
+              16,
+              6
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, SUM(rainfall_mm) OVER (PARTITION BY city ORDER BY reading_date) AS total_rain FROM readings;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, SUM(rainfall_mm) OVER (ORDER BY reading_date) AS total_rain FROM readings;",
+        "why": "Mixes cities"
+      },
+      {
+        "sql": "SELECT id, SUM(rainfall_mm) OVER (PARTITION BY city) AS total_rain FROM readings;",
+        "why": "Shows the final total"
+      }
+    ]
+  },
+  {
+    "id": "st07-r09",
+    "kind": "review",
+    "stage": 7,
+    "skills": [
+      43,
+      42
+    ],
+    "recalls": [],
+    "title": "Above personal best",
+    "prompt": "Show the id of sessions longer than every previous session by the same user.",
+    "dataset": "app",
+    "hints": [
+      "Compare with the running MAX of earlier rows."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android'); INSERT INTO sessions VALUES (15, 7, '2024-03-02', 20, 'web');",
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": []
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id FROM (SELECT id, minutes, MAX(minutes) OVER (PARTITION BY user_id ORDER BY id ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING) AS best FROM sessions) WHERE best IS NOT NULL AND minutes > best;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id FROM (SELECT id, minutes, MAX(minutes) OVER (PARTITION BY user_id ORDER BY id) AS best FROM sessions) WHERE minutes > best;",
+        "why": "The frame includes the current row"
+      },
+      {
+        "sql": "SELECT id FROM (SELECT id, minutes, LAG(minutes) OVER (PARTITION BY user_id ORDER BY id) AS best FROM sessions) WHERE minutes > best;",
+        "why": "Checks only the previous session"
+      }
+    ]
+  },
+  {
+    "id": "st07-r10",
+    "kind": "review",
+    "stage": 7,
+    "skills": [
+      41,
+      37
+    ],
+    "recalls": [],
+    "title": "Top student per year",
+    "prompt": "Show each year_group and name of the student with the best average grade in it. Ties all count.",
+    "dataset": "school",
+    "hints": [
+      "Average first, then rank."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "year_group",
+            "name"
+          ],
+          "rows": [
+            [
+              10,
+              "Anya"
+            ],
+            [
+              11,
+              "Dmitri"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "year_group",
+            "name"
+          ],
+          "rows": [
+            [
+              9,
+              "Gia"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "WITH a AS (SELECT s.year_group, s.name, AVG(e.grade) AS average FROM students s JOIN enrolments e ON e.student_id = s.id GROUP BY s.id, s.year_group, s.name) SELECT year_group, name FROM (SELECT year_group, name, RANK() OVER (PARTITION BY year_group ORDER BY average DESC) AS r FROM a) WHERE r = 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "WITH a AS (SELECT s.year_group, s.name, AVG(e.grade) AS average FROM students s JOIN enrolments e ON e.student_id = s.id GROUP BY s.id, s.year_group, s.name) SELECT year_group, name FROM (SELECT year_group, name, RANK() OVER (ORDER BY average DESC) AS r FROM a) WHERE r = 1;",
+        "why": "Ranks across year groups"
+      },
+      {
+        "sql": "WITH a AS (SELECT s.year_group, s.name, AVG(e.grade) AS average FROM students s JOIN enrolments e ON e.student_id = s.id GROUP BY s.id, s.year_group, s.name) SELECT year_group, name FROM (SELECT year_group, name, RANK() OVER (PARTITION BY year_group ORDER BY average) AS r FROM a) WHERE r = 1;",
+        "why": "Finds the lowest"
+      }
+    ]
+  }
+]

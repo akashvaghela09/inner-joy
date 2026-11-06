@@ -1,0 +1,1097 @@
+[
+  {
+    "id": "s41-01",
+    "skill": 41,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [
+      40
+    ],
+    "title": "Number the rows",
+    "prompt": "Show each employee's name, salary, and a row number by salary from highest to lowest, as row_num. Break ties by name. Replace the ___.",
+    "dataset": "staff",
+    "starterSql": "SELECT name, salary,\n  ROW_NUMBER() OVER (ORDER BY ___) AS row_num\nFROM employees;",
+    "hints": [
+      "ROW_NUMBER needs an order."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "salary",
+            "row_num"
+          ],
+          "rows": [
+            [
+              "Asha",
+              120000,
+              1
+            ],
+            [
+              "Ben",
+              95000,
+              2
+            ],
+            [
+              "Chloe",
+              95000,
+              3
+            ],
+            [
+              "Dev",
+              70000,
+              4
+            ],
+            [
+              "Elena",
+              62000,
+              5
+            ],
+            [
+              "Farid",
+              58000,
+              6
+            ],
+            [
+              "Grace",
+              48000,
+              7
+            ],
+            [
+              "Hugo",
+              41000,
+              8
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "salary",
+            "row_num"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              90000,
+              1
+            ],
+            [
+              "Jon",
+              70000,
+              2
+            ],
+            [
+              "Kim",
+              70000,
+              3
+            ],
+            [
+              "Mia",
+              55000,
+              4
+            ],
+            [
+              "Leo",
+              30000,
+              5
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, salary, ROW_NUMBER() OVER (ORDER BY salary DESC, name) AS row_num FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, salary, ROW_NUMBER() OVER (ORDER BY salary, name) AS row_num FROM employees;",
+        "why": "Numbers lowest first"
+      },
+      {
+        "sql": "SELECT name, salary, ROW_NUMBER() OVER (ORDER BY name) AS row_num FROM employees;",
+        "why": "Numbers by name"
+      }
+    ]
+  },
+  {
+    "id": "s41-02",
+    "skill": 41,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      40
+    ],
+    "title": "RANK and ties",
+    "prompt": "Show each employee's name and their rank by salary, highest first, as salary_rank, with gaps after ties.",
+    "dataset": "staff",
+    "hints": [
+      "RANK gives ties the same number."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "salary_rank"
+          ],
+          "rows": [
+            [
+              "Asha",
+              1
+            ],
+            [
+              "Ben",
+              2
+            ],
+            [
+              "Chloe",
+              2
+            ],
+            [
+              "Dev",
+              4
+            ],
+            [
+              "Elena",
+              5
+            ],
+            [
+              "Farid",
+              6
+            ],
+            [
+              "Grace",
+              7
+            ],
+            [
+              "Hugo",
+              8
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "salary_rank"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              1
+            ],
+            [
+              "Jon",
+              2
+            ],
+            [
+              "Kim",
+              2
+            ],
+            [
+              "Mia",
+              4
+            ],
+            [
+              "Leo",
+              5
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, RANK() OVER (ORDER BY salary DESC) AS salary_rank FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, ROW_NUMBER() OVER (ORDER BY salary DESC) AS salary_rank FROM employees;",
+        "why": "Splits ties"
+      },
+      {
+        "sql": "SELECT name, DENSE_RANK() OVER (ORDER BY salary DESC) AS salary_rank FROM employees;",
+        "why": "Has no gaps after ties"
+      }
+    ]
+  },
+  {
+    "id": "s41-03",
+    "skill": 41,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      10
+    ],
+    "title": "DENSE_RANK and ties",
+    "prompt": "Show each employee's name and salary level as level, with no gaps after ties, highest salary first.",
+    "dataset": "staff",
+    "hints": [
+      "DENSE_RANK has no gaps."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "level"
+          ],
+          "rows": [
+            [
+              "Asha",
+              1
+            ],
+            [
+              "Ben",
+              2
+            ],
+            [
+              "Chloe",
+              2
+            ],
+            [
+              "Dev",
+              3
+            ],
+            [
+              "Elena",
+              4
+            ],
+            [
+              "Farid",
+              5
+            ],
+            [
+              "Grace",
+              6
+            ],
+            [
+              "Hugo",
+              7
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test');",
+        "expected": {
+          "columns": [
+            "name",
+            "level"
+          ],
+          "rows": [
+            [
+              "Ivy",
+              1
+            ],
+            [
+              "Jon",
+              2
+            ],
+            [
+              "Kim",
+              2
+            ],
+            [
+              "Mia",
+              3
+            ],
+            [
+              "Leo",
+              4
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name, DENSE_RANK() OVER (ORDER BY salary DESC) AS level FROM employees;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name, RANK() OVER (ORDER BY salary DESC) AS level FROM employees;",
+        "why": "Has gaps after ties"
+      },
+      {
+        "sql": "SELECT name, DENSE_RANK() OVER (ORDER BY salary) AS level FROM employees;",
+        "why": "Ranks lowest first"
+      }
+    ]
+  },
+  {
+    "id": "s41-04",
+    "skill": 41,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      40
+    ],
+    "title": "Rank within a category",
+    "prompt": "Show each product's category, name, and its price rank within its category, highest first, as price_rank.",
+    "dataset": "shop",
+    "hints": [
+      "PARTITION BY restarts the numbering."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "category",
+            "name",
+            "price_rank"
+          ],
+          "rows": [
+            [
+              "Home",
+              "Rug",
+              1
+            ],
+            [
+              "Home",
+              "Lamp",
+              2
+            ],
+            [
+              "Kitchen",
+              "Kettle",
+              1
+            ],
+            [
+              "Kitchen",
+              "Mug",
+              2
+            ],
+            [
+              "Stationery",
+              "Notebook",
+              1
+            ],
+            [
+              "Stationery",
+              "Pen",
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "category",
+            "name",
+            "price_rank"
+          ],
+          "rows": [
+            [
+              "Home",
+              "Stool",
+              1
+            ],
+            [
+              "Kitchen",
+              "Cup",
+              1
+            ],
+            [
+              "Stationery",
+              "Ink",
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT category, name, RANK() OVER (PARTITION BY category ORDER BY price DESC) AS price_rank FROM products;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT category, name, RANK() OVER (ORDER BY price DESC) AS price_rank FROM products;",
+        "why": "Ranks across categories"
+      },
+      {
+        "sql": "SELECT category, name, RANK() OVER (PARTITION BY category ORDER BY price) AS price_rank FROM products;",
+        "why": "Ranks cheapest first"
+      }
+    ]
+  },
+  {
+    "id": "s41-05",
+    "skill": 41,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      40
+    ],
+    "title": "Ties in a course",
+    "prompt": "Show each graded enrolment's course_id, student_id, and rank within the course by grade, highest first, as place, with equal grades sharing a place and no gaps.",
+    "dataset": "school",
+    "hints": [
+      "Filter NULLs, then DENSE_RANK with a partition."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "course_id",
+            "student_id",
+            "place"
+          ],
+          "rows": [
+            [
+              1,
+              4,
+              1
+            ],
+            [
+              1,
+              1,
+              2
+            ],
+            [
+              1,
+              2,
+              3
+            ],
+            [
+              1,
+              2,
+              4
+            ],
+            [
+              2,
+              4,
+              1
+            ],
+            [
+              3,
+              1,
+              1
+            ],
+            [
+              3,
+              4,
+              2
+            ],
+            [
+              3,
+              3,
+              3
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring'); INSERT INTO enrolments VALUES (15, 8, 5, 60, '2024-spring'), (16, 8, 5, 55, '2024-autumn');",
+        "expected": {
+          "columns": [
+            "course_id",
+            "student_id",
+            "place"
+          ],
+          "rows": [
+            [
+              5,
+              6,
+              1
+            ],
+            [
+              5,
+              6,
+              1
+            ],
+            [
+              5,
+              8,
+              1
+            ],
+            [
+              5,
+              8,
+              2
+            ],
+            [
+              6,
+              7,
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT course_id, student_id, DENSE_RANK() OVER (PARTITION BY course_id ORDER BY grade DESC) AS place FROM enrolments WHERE grade IS NOT NULL;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT course_id, student_id, ROW_NUMBER() OVER (PARTITION BY course_id ORDER BY grade DESC) AS place FROM enrolments WHERE grade IS NOT NULL;",
+        "why": "Splits ties"
+      },
+      {
+        "sql": "SELECT course_id, student_id, DENSE_RANK() OVER (ORDER BY grade DESC) AS place FROM enrolments WHERE grade IS NOT NULL;",
+        "why": "Doesn't restart per course"
+      }
+    ]
+  },
+  {
+    "id": "s41-06",
+    "skill": 41,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the filter",
+    "prompt": "This should show each department's highest-paid employee's name, but a window function can't go in WHERE. Fix it. Ties all count, and ignore employees with no department.",
+    "dataset": "staff",
+    "starterSql": "SELECT name\nFROM employees\nWHERE RANK() OVER (PARTITION BY department_id ORDER BY salary DESC) = 1;",
+    "hints": [
+      "Rank in a subquery, then filter outside."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Asha"
+            ],
+            [
+              "Dev"
+            ],
+            [
+              "Grace"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET salary = 90000 WHERE id = 12;",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Ivy"
+            ],
+            [
+              "Jon"
+            ],
+            [
+              "Kim"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM (SELECT name, RANK() OVER (PARTITION BY department_id ORDER BY salary DESC) AS r FROM employees WHERE department_id IS NOT NULL) WHERE r = 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM (SELECT name, ROW_NUMBER() OVER (PARTITION BY department_id ORDER BY salary DESC) AS r FROM employees WHERE department_id IS NOT NULL) WHERE r = 1;",
+        "why": "Keeps only one of any tie"
+      },
+      {
+        "sql": "SELECT name FROM (SELECT name, RANK() OVER (ORDER BY salary DESC) AS r FROM employees WHERE department_id IS NOT NULL) WHERE r = 1;",
+        "why": "Finds only the overall top"
+      }
+    ]
+  },
+  {
+    "id": "s41-07",
+    "skill": 41,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      37
+    ],
+    "title": "Top 2 per category",
+    "prompt": "Show each category and name of the 2 most expensive products in it. Use ROW_NUMBER, breaking price ties by name.",
+    "dataset": "shop",
+    "hints": [
+      "Filter on the row number."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "category",
+            "name"
+          ],
+          "rows": [
+            [
+              "Home",
+              "Rug"
+            ],
+            [
+              "Home",
+              "Lamp"
+            ],
+            [
+              "Kitchen",
+              "Kettle"
+            ],
+            [
+              "Kitchen",
+              "Mug"
+            ],
+            [
+              "Stationery",
+              "Notebook"
+            ],
+            [
+              "Stationery",
+              "Pen"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO products VALUES (10, 'Vase', 'Home', 5.0, 2.0), (11, 'Bowl', 'Home', 7.0, 2.0);",
+        "expected": {
+          "columns": [
+            "category",
+            "name"
+          ],
+          "rows": [
+            [
+              "Home",
+              "Stool"
+            ],
+            [
+              "Home",
+              "Bowl"
+            ],
+            [
+              "Kitchen",
+              "Cup"
+            ],
+            [
+              "Stationery",
+              "Ink"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT category, name FROM (SELECT category, name, ROW_NUMBER() OVER (PARTITION BY category ORDER BY price DESC, name) AS r FROM products) WHERE r <= 2;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT category, name FROM (SELECT category, name, ROW_NUMBER() OVER (PARTITION BY category ORDER BY price DESC, name) AS r FROM products) WHERE r = 2;",
+        "why": "Keeps only the second"
+      },
+      {
+        "sql": "SELECT category, name FROM (SELECT category, name, ROW_NUMBER() OVER (ORDER BY price DESC, name) AS r FROM products) WHERE r <= 2;",
+        "why": "Doesn't restart per category"
+      }
+    ]
+  },
+  {
+    "id": "s41-08",
+    "skill": 41,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      25,
+      37
+    ],
+    "title": "Best course per student",
+    "prompt": "Using a CTE with ROW_NUMBER, show each student's name and the title of their highest-graded course. Break ties by course title. Only graded enrolments count.",
+    "dataset": "school",
+    "hints": [
+      "Rank per student, join, then keep rank 1."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "title"
+          ],
+          "rows": [
+            [
+              "Anya",
+              "Biology"
+            ],
+            [
+              "Bilal",
+              "Algebra"
+            ],
+            [
+              "Cara",
+              "Biology"
+            ],
+            [
+              "Dmitri",
+              "Algebra"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "name",
+            "title"
+          ],
+          "rows": [
+            [
+              "Femi",
+              "Chemistry"
+            ],
+            [
+              "Gia",
+              "Drama"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "WITH r AS (SELECT s.name, c.title, ROW_NUMBER() OVER (PARTITION BY s.id ORDER BY e.grade DESC, c.title) AS n FROM enrolments e JOIN students s ON s.id = e.student_id JOIN courses c ON c.id = e.course_id WHERE e.grade IS NOT NULL) SELECT name, title FROM r WHERE n = 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "WITH r AS (SELECT s.name, c.title, ROW_NUMBER() OVER (PARTITION BY s.id ORDER BY e.grade, c.title) AS n FROM enrolments e JOIN students s ON s.id = e.student_id JOIN courses c ON c.id = e.course_id WHERE e.grade IS NOT NULL) SELECT name, title FROM r WHERE n = 1;",
+        "why": "Finds the lowest grade"
+      },
+      {
+        "sql": "SELECT s.name, c.title FROM enrolments e JOIN students s ON s.id = e.student_id JOIN courses c ON c.id = e.course_id WHERE e.grade IS NOT NULL;",
+        "why": "Keeps every course"
+      }
+    ]
+  },
+  {
+    "id": "s41-09",
+    "skill": 41,
+    "step": 9,
+    "stepType": "scenario",
+    "required": false,
+    "recalls": [
+      25
+    ],
+    "title": "Top 2 different salaries",
+    "prompt": "Show each department's employees with one of the top 2 different salaries in that department: department name as department, employee name, and salary. Use DENSE_RANK.",
+    "dataset": "staff",
+    "hints": [
+      "DENSE_RANK keeps ties, and doesn't skip a level."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "department",
+            "name",
+            "salary"
+          ],
+          "rows": [
+            [
+              "Engineering",
+              "Asha",
+              120000
+            ],
+            [
+              "Engineering",
+              "Ben",
+              95000
+            ],
+            [
+              "Engineering",
+              "Chloe",
+              95000
+            ],
+            [
+              "Sales",
+              "Dev",
+              70000
+            ],
+            [
+              "Sales",
+              "Elena",
+              62000
+            ],
+            [
+              "Support",
+              "Grace",
+              48000
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET salary = 80000 WHERE id = 11; UPDATE employees SET salary = 80000 WHERE id = 12; INSERT INTO employees VALUES (16, 'Nia', 5, 11, 50000, '2024-01-01', NULL, NULL);",
+        "expected": {
+          "columns": [
+            "department",
+            "name",
+            "salary"
+          ],
+          "rows": [
+            [
+              "Design",
+              "Ivy",
+              80000
+            ],
+            [
+              "Design",
+              "Jon",
+              80000
+            ],
+            [
+              "Design",
+              "Nia",
+              50000
+            ],
+            [
+              "Finance",
+              "Kim",
+              70000
+            ],
+            [
+              "Finance",
+              "Mia",
+              55000
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT department, name, salary FROM (SELECT d.name AS department, e.name, e.salary, DENSE_RANK() OVER (PARTITION BY d.id ORDER BY e.salary DESC) AS r FROM employees e JOIN departments d ON d.id = e.department_id) WHERE r <= 2;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT department, name, salary FROM (SELECT d.name AS department, e.name, e.salary, RANK() OVER (PARTITION BY d.id ORDER BY e.salary DESC) AS r FROM employees e JOIN departments d ON d.id = e.department_id) WHERE r <= 2;",
+        "why": "A tie for first skips the second level"
+      },
+      {
+        "sql": "SELECT department, name, salary FROM (SELECT d.name AS department, e.name, e.salary, ROW_NUMBER() OVER (PARTITION BY d.id ORDER BY e.salary DESC) AS r FROM employees e JOIN departments d ON d.id = e.department_id) WHERE r <= 2;",
+        "why": "Drops people tied with others"
+      }
+    ]
+  },
+  {
+    "id": "s41-10",
+    "skill": 41,
+    "step": 10,
+    "stepType": "challenge",
+    "required": false,
+    "recalls": [
+      10
+    ],
+    "title": "Remove duplicates by rank",
+    "prompt": "Each user sometimes has several sessions per day. For each user and day, show the id, user_id, and session_date of the longest session, breaking ties with the lowest id.",
+    "dataset": "app",
+    "hints": [
+      "ROW_NUMBER picks exactly one row per group."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "user_id",
+            "session_date"
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "2024-01-01"
+            ],
+            [
+              2,
+              1,
+              "2024-01-02"
+            ],
+            [
+              3,
+              1,
+              "2024-01-03"
+            ],
+            [
+              4,
+              2,
+              "2024-01-03"
+            ],
+            [
+              5,
+              2,
+              "2024-01-05"
+            ],
+            [
+              6,
+              3,
+              "2024-01-04"
+            ],
+            [
+              7,
+              3,
+              "2024-01-05"
+            ],
+            [
+              8,
+              4,
+              "2024-01-10"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android'); INSERT INTO sessions VALUES (15, 8, '2024-03-02', 90, 'ios');",
+        "expected": {
+          "columns": [
+            "id",
+            "user_id",
+            "session_date"
+          ],
+          "rows": [
+            [
+              11,
+              7,
+              "2024-02-28"
+            ],
+            [
+              12,
+              7,
+              "2024-02-29"
+            ],
+            [
+              13,
+              7,
+              "2024-03-01"
+            ],
+            [
+              15,
+              8,
+              "2024-03-02"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, user_id, session_date FROM (SELECT id, user_id, session_date, ROW_NUMBER() OVER (PARTITION BY user_id, session_date ORDER BY minutes DESC, id) AS n FROM sessions) WHERE n = 1;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, user_id, session_date FROM (SELECT id, user_id, session_date, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY minutes DESC, id) AS n FROM sessions) WHERE n = 1;",
+        "why": "One row per user, not per day"
+      },
+      {
+        "sql": "SELECT DISTINCT id, user_id, session_date FROM sessions;",
+        "why": "Keeps every session"
+      }
+    ]
+  }
+]

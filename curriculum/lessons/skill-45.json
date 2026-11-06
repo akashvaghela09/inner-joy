@@ -1,0 +1,15 @@
+{
+  "skill": 45,
+  "summary": "When LIKE isn't enough, GLOB adds case sensitivity and REGEXP adds full patterns.",
+  "points": [
+    "GLOB is case-sensitive and uses * for any text, ? for one character, and [a-z] for a range.",
+    "REGEXP matches a regular expression. In this app, it uses JavaScript's rules.",
+    "^ means the start and $ means the end. Without them, a pattern can match part of the text.",
+    "\\. means a real dot, because a plain . matches any character. + means one or more."
+  ],
+  "example": {
+    "dataset": "contacts",
+    "sql": "SELECT full_name, email\nFROM contacts\nWHERE email REGEXP '^[a-zA-Z][a-zA-Z0-9_.-]*@club\\.test$';",
+    "explanation": "This requires a letter first, then allowed characters, then exactly @club.test at the end."
+  }
+}

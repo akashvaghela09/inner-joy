@@ -1,0 +1,1067 @@
+[
+  {
+    "id": "s42-01",
+    "skill": 42,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [
+      40
+    ],
+    "title": "Previous temperature",
+    "prompt": "Show each reading's city, reading_date, temp_c, and the previous reading's temperature in the same city as previous. Replace the ___.",
+    "dataset": "weather",
+    "starterSql": "SELECT city, reading_date, temp_c,\n  LAG(temp_c) OVER (PARTITION BY city ORDER BY ___) AS previous\nFROM readings;",
+    "hints": [
+      "Order by date within each city."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "city",
+            "reading_date",
+            "temp_c",
+            "previous"
+          ],
+          "rows": [
+            [
+              "Lima",
+              "2024-03-01",
+              24,
+              null
+            ],
+            [
+              "Lima",
+              "2024-03-02",
+              26,
+              24
+            ],
+            [
+              "Lima",
+              "2024-03-03",
+              26,
+              26
+            ],
+            [
+              "Lima",
+              "2024-03-04",
+              25,
+              26
+            ],
+            [
+              "Oslo",
+              "2024-03-01",
+              2,
+              null
+            ],
+            [
+              "Oslo",
+              "2024-03-02",
+              4,
+              2
+            ],
+            [
+              "Oslo",
+              "2024-03-03",
+              3,
+              4
+            ],
+            [
+              "Oslo",
+              "2024-03-05",
+              7,
+              3
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "city",
+            "reading_date",
+            "temp_c",
+            "previous"
+          ],
+          "rows": [
+            [
+              "Cairo",
+              "2024-07-30",
+              38,
+              null
+            ],
+            [
+              "Cairo",
+              "2024-07-31",
+              40,
+              38
+            ],
+            [
+              "Cairo",
+              "2024-08-01",
+              41,
+              40
+            ],
+            [
+              "Quito",
+              "2024-07-31",
+              15,
+              null
+            ],
+            [
+              "Quito",
+              "2024-08-01",
+              14,
+              15
+            ],
+            [
+              "Quito",
+              "2024-08-03",
+              18,
+              14
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT city, reading_date, temp_c, LAG(temp_c) OVER (PARTITION BY city ORDER BY reading_date) AS previous FROM readings;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT city, reading_date, temp_c, LEAD(temp_c) OVER (PARTITION BY city ORDER BY reading_date) AS previous FROM readings;",
+        "why": "Reads the next row"
+      },
+      {
+        "sql": "SELECT city, reading_date, temp_c, LAG(temp_c) OVER (ORDER BY reading_date) AS previous FROM readings;",
+        "why": "Mixes cities"
+      }
+    ]
+  },
+  {
+    "id": "s42-02",
+    "skill": 42,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [
+      40
+    ],
+    "title": "Next temperature",
+    "prompt": "Show each reading's id and the next reading's temperature in the same city as following.",
+    "dataset": "weather",
+    "hints": [
+      "LEAD looks forward."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "following"
+          ],
+          "rows": [
+            [
+              5,
+              26
+            ],
+            [
+              6,
+              26
+            ],
+            [
+              7,
+              25
+            ],
+            [
+              8,
+              null
+            ],
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "following"
+          ],
+          "rows": [
+            [
+              11,
+              40
+            ],
+            [
+              12,
+              41
+            ],
+            [
+              13,
+              null
+            ],
+            [
+              14,
+              14
+            ],
+            [
+              15,
+              18
+            ],
+            [
+              16,
+              null
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, LEAD(temp_c) OVER (PARTITION BY city ORDER BY reading_date) AS following FROM readings;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, LAG(temp_c) OVER (PARTITION BY city ORDER BY reading_date) AS following FROM readings;",
+        "why": "Reads the previous row"
+      },
+      {
+        "sql": "SELECT id, LEAD(temp_c) OVER (ORDER BY reading_date) AS following FROM readings;",
+        "why": "Mixes cities"
+      }
+    ]
+  },
+  {
+    "id": "s42-03",
+    "skill": 42,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      12
+    ],
+    "title": "Daily change",
+    "prompt": "Show each reading's id and the change since the previous reading in the same city, as change.",
+    "dataset": "weather",
+    "hints": [
+      "Subtract LAG from the current value."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "change"
+          ],
+          "rows": [
+            [
+              5,
+              null
+            ],
+            [
+              6,
+              2
+            ],
+            [
+              7,
+              0
+            ],
+            [
+              8,
+              -1
+            ],
+            [
+              1,
+              null
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              -1
+            ],
+            [
+              4,
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "change"
+          ],
+          "rows": [
+            [
+              11,
+              null
+            ],
+            [
+              12,
+              2
+            ],
+            [
+              13,
+              1
+            ],
+            [
+              14,
+              null
+            ],
+            [
+              15,
+              -1
+            ],
+            [
+              16,
+              4
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, temp_c - LAG(temp_c) OVER (PARTITION BY city ORDER BY reading_date) AS change FROM readings;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, LAG(temp_c) OVER (PARTITION BY city ORDER BY reading_date) - temp_c AS change FROM readings;",
+        "why": "Subtracts the wrong way round"
+      },
+      {
+        "sql": "SELECT id, temp_c AS change FROM readings;",
+        "why": "Doesn't subtract"
+      }
+    ]
+  },
+  {
+    "id": "s42-04",
+    "skill": 42,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      16
+    ],
+    "title": "Gap between sessions",
+    "prompt": "Show each session's id and how many days since that user's previous session, as gap_days, as a whole number.",
+    "dataset": "app",
+    "hints": [
+      "Compare julianday values."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "gap_days"
+          ],
+          "rows": [
+            [
+              1,
+              null
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              4,
+              null
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              6,
+              null
+            ],
+            [
+              7,
+              1
+            ],
+            [
+              8,
+              null
+            ],
+            [
+              9,
+              0
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android');",
+        "expected": {
+          "columns": [
+            "id",
+            "gap_days"
+          ],
+          "rows": [
+            [
+              11,
+              null
+            ],
+            [
+              12,
+              1
+            ],
+            [
+              13,
+              1
+            ],
+            [
+              14,
+              null
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, CAST(julianday(session_date) - julianday(LAG(session_date) OVER (PARTITION BY user_id ORDER BY session_date, id)) AS INTEGER) AS gap_days FROM sessions;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, CAST(julianday(session_date) - julianday(LAG(session_date) OVER (ORDER BY session_date, id)) AS INTEGER) AS gap_days FROM sessions;",
+        "why": "Mixes users"
+      },
+      {
+        "sql": "SELECT id, LAG(session_date) OVER (PARTITION BY user_id ORDER BY session_date, id) AS gap_days FROM sessions;",
+        "why": "Shows a date"
+      }
+    ]
+  },
+  {
+    "id": "s42-05",
+    "skill": 42,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      40
+    ],
+    "title": "A default for the first row",
+    "prompt": "Show each reading's id and the previous temperature in the same city as previous, using 0 for each city's first reading.",
+    "dataset": "weather",
+    "hints": [
+      "LAG's third value is the default."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "previous"
+          ],
+          "rows": [
+            [
+              5,
+              0
+            ],
+            [
+              6,
+              24
+            ],
+            [
+              7,
+              26
+            ],
+            [
+              8,
+              26
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              3
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "previous"
+          ],
+          "rows": [
+            [
+              11,
+              0
+            ],
+            [
+              12,
+              38
+            ],
+            [
+              13,
+              40
+            ],
+            [
+              14,
+              0
+            ],
+            [
+              15,
+              15
+            ],
+            [
+              16,
+              14
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, LAG(temp_c, 1, 0) OVER (PARTITION BY city ORDER BY reading_date) AS previous FROM readings;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, LAG(temp_c) OVER (PARTITION BY city ORDER BY reading_date) AS previous FROM readings;",
+        "why": "The first row stays NULL"
+      },
+      {
+        "sql": "SELECT id, LAG(temp_c, 0, 1) OVER (PARTITION BY city ORDER BY reading_date) AS previous FROM readings;",
+        "why": "An offset of 0 reads the same row"
+      }
+    ]
+  },
+  {
+    "id": "s42-06",
+    "skill": 42,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [
+      40
+    ],
+    "title": "Fix the missing order",
+    "prompt": "This should show the previous temperature in each city as previous, but LAG needs an order. Fix it.",
+    "dataset": "weather",
+    "starterSql": "SELECT id,\n  LAG(temp_c) OVER (PARTITION BY city ORDER BY id DESC) AS previous\nFROM readings;",
+    "hints": [
+      "Add ORDER BY inside OVER."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "previous"
+          ],
+          "rows": [
+            [
+              5,
+              null
+            ],
+            [
+              6,
+              24
+            ],
+            [
+              7,
+              26
+            ],
+            [
+              8,
+              26
+            ],
+            [
+              1,
+              null
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              3
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "previous"
+          ],
+          "rows": [
+            [
+              11,
+              null
+            ],
+            [
+              12,
+              38
+            ],
+            [
+              13,
+              40
+            ],
+            [
+              14,
+              null
+            ],
+            [
+              15,
+              15
+            ],
+            [
+              16,
+              14
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, LAG(temp_c) OVER (PARTITION BY city ORDER BY reading_date) AS previous FROM readings;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, LAG(temp_c) OVER (ORDER BY reading_date) AS previous FROM readings;",
+        "why": "Removes the partition"
+      },
+      {
+        "sql": "SELECT id, LEAD(temp_c) OVER (PARTITION BY city ORDER BY reading_date) AS previous FROM readings;",
+        "why": "Reads the next row"
+      }
+    ]
+  },
+  {
+    "id": "s42-07",
+    "skill": 42,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      16,
+      30
+    ],
+    "title": "True previous day",
+    "prompt": "Rows can skip days. Show each reading's id and temp_c, with the previous reading's temperature as previous only if it was exactly the day before, otherwise NULL.",
+    "dataset": "weather",
+    "hints": [
+      "Check the date gap with CASE."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id",
+            "temp_c",
+            "previous"
+          ],
+          "rows": [
+            [
+              5,
+              24,
+              null
+            ],
+            [
+              6,
+              26,
+              24
+            ],
+            [
+              7,
+              26,
+              26
+            ],
+            [
+              8,
+              25,
+              26
+            ],
+            [
+              1,
+              2,
+              null
+            ],
+            [
+              2,
+              4,
+              2
+            ],
+            [
+              3,
+              3,
+              4
+            ],
+            [
+              4,
+              7,
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "id",
+            "temp_c",
+            "previous"
+          ],
+          "rows": [
+            [
+              11,
+              38,
+              null
+            ],
+            [
+              12,
+              40,
+              38
+            ],
+            [
+              13,
+              41,
+              40
+            ],
+            [
+              14,
+              15,
+              null
+            ],
+            [
+              15,
+              14,
+              15
+            ],
+            [
+              16,
+              18,
+              null
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id, temp_c, CASE WHEN LAG(reading_date) OVER (PARTITION BY city ORDER BY reading_date) = date(reading_date, '-1 day') THEN LAG(temp_c) OVER (PARTITION BY city ORDER BY reading_date) END AS previous FROM readings;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id, temp_c, LAG(temp_c) OVER (PARTITION BY city ORDER BY reading_date) AS previous FROM readings;",
+        "why": "Ignores gaps"
+      },
+      {
+        "sql": "SELECT id, temp_c, CASE WHEN LAG(reading_date) OVER (ORDER BY reading_date) = date(reading_date, '-1 day') THEN LAG(temp_c) OVER (ORDER BY reading_date) END AS previous FROM readings;",
+        "why": "Mixes cities"
+      }
+    ]
+  },
+  {
+    "id": "s42-08",
+    "skill": 42,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      37
+    ],
+    "title": "Three in a row",
+    "prompt": "Show the different user_ids with at least 3 consecutive sessions on the same device, in session id order.",
+    "dataset": "app",
+    "hints": [
+      "Compare with LAG at offsets 1 and 2."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "user_id"
+          ],
+          "rows": []
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android'); INSERT INTO sessions VALUES (15, 7, '2024-03-02', 5, 'web'), (16, 8, '2024-03-03', 5, 'android'), (17, 8, '2024-03-04', 5, 'ios'), (18, 8, '2024-03-05', 5, 'android');",
+        "expected": {
+          "columns": [
+            "user_id"
+          ],
+          "rows": []
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT DISTINCT user_id FROM (SELECT user_id, device, LAG(device, 1) OVER (PARTITION BY user_id ORDER BY id) AS d1, LAG(device, 2) OVER (PARTITION BY user_id ORDER BY id) AS d2 FROM sessions) WHERE device = d1 AND device = d2;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT DISTINCT user_id FROM (SELECT user_id, device, LAG(device, 1) OVER (PARTITION BY user_id ORDER BY id) AS d1 FROM sessions) WHERE device = d1;",
+        "why": "Needs only two in a row"
+      },
+      {
+        "sql": "SELECT user_id FROM sessions GROUP BY user_id, device HAVING COUNT(*) >= 3;",
+        "why": "Doesn't require them to be consecutive"
+      }
+    ]
+  },
+  {
+    "id": "s42-09",
+    "skill": 42,
+    "step": 9,
+    "stepType": "scenario",
+    "required": false,
+    "recalls": [
+      16,
+      37
+    ],
+    "title": "Order gaps",
+    "prompt": "Show each customer's id as customer_id and the longest gap in days between two of their orders, as longest_gap, for customers with at least 2 orders.",
+    "dataset": "shop",
+    "hints": [
+      "Calculate gaps in a CTE, then take MAX."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "customer_id",
+            "longest_gap"
+          ],
+          "rows": [
+            [
+              1,
+              29
+            ],
+            [
+              3,
+              24
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL); INSERT INTO orders VALUES (14, 7, '2024-06-30', 'shipped');",
+        "expected": {
+          "columns": [
+            "customer_id",
+            "longest_gap"
+          ],
+          "rows": [
+            [
+              7,
+              91
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "WITH g AS (SELECT customer_id, julianday(order_date) - julianday(LAG(order_date) OVER (PARTITION BY customer_id ORDER BY order_date)) AS gap FROM orders) SELECT customer_id, CAST(MAX(gap) AS INTEGER) AS longest_gap FROM g WHERE gap IS NOT NULL GROUP BY customer_id;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "WITH g AS (SELECT customer_id, julianday(order_date) - julianday(LAG(order_date) OVER (PARTITION BY customer_id ORDER BY order_date)) AS gap FROM orders) SELECT customer_id, CAST(MIN(gap) AS INTEGER) AS longest_gap FROM g WHERE gap IS NOT NULL GROUP BY customer_id;",
+        "why": "Finds the shortest"
+      },
+      {
+        "sql": "SELECT customer_id, COUNT(*) AS longest_gap FROM orders GROUP BY customer_id;",
+        "why": "Counts orders"
+      }
+    ]
+  },
+  {
+    "id": "s42-10",
+    "skill": 42,
+    "step": 10,
+    "stepType": "challenge",
+    "required": false,
+    "recalls": [
+      40
+    ],
+    "title": "Rising streaks",
+    "prompt": "Show each reading's id where the temperature rose compared with both of the two previous readings in its city, in date order.",
+    "dataset": "weather",
+    "hints": [
+      "Use offsets 1 and 2."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Weather Log",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM readings; INSERT INTO readings VALUES (11, 'Cairo', '2024-07-30', 38, 0.0), (12, 'Cairo', '2024-07-31', 40, NULL), (13, 'Cairo', '2024-08-01', 41, 0.5), (14, 'Quito', '2024-07-31', 15, 3.0), (15, 'Quito', '2024-08-01', 14, 3.0), (16, 'Quito', '2024-08-03', 18, NULL);",
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              13
+            ],
+            [
+              16
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id FROM (SELECT id, temp_c, LAG(temp_c, 1) OVER (PARTITION BY city ORDER BY reading_date) AS p1, LAG(temp_c, 2) OVER (PARTITION BY city ORDER BY reading_date) AS p2 FROM readings) WHERE temp_c > p1 AND temp_c > p2;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id FROM (SELECT id, temp_c, LAG(temp_c, 1) OVER (PARTITION BY city ORDER BY reading_date) AS p1 FROM readings) WHERE temp_c > p1;",
+        "why": "Checks only one previous reading"
+      },
+      {
+        "sql": "SELECT id FROM (SELECT id, temp_c, LEAD(temp_c, 1) OVER (PARTITION BY city ORDER BY reading_date) AS p1, LEAD(temp_c, 2) OVER (PARTITION BY city ORDER BY reading_date) AS p2 FROM readings) WHERE temp_c > p1 AND temp_c > p2;",
+        "why": "Looks forward"
+      }
+    ]
+  }
+]

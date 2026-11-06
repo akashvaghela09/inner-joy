@@ -1,0 +1,15 @@
+{
+  "skill": 42,
+  "summary": "LAG and LEAD read a value from another row, without a self join.",
+  "points": [
+    "LAG(column) reads the previous row, and LEAD(column) reads the next.",
+    "Always give them an order: LAG(temp_c) OVER (PARTITION BY city ORDER BY reading_date).",
+    "The first row has no previous row, so LAG returns NULL. LAG(x, 1, 0) sets a default.",
+    "LAG(x, 2) reads two rows back. The previous row may not be the previous calendar day."
+  ],
+  "example": {
+    "dataset": "weather",
+    "sql": "SELECT city, reading_date, temp_c,\n  temp_c - LAG(temp_c) OVER (PARTITION BY city ORDER BY reading_date) AS change\nFROM readings;",
+    "explanation": "Each reading is compared with the one before it in the same city."
+  }
+}

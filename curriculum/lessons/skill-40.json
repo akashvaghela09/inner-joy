@@ -1,0 +1,15 @@
+{
+  "skill": 40,
+  "summary": "A window function calculates across related rows but, unlike GROUP BY, keeps every row in the result.",
+  "points": [
+    "OVER () makes the window the whole result: AVG(salary) OVER ().",
+    "PARTITION BY splits it into groups: AVG(salary) OVER (PARTITION BY department_id).",
+    "Each row keeps its own columns, and gains the group's value alongside them.",
+    "You can't filter on a window function in WHERE, so wrap it in a subquery or CTE first."
+  ],
+  "example": {
+    "dataset": "staff",
+    "sql": "SELECT name, department_id, salary,\n  AVG(salary) OVER (PARTITION BY department_id) AS dept_avg\nFROM employees;",
+    "explanation": "Every employee stays in the result, shown beside their own department's average."
+  }
+}

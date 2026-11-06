@@ -1,0 +1,584 @@
+[
+  {
+    "id": "s45-01",
+    "skill": 45,
+    "step": 1,
+    "stepType": "guided",
+    "required": true,
+    "recalls": [
+      15
+    ],
+    "title": "Case-sensitive match",
+    "prompt": "Show the full_name of contacts whose tags start with exactly GOLD in capitals, using GLOB. Replace the ___.",
+    "dataset": "contacts",
+    "starterSql": "SELECT full_name\nFROM contacts\nWHERE tags GLOB ___;",
+    "hints": [
+      "In GLOB, * means any text."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "full_name"
+          ],
+          "rows": [
+            [
+              "Grace HOPPER"
+            ],
+            [
+              "Tim Lee"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3');",
+        "expected": {
+          "columns": [
+            "full_name"
+          ],
+          "rows": [
+            [
+              "Ken Thompson"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT full_name FROM contacts WHERE tags GLOB 'GOLD*';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT full_name FROM contacts WHERE tags LIKE 'GOLD%';",
+        "why": "LIKE ignores capitals"
+      },
+      {
+        "sql": "SELECT full_name FROM contacts WHERE tags GLOB 'GOLD';",
+        "why": "Without *, it needs the exact text"
+      }
+    ]
+  },
+  {
+    "id": "s45-02",
+    "skill": 45,
+    "step": 2,
+    "stepType": "direct",
+    "required": true,
+    "recalls": [],
+    "title": "Digits only",
+    "prompt": "Show the full_name of contacts whose phone is exactly 7 digits, with nothing else. Use REGEXP.",
+    "dataset": "contacts",
+    "hints": [
+      "^[0-9]{7}$ anchors both ends."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "full_name"
+          ],
+          "rows": [
+            [
+              "Katherine Johnson"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3'); UPDATE contacts SET phone = '12345678' WHERE id = 13;",
+        "expected": {
+          "columns": [
+            "full_name"
+          ],
+          "rows": [
+            [
+              "Ken Thompson"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT full_name FROM contacts WHERE phone REGEXP '^[0-9]{7}$';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT full_name FROM contacts WHERE phone REGEXP '[0-9]{7}';",
+        "why": "Can match inside longer text"
+      },
+      {
+        "sql": "SELECT full_name FROM contacts WHERE phone LIKE '555%';",
+        "why": "Accepts dashes"
+      }
+    ]
+  },
+  {
+    "id": "s45-03",
+    "skill": 45,
+    "step": 3,
+    "stepType": "variation",
+    "required": true,
+    "recalls": [
+      6
+    ],
+    "title": "Starting letters",
+    "prompt": "Show the name of employees whose name starts with a letter from A to C, in capitals, using GLOB.",
+    "dataset": "staff",
+    "hints": [
+      "[A-C]* is a range followed by anything."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Staff Directory",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Asha"
+            ],
+            [
+              "Ben"
+            ],
+            [
+              "Chloe"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM employees; DELETE FROM departments; INSERT INTO departments VALUES (5, 'Design'), (6, 'Finance'), (7, 'Ops'); INSERT INTO employees VALUES (11, 'Ivy', 5, NULL, 90000, '2019-02-01', 900, 'ivy@acme.test'), (12, 'Jon', 5, 11, 70000, '2020-06-15', NULL, NULL), (13, 'Kim', 6, 11, 70000, '2023-03-03', 300, 'kim@acme.test'), (14, 'Leo', NULL, 77, 30000, '2024-08-20', NULL, 'leo@acme.test'), (15, 'Mia', 6, 13, 55000, '2022-12-31', 0, 'mia@acme.test'); UPDATE employees SET name = 'Abe' WHERE id = 12; UPDATE employees SET name = 'cara' WHERE id = 13;",
+        "expected": {
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Abe"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT name FROM employees WHERE name GLOB '[A-C]*';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT name FROM employees WHERE name GLOB '[A-C]';",
+        "why": "Needs just one letter in the name"
+      },
+      {
+        "sql": "SELECT name FROM employees WHERE name GLOB '[a-c]*';",
+        "why": "GLOB cares about capitals"
+      }
+    ]
+  },
+  {
+    "id": "s45-04",
+    "skill": 45,
+    "step": 4,
+    "stepType": "newContext",
+    "required": true,
+    "recalls": [
+      15
+    ],
+    "title": "Valid club email",
+    "prompt": "Show the id of contacts whose email ends with exactly @club.test in lowercase. Use REGEXP.",
+    "dataset": "contacts",
+    "hints": [
+      "Write the dot as \\\\. and anchor the end with $."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              4
+            ],
+            [
+              5
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3');",
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              11
+            ],
+            [
+              14
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id FROM contacts WHERE email REGEXP '@club\\.test$';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id FROM contacts WHERE email REGEXP '@club.test$';",
+        "why": "A plain dot matches any character"
+      },
+      {
+        "sql": "SELECT id FROM contacts WHERE email LIKE '%@club.test';",
+        "why": "LIKE ignores capitals"
+      }
+    ]
+  },
+  {
+    "id": "s45-05",
+    "skill": 45,
+    "step": 5,
+    "stepType": "edgeCase",
+    "required": true,
+    "recalls": [
+      9
+    ],
+    "title": "Missing values",
+    "prompt": "Show the id of contacts with no email or an email that isn't on @club.test.",
+    "dataset": "contacts",
+    "hints": [
+      "A pattern check skips NULLs, so test for them too."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              3
+            ],
+            [
+              6
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3');",
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              12
+            ],
+            [
+              13
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id FROM contacts WHERE email IS NULL OR NOT email REGEXP '@club\\.test$';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id FROM contacts WHERE NOT email REGEXP '@club\\.test$';",
+        "why": "Comparing NULL gives NULL, so missing emails are dropped"
+      },
+      {
+        "sql": "SELECT id FROM contacts WHERE email IS NULL;",
+        "why": "Keeps only missing emails"
+      }
+    ]
+  },
+  {
+    "id": "s45-06",
+    "skill": 45,
+    "step": 6,
+    "stepType": "fixBug",
+    "required": false,
+    "recalls": [],
+    "title": "Fix the anchors",
+    "prompt": "This should find phones in the exact form 555-0000, but it also matches longer text. Show the full_name, and fix the pattern.",
+    "dataset": "contacts",
+    "starterSql": "SELECT full_name\nFROM contacts\nWHERE phone REGEXP '555-[0-9]{4}';",
+    "hints": [
+      "Add ^ and $."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "full_name"
+          ],
+          "rows": [
+            [
+              "ada lovelace"
+            ],
+            [
+              "Grace HOPPER"
+            ],
+            [
+              "edsger dijkstra"
+            ],
+            [
+              "Tim Lee"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3'); UPDATE contacts SET phone = '555-01119' WHERE id = 11;",
+        "expected": {
+          "columns": [
+            "full_name"
+          ],
+          "rows": [
+            [
+              "BOB Kahn"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT full_name FROM contacts WHERE phone REGEXP '^555-[0-9]{4}$';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT full_name FROM contacts WHERE phone REGEXP '555-[0-9]{4}';",
+        "why": "Still has no anchors"
+      },
+      {
+        "sql": "SELECT full_name FROM contacts WHERE phone REGEXP '^555[0-9]{4}$';",
+        "why": "Requires no dash"
+      }
+    ]
+  },
+  {
+    "id": "s45-07",
+    "skill": 45,
+    "step": 7,
+    "stepType": "requirementChange",
+    "required": false,
+    "recalls": [
+      15
+    ],
+    "title": "Must start with a letter",
+    "prompt": "Show the id of contacts whose email starts with a letter, using REGEXP. Upper or lower case is fine.",
+    "dataset": "contacts",
+    "hints": [
+      "^[a-zA-Z] checks the first character."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ],
+            [
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3'); UPDATE contacts SET email = 'Ken@club.test' WHERE id = 14;",
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              11
+            ],
+            [
+              12
+            ],
+            [
+              13
+            ],
+            [
+              14
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id FROM contacts WHERE email REGEXP '^[a-zA-Z]';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id FROM contacts WHERE email REGEXP '[a-zA-Z]';",
+        "why": "A letter anywhere passes"
+      },
+      {
+        "sql": "SELECT id FROM contacts WHERE email GLOB '[a-z]*';",
+        "why": "Rejects capitals"
+      }
+    ]
+  },
+  {
+    "id": "s45-08",
+    "skill": 45,
+    "step": 8,
+    "stepType": "apply",
+    "required": false,
+    "recalls": [
+      6,
+      15
+    ],
+    "title": "Full email validation",
+    "prompt": "A valid email starts with a letter, then has only letters, digits, underscores, dots, or dashes, then ends with exactly @club.test. Show the id of contacts with one.",
+    "dataset": "contacts",
+    "hints": [
+      "Combine a start check, a repeated character class, and an end check."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              4
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3');",
+        "expected": {
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              11
+            ],
+            [
+              14
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT id FROM contacts WHERE email REGEXP '^[a-zA-Z][a-zA-Z0-9_.-]*@club\\.test$';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT id FROM contacts WHERE email REGEXP '@club\\.test$';",
+        "why": "Allows any start"
+      },
+      {
+        "sql": "SELECT id FROM contacts WHERE email REGEXP '^[a-zA-Z][a-zA-Z0-9_.-]*@club.test$';",
+        "why": "A plain dot matches any character"
+      }
+    ]
+  }
+]

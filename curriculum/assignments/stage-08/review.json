@@ -1,0 +1,414 @@
+[
+  {
+    "id": "st08-r01",
+    "kind": "review",
+    "stage": 8,
+    "skills": [
+      44
+    ],
+    "recalls": [],
+    "title": "Customers in a city",
+    "prompt": "Show each city and its customer names in alphabetical order, joined with commas, as residents.",
+    "dataset": "shop",
+    "hints": [
+      "One row per city."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Online Shop",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "city",
+            "residents"
+          ],
+          "rows": [
+            [
+              "Pune",
+              "Noor,Priya"
+            ],
+            [
+              "Rome",
+              "Luis,Marco"
+            ],
+            [
+              "Tokyo",
+              "Hana"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM order_items; DELETE FROM orders; DELETE FROM products; DELETE FROM customers; INSERT INTO customers VALUES (7, 'Ravi', 'Oslo', 'ravi@mail.test', '2024-05-05'), (8, 'Sara', 'Lima', NULL, '2024-06-06'), (9, 'Tom', 'Oslo', NULL, '2024-07-07'); INSERT INTO products VALUES (7, 'Stool', 'Home', 40.0, 25.0), (8, 'Cup', 'Kitchen', 9.0, 2.0), (9, 'Ink', 'Stationery', 12.5, 6.0); INSERT INTO orders VALUES (11, 7, '2024-02-28', 'shipped'), (12, 8, '2024-03-01', 'pending'), (13, 7, '2024-03-31', 'cancelled'); INSERT INTO order_items VALUES (11, 7, 1, 4.0), (11, 8, 3, NULL), (12, 9, 2, NULL), (13, 8, 1, NULL);",
+        "expected": {
+          "columns": [
+            "city",
+            "residents"
+          ],
+          "rows": [
+            [
+              "Lima",
+              "Sara"
+            ],
+            [
+              "Oslo",
+              "Ravi,Tom"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT city, GROUP_CONCAT(name ORDER BY name) AS residents FROM customers GROUP BY city;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT city, GROUP_CONCAT(name ORDER BY name DESC) AS residents FROM customers GROUP BY city;",
+        "why": "Sorts backwards"
+      },
+      {
+        "sql": "SELECT city, COUNT(*) AS residents FROM customers GROUP BY city;",
+        "why": "Counts instead"
+      }
+    ]
+  },
+  {
+    "id": "st08-r02",
+    "kind": "review",
+    "stage": 8,
+    "skills": [
+      45
+    ],
+    "recalls": [],
+    "title": "Name format",
+    "prompt": "Show the full_name of contacts whose name is two words, each starting with a capital letter.",
+    "dataset": "contacts",
+    "hints": [
+      "A pattern with exactly one space."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "full_name"
+          ],
+          "rows": [
+            [
+              "Grace HOPPER"
+            ],
+            [
+              "Katherine Johnson"
+            ],
+            [
+              "Tim Lee"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3'); UPDATE contacts SET full_name = 'Ken' WHERE id = 14;",
+        "expected": {
+          "columns": [
+            "full_name"
+          ],
+          "rows": [
+            [
+              "BOB Kahn"
+            ],
+            [
+              "Rosa Park"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT full_name FROM contacts WHERE full_name REGEXP '^[A-Z][a-zA-Z]* [A-Z][a-zA-Z]*$';"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT full_name FROM contacts WHERE full_name LIKE '% %';",
+        "why": "Ignores capitals"
+      },
+      {
+        "sql": "SELECT full_name FROM contacts WHERE full_name REGEXP '^[A-Z]';",
+        "why": "Checks only the first letter"
+      }
+    ]
+  },
+  {
+    "id": "st08-r03",
+    "kind": "review",
+    "stage": 8,
+    "skills": [
+      44,
+      10
+    ],
+    "recalls": [],
+    "title": "Devices by date",
+    "prompt": "Show each device and its different session dates in order, joined with a comma and space, as dates.",
+    "dataset": "app",
+    "hints": [
+      "DISTINCT uses the default comma, so build it with a subquery."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "App Activity",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "device",
+            "dates"
+          ],
+          "rows": [
+            [
+              "android",
+              "2024-01-03, 2024-01-05"
+            ],
+            [
+              "ios",
+              "2024-01-01, 2024-01-02, 2024-01-10"
+            ],
+            [
+              "web",
+              "2024-01-03, 2024-01-04, 2024-01-05, 2024-01-10"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM sessions; DELETE FROM users; INSERT INTO users VALUES (7, 'sable', NULL, '2024-02-27'), (8, 'tulip', 7, '2024-02-28'), (9, 'umber', 7, '2024-03-01'); INSERT INTO sessions VALUES (11, 7, '2024-02-28', 50, 'web'), (12, 7, '2024-02-29', 50, 'web'), (13, 7, '2024-03-01', 7, 'ios'), (14, 8, '2024-03-02', 33, 'android'); INSERT INTO sessions VALUES (15, 7, '2024-02-28', 5, 'web');",
+        "expected": {
+          "columns": [
+            "device",
+            "dates"
+          ],
+          "rows": [
+            [
+              "android",
+              "2024-03-02"
+            ],
+            [
+              "ios",
+              "2024-03-01"
+            ],
+            [
+              "web",
+              "2024-02-28, 2024-02-29"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT device, GROUP_CONCAT(session_date, ', ' ORDER BY session_date) AS dates FROM (SELECT DISTINCT device, session_date FROM sessions) GROUP BY device;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT device, GROUP_CONCAT(session_date, ', ' ORDER BY session_date) AS dates FROM sessions GROUP BY device;",
+        "why": "Keeps repeats"
+      },
+      {
+        "sql": "SELECT device, GROUP_CONCAT(session_date, ',' ORDER BY session_date) AS dates FROM (SELECT DISTINCT device, session_date FROM sessions) GROUP BY device;",
+        "why": "Leaves out the space"
+      }
+    ]
+  },
+  {
+    "id": "st08-r04",
+    "kind": "review",
+    "stage": 8,
+    "skills": [
+      45,
+      22
+    ],
+    "recalls": [],
+    "title": "City tags",
+    "prompt": "Show each known city and how many contacts have a tag starting with GOLD, in exact capitals, as gold, including 0.",
+    "dataset": "contacts",
+    "hints": [
+      "A conditional count with GLOB."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Contact List",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "city",
+            "gold"
+          ],
+          "rows": [
+            [
+              "Austin",
+              0
+            ],
+            [
+              "Geneva",
+              1
+            ],
+            [
+              "London",
+              1
+            ],
+            [
+              "New York",
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM contacts; INSERT INTO contacts VALUES (11, 'mary jackson', 'mary-j@club.test', '555-0111', 'Hampton', 'SILVER GOLD1'), (12, 'BOB Kahn', 'bob@CLUB.test', '555-0112', NULL, 'gold1'), (13, 'Rosa Park', 'rosa@club-test', NULL, 'Tuskegee', 'NEW'), (14, 'Ken Thompson', 'ken.t@club.test', '5550114', 'Murray', 'GOLD3');",
+        "expected": {
+          "columns": [
+            "city",
+            "gold"
+          ],
+          "rows": [
+            [
+              "Hampton",
+              1
+            ],
+            [
+              "Murray",
+              1
+            ],
+            [
+              "Tuskegee",
+              0
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT city, SUM(CASE WHEN tags GLOB 'GOLD*' OR tags GLOB '* GOLD*' THEN 1 ELSE 0 END) AS gold FROM contacts WHERE city IS NOT NULL GROUP BY city;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT city, COUNT(*) AS gold FROM contacts WHERE tags GLOB 'GOLD*' GROUP BY city;",
+        "why": "Drops cities with none"
+      },
+      {
+        "sql": "SELECT city, SUM(CASE WHEN tags LIKE '%GOLD%' THEN 1 ELSE 0 END) AS gold FROM contacts WHERE city IS NOT NULL GROUP BY city;",
+        "why": "Also matches XGOLD1"
+      }
+    ]
+  },
+  {
+    "id": "st08-r05",
+    "kind": "review",
+    "stage": 8,
+    "skills": [
+      44,
+      25
+    ],
+    "recalls": [],
+    "title": "Grades per student",
+    "prompt": "Show each student's name and their known grades from highest to lowest, separated by a slash, as grades.",
+    "dataset": "school",
+    "hints": [
+      "Join, then GROUP_CONCAT."
+    ],
+    "check": {
+      "mode": "result",
+      "ordered": false,
+      "columnNames": true
+    },
+    "cases": [
+      {
+        "name": "Riverside School",
+        "hidden": false,
+        "expected": {
+          "columns": [
+            "name",
+            "grades"
+          ],
+          "rows": [
+            [
+              "Anya",
+              "91/82"
+            ],
+            [
+              "Bilal",
+              "71/55"
+            ],
+            [
+              "Cara",
+              "67"
+            ],
+            [
+              "Dmitri",
+              "91/88/74"
+            ]
+          ]
+        }
+      },
+      {
+        "name": "Different data",
+        "hidden": true,
+        "setupSql": "DELETE FROM enrolments; DELETE FROM courses; DELETE FROM students; INSERT INTO students VALUES (6, 'Femi', 9), (7, 'Gia', 9), (8, 'Hao', 10); INSERT INTO courses VALUES (5, 'Chemistry', 'Science'), (6, 'Drama', 'Arts'); INSERT INTO enrolments VALUES (11, 6, 5, 60, '2023-autumn'), (12, 6, 5, 60, '2024-spring'), (13, 7, 5, NULL, '2024-spring'), (14, 7, 6, 95, '2024-spring');",
+        "expected": {
+          "columns": [
+            "name",
+            "grades"
+          ],
+          "rows": [
+            [
+              "Femi",
+              "60/60"
+            ],
+            [
+              "Gia",
+              "95"
+            ]
+          ]
+        }
+      }
+    ],
+    "solutions": [
+      "SELECT s.name, GROUP_CONCAT(e.grade, '/' ORDER BY e.grade DESC) AS grades FROM students s JOIN enrolments e ON e.student_id = s.id GROUP BY s.id, s.name;"
+    ],
+    "wrongSolutions": [
+      {
+        "sql": "SELECT s.name, GROUP_CONCAT(e.grade, '/' ORDER BY e.grade) AS grades FROM students s JOIN enrolments e ON e.student_id = s.id GROUP BY s.id, s.name;",
+        "why": "Sorts lowest first"
+      },
+      {
+        "sql": "SELECT s.name, GROUP_CONCAT(e.grade ORDER BY e.grade DESC) AS grades FROM students s JOIN enrolments e ON e.student_id = s.id GROUP BY s.id, s.name;",
+        "why": "Uses commas"
+      }
+    ]
+  }
+]

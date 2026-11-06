@@ -36,7 +36,8 @@ altFor.set("cafe", "DELETE FROM orders; DELETE FROM customers; INSERT INTO custo
 altFor.set("trail-club", "DELETE FROM trails; INSERT INTO trails VALUES (7, 'Birch Walk', 'West', 3.1, 40), (8, 'High Moor', 'East', 12.6, 610), (9, 'Crag Top', 'North', 6.0, 900);");
 
 function regexp(pattern, value) {
-  return value !== null && new RegExp(pattern).test(String(value)) ? 1 : 0;
+  if (value === null) return null;
+  return new RegExp(pattern).test(String(value)) ? 1 : 0;
 }
 
 function resultOf(dataset, setupSql, sql, checkSql) {

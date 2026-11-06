@@ -1,0 +1,15 @@
+{
+  "skill": 43,
+  "summary": "Adding ORDER BY to a window makes aggregates cumulative, and a frame controls exactly which rows count.",
+  "points": [
+    "SUM(x) OVER (ORDER BY d) gives a running total.",
+    "A frame such as ROWS BETWEEN 6 PRECEDING AND CURRENT ROW gives a moving window.",
+    "ROWS counts rows, and RANGE compares values. Ties make them differ.",
+    "If dates are missing, seven rows aren't seven days, so total by day first or use julianday with RANGE."
+  ],
+  "example": {
+    "dataset": "app",
+    "sql": "SELECT session_date, minutes,\n  SUM(minutes) OVER (ORDER BY session_date, id) AS running_total\nFROM sessions;",
+    "explanation": "Each row shows the total so far. Including id makes the order exact when dates repeat."
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "skill": 44,
+  "summary": "GROUP_CONCAT combines the values in each group into one piece of text.",
+  "points": [
+    "GROUP_CONCAT(name) joins values with commas by default.",
+    "A second value sets the separator: GROUP_CONCAT(name, '; ').",
+    "Add ORDER BY inside it to control the order: GROUP_CONCAT(name ORDER BY name).",
+    "DISTINCT removes repeats, but it works only with the default comma separator."
+  ],
+  "example": {
+    "dataset": "shop",
+    "sql": "SELECT category, COUNT(*) AS products, GROUP_CONCAT(name ORDER BY name) AS names\nFROM products\nGROUP BY category;",
+    "explanation": "Each category becomes one row, with its product names listed alphabetically."
+  }
+}
