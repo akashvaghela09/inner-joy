@@ -11,11 +11,16 @@ curriculum/
 │       ├── skill-05.json       # one file per skill
 │       ├── review.json         # stage reviews
 │       └── checkpoint.json     # stage checkpoints
+├── external-practice.json      # links to outside problems for each chapter
 ├── tools/grade.ts              # runs SQL and compares results
 └── curriculum.test.ts          # validates everything above
 ```
 
 Run `npm test` to validate the curriculum.
+
+## External practice
+
+Each chapter screen ends with a "Verify your skills" list, always available and not counted in progress. `external-practice.json` holds each problem's `source` number, `title`, `difficulty`, and `url`. Chapters find their problems through `checkpoints.sourceProblems` in the skill map. Keep this file to links and facts, with no problem text.
 
 ## Dataset
 

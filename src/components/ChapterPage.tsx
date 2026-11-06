@@ -1,10 +1,10 @@
 import type { Assignment } from "../../curriculum/tools/grade";
-import { isRequired, typeLabel, type Group, type Stage } from "../curriculum";
+import { EXTERNAL_PLATFORM, externalPracticeFor, isRequired, typeLabel, type Group, type Stage } from "../curriculum";
 import styles from "../landing.module.css";
 import { groupProgress, stageProgress } from "../progress";
 import { useProgress } from "../storage";
 import ui from "../ui.module.css";
-import { AttemptedIcon, ChevronLeftIcon, DoneIcon, ExtraIcon, NotStartedIcon } from "./Icons";
+import { AttemptedIcon, ChevronLeftIcon, DoneIcon, ExternalLinkIcon, ExtraIcon, NotStartedIcon } from "./Icons";
 import { ProgressBar } from "./ProgressBar";
 
 function StatusIcon({ assignment }: { assignment: Assignment }) {
@@ -55,6 +55,36 @@ function GroupSection({ group }: { group: Group }) {
               <span className={styles.assignmentTitle}>{assignment.title}</span>
               <span className={styles.assignmentType}>{typeLabel(assignment)}</span>
               <span className={styles.extraTag}>{isRequired(assignment) ? "" : "Extra"}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/** Always available: learners decide when they're ready to test themselves elsewhere. */
+function VerifySkills({ stage }: { stage: Stage }) {
+  const problems = externalPracticeFor(stage.id);
+  if (problems.length === 0) return null;
+  return (
+    <section className={styles.verifySection}>
+      <h2 className={styles.verifyHeading}>Verify your skills</h2>
+      <p className={styles.verifyNote}>
+        Try this chapter's skills on another platform whenever you feel ready. These may need an account, use other SQL
+        dialects such as MySQL, and don't count towards your Inner Joy progress.
+      </p>
+      <ul>
+        {problems.map((problem) => (
+          <li key={problem.source}>
+            <a className={styles.verifyRow} href={problem.url} target="_blank" rel="noopener noreferrer">
+              <span>{problem.title}</span>
+              <span className={styles.assignmentType}>{problem.difficulty}</span>
+              <span className={styles.verifyPlatform}>
+                {EXTERNAL_PLATFORM}
+                <ExternalLinkIcon />
+                <span className={ui.srOnly}>(opens in a new tab)</span>
+              </span>
             </a>
           </li>
         ))}
@@ -121,6 +151,8 @@ export function ChapterPage({ stage }: { stage: Stage }) {
           </ul>
         </section>
       )}
+
+      <VerifySkills stage={stage} />
     </div>
   );
 }

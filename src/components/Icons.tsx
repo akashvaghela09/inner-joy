@@ -68,6 +68,12 @@ export const EyeOffIcon = () => (
   </Icon>
 );
 
+export const ExternalLinkIcon = () => (
+  <Icon size={14}>
+    <path d="M6.5 3H3v10h10V9.5M9 3h4v4M13 3 7.5 8.5" {...stroke} />
+  </Icon>
+);
+
 export const ChevronRightIcon = () => (
   <Icon>
     <path d="m6 3.5 4.5 4.5L6 12.5" {...stroke} />

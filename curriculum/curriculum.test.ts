@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import initSqlJs, { type SqlJsStatic } from "sql.js";
+import externalPractice from "./external-practice.json";
 import skillMap from "./skill-map.json";
 import { passesAllCases, runCase, type Assignment, type Dataset, type Value } from "./tools/grade";
 
@@ -74,6 +75,21 @@ describe("skill map", () => {
     const recalled = new Set(skills.flatMap((skill) => skill.recalls));
     const forgotten = skills.filter((skill) => stageOfSkill.get(skill.id)!.id < 10 && !recalled.has(skill.id)).map((skill) => skill.id);
     expect(forgotten).toEqual([]);
+  });
+});
+
+describe("external practice", () => {
+  it("links every source problem exactly once", () => {
+    const sources = externalPractice.problems.map((problem) => problem.source).sort((a, b) => a - b);
+    expect(sources).toEqual(Array.from({ length: 50 }, (_, index) => index + 1));
+  });
+
+  it("has complete, well-formed links", () => {
+    for (const problem of externalPractice.problems) {
+      expect(problem.title).not.toBe("");
+      expect(["Easy", "Medium", "Hard"]).toContain(problem.difficulty);
+      expect(problem.url).toMatch(/^https:\/\/leetcode\.com\/problems\/[a-z0-9-]+\/$/);
+    }
   });
 });
 

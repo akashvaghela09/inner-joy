@@ -1,3 +1,4 @@
+import externalPractice from "../curriculum/external-practice.json";
 import skillMap from "../curriculum/skill-map.json";
 import type { Assignment, Dataset } from "../curriculum/tools/grade";
 
@@ -103,6 +104,16 @@ export function datasetFor(assignment: Assignment): Dataset {
   const dataset = datasets.get(assignment.dataset);
   if (!dataset) throw new Error(`Unknown dataset: ${assignment.dataset}`);
   return dataset;
+}
+
+export const EXTERNAL_PLATFORM = externalPractice.platform;
+
+export type ExternalProblem = (typeof externalPractice.problems)[number];
+
+/** Outside problems covering a chapter's skills, in the chapter's checkpoint order. */
+export function externalPracticeFor(stageId: number): ExternalProblem[] {
+  const sources = skillMap.stages.find((stage) => stage.id === stageId)?.checkpoints.sourceProblems ?? [];
+  return sources.flatMap((source) => externalPractice.problems.filter((problem) => problem.source === source));
 }
 
 const skillTitles = new Map(skillMap.stages.flatMap((stage) => stage.skills.map((skill) => [skill.id, skill.title])));

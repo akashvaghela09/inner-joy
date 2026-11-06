@@ -60,6 +60,10 @@ Learners see stages as **chapters** in the app. The curriculum data keeps the na
 
 The 61 checkpoints are our own versions of the 50 concepts in the [SQL 50 assessment](sql-50-assessment.md), plus 11 new ones: 3 in Stage 1, 3 in Stage 9, and 5 in Stage 10. They use original wording and data.
 
+## Verifying skills elsewhere
+
+The last item on each chapter screen links to problems on another platform that use the chapter's skills. Learners can open these at any time, because nothing is locked. They're optional and don't count towards progress, since we can't see outside results. Chapters 1 and 10 have no linked problems yet.
+
 ## Writing order
 
 Stage 2 comes first because it proves the format on real SQL. Stage 1 follows, because it's mostly concepts, and the remaining stages then run in order.
